@@ -19,5 +19,6 @@ class Project extends Model
         'max_investment',
         'limit_date',
         'state',
+        'current_investment'
     ];
 }

@@ -13,6 +13,15 @@ return new class extends Migration
     {
         Schema::create('projects', function (Blueprint $table) {
             $table->id();
+            $table->string('title');
+            $table->string('description');
+            $table->string('image_url');
+            $table->string('video_url');
+            $table->float('min_investment');
+            $table->float('max_investment');
+            $table->date('limit_date');
+            $table->enum('state',['active', 'inactive', 'pending', 'rejected']);
+            $table->float('current_investment');
             $table->timestamps();
         });
     }

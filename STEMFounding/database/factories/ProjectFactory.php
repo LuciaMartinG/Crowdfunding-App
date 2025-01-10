@@ -17,7 +17,15 @@ class ProjectFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'title' => fake()->sentence(5),
+            'description'=> fake()->sentence(10),
+            'image_url'=> fake()->imageUrl(300, 450, 'finances', true, 'finances_img'), 
+            'video_url'=> fake()->sentence(5),
+            'min_investment' =>fake()->randomFloat(2, 100, 100000),
+            'max_investment'=> fake()->randomFloat(2, 10000, 500000),
+            'limit_date' => fake()->dateTimeBetween('now', '+1 year'),
+            'state' => fake()->randomElement(['active', 'inactive', 'pending', 'rejected']),
+            'current_investment' => fake()->randomFloat(2, 100, 50000),
         ];
     }
 }
