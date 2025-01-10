@@ -21,4 +21,8 @@ class Project extends Model
         'state',
         'current_investment'
     ];
+
+    // protected $attributes = [
+    //     'state' => 'pending',
+    // ];
 }

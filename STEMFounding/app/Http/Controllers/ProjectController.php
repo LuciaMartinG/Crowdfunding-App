@@ -18,7 +18,7 @@ class ProjectController extends Controller
             'min_investment' => $request->input('min_investment'),
             'max_investment' => $request->input('max_investment'),
             'limit_date' => $request->input('limit_date'),
-            'state' => $request->input('state'),
+            'state' => 'pending', //para que por defecto se cree un proyecto en estado "pendiente"
             'current_investment' => $request->input('current_investment'),
         ]);
 
