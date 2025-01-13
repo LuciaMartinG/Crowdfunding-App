@@ -6,3 +6,60 @@
 
 // Bootstrap
 @import 'bootstrap/scss/bootstrap';
+
+// Contenedor principal
+.container {
+    min-height: 100vh;
+    background-color:#FFFAEC; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+// Tarjeta de registro
+.card {
+    background-color:#F5ECD5 ; 
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
+    padding: 1.5rem;
+    max-width: 600px; 
+    width: 100%; 
+}
+
+// Icono de registro (el círculo con el "+")
+.card .register-icon {
+    width: 80px;
+    height: 80px;
+    background-color: #578E7E;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+}
+
+.card .register-icon span {
+    color: white; 
+    font-size: 2rem;
+}
+
+// Título de la tarjeta
+.card h2 {
+    color: white; 
+    margin-top: 1rem;
+}
+
+// Botones
+.card .btn-primary {
+    width: 45%; 
+}
+
+.card .btn-outline-primary {
+    width: 45%;
+}
+
+// Espaciado entre los botones
+.card .btn-group {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+}
