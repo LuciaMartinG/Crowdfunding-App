@@ -7,9 +7,9 @@ use App\Http\Controllers\Auth\RegisterController;
 
 use App\Models\Project;
 
-// Route::get('/user', function (Request $request) {
-//     return $request->user();
-// })->middleware('auth:sanctum');
+Route::get('/user', function (Request $request) {
+    return $request->user();
+})->middleware('auth:sanctum');
 
 Route::get('/project', function () {
     return Project::all();
