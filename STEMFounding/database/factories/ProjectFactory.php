@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Models\User;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Project>
@@ -26,6 +27,7 @@ class ProjectFactory extends Factory
             'limit_date' => fake()->dateTimeBetween('now', '+1 year'),
             'state' => 'pending',
             'current_investment' => 0,
+            'user_id' => User::inRandomOrder()->first(),
         ];
     }
 }

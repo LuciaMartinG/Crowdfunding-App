@@ -23,6 +23,10 @@ return new class extends Migration
             $table->enum('state',['active', 'inactive', 'pending', 'rejected']);
             $table->float('current_investment');
             $table->timestamps();
+
+            $table->unsignedBigInteger('user_id'); // Los IDs generados por Eloquent son undigned big int
+
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
