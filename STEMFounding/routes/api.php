@@ -27,4 +27,4 @@ Route::post('/project', [ProjectController::class, 'createProject']);
 
 Route::put('/project', [ProjectController::class, 'updateProject']);
 
-Route::post('/register', [RegisterController::class, 'register']);
+// Route::post('/register', [RegisterController::class, 'register']);

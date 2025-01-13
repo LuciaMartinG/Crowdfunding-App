@@ -1,0 +1,28 @@
+@extends('layout')
+
+@section('title', 'Project List')
+
+@section('content')
+
+<div class="container">
+    <div class="row">
+        @foreach($projectList as $project)
+        <a href="project/detail/{{ $project->id }}" class="card col-12 col-md-6 col-lg-3">
+            <!-- <img src="{{ $project->image_url }}" alt=""> -->
+            <h2>{{ $project->title }}</h2>
+            <h3>{{ $project->description }}</h3>
+        </a>
+        @endforeach
+    </div>
+
+    @if( ! $projectList->onFirstPage() )
+        <a href="{{$projectList->previousPageUrl()}}" class="btn btn-primary">Previous page</a>
+    @endif
+
+    @if( ! $projectList->onLastPage() )
+        <a href="{{$projectList->nextPageUrl()}}" class="btn btn-primary">Next page</a>
+    @endif
+
+</div>
+
+@endsection
