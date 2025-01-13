@@ -11,6 +11,7 @@ class ProjectController extends Controller
     {
         // Crear película con los datos recibidos
         $project = Project::create([
+            'user_id' => auth()->id(),
             'title' => $request->input('title'),
             'description' => $request->input('description'),
             'image_url' => $request->input('image_url'),
@@ -19,7 +20,7 @@ class ProjectController extends Controller
             'max_investment' => $request->input('max_investment'),
             'limit_date' => $request->input('limit_date'),
             'state' => 'pending', //para que por defecto se cree un proyecto en estado "pendiente"
-            'current_investment' => $request->input('current_investment'),
+            'current_investment' => 0,
         ]);
 
         return $project;
