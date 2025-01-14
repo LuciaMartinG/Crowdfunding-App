@@ -2,17 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
-.lucia{
-    color: rgb(141, 10, 10);
-}
  /* Contenedor principal */
-.container {
-    min-height: 100vh;
+/* .container {
+    min-height: 10vh;
     background-color:#FFFAEC; 
     display: flex;
     justify-content: center;
     align-items: center;
-}
+} */
 
 /*  Tarjeta de registro */
 .card {

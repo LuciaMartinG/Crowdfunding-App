@@ -1,13 +1,11 @@
 @extends('layouts.app')
 
 @section('content')
+
 <div class="container d-flex justify-content-center align-items-center">
 <div class="card shadow p-4">
         <div class="text-center mb-4">
-            <div class="d-flex justify-content-center align-items-center rounded-circle bg-primary">
-                <span class="text-white fs-1">+</span>
-            </div>
-            <h2 class="mt-3" style="color: $text-color;">Register</h2>
+            <h2>Register</h2>
         </div>
         <form method="POST" action="{{ route('register') }}">
             @csrf
