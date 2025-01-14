@@ -18,7 +18,7 @@
             <h3>Current investment: {{ $project->current_investment }}</h3>
             <p>{{ $project->description }}<p>
                 
-            @if (Auth::user()->role == 'admin' || Auth::user()->role == 'entrepeneur')
+            @if (Auth::user()->role == 'admin')
             <a href="/project/delete/{{ $project->id }}" class="btn btn-danger btn-sm mb-3 w-auto" onclick="return confirm('¿Are you sure?');">Delete Project</a>
         @endif
         </div>
