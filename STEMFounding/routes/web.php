@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Models\Project;
 use App\Models\User;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -64,3 +65,24 @@ Route::post('/project/create', function (Request $request) {
 })->middleware(['auth', 'role:entrepeneur']);
 
 
+
+Auth::routes();
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+Auth::routes();
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+
+/*
+    Ruta para mostrar la lista de proyectos, solo accesible para usuarios autenticados.
+    Paginación de 10 proyectos por página.
+*/
+Route::get('/user', function () {
+    return view('userList', ['userList' => User::paginate(10)]);
+})->middleware('auth');
+
+Route::get('/', function () {
+    return redirect('/user');
+});

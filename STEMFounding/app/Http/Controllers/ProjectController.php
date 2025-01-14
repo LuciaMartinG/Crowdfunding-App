@@ -46,5 +46,43 @@ class ProjectController extends Controller
 
         return $project;
 
+
     }
+
+    function updateStateProject(Request $request){ // $request me permite acceder a los datos de la petición, similar $_POST
+
+        $id = $request->input('id');
+
+        $project = Project::find($id);
+
+        $project->state = $request->input('state');
+       
+
+        $project->save();
+
+        return $project;
+
+    }
+
+    function activateOrDeactivateProject (Request $request){ // Función para que el emprendedor solo pueda poner que el estado sea activo o inactivo
+
+        $id = $request->input('id');
+
+        $project = Project::find($id);
+
+        $state = $request->input('state');
+        if (!in_array($state, ['activo', 'inactivo'])) {
+            return response()->json(['error' => 'Estado no permitido. Solo se permite "activo" o "inactivo".'], 400);
+        }
+
+        // Actualizar el estado del proyecto
+        $project->state = $state;
+
+        // Guardar los cambios
+        $project->save();
+
+        return $project;
+
+    }
+
 }
