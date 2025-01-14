@@ -5,9 +5,11 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
-                <div class="card-header">{{ __('Register') }}</div>
-
-                <div class="card-body">
+                <!-- <div class="card-header">{{ __('Register') }}</div> -->
+                
+                <div class="card-body bg-primary text-center">
+                <!-- <i class="bi bi-plus-circle-fill text-secondary" style="font-size: 5rem;"></i> -->
+                <h1 class="text-center">Register</h1>
                     <form method="POST" action="{{ route('register') }}">
                         @csrf
 
@@ -61,9 +63,28 @@
                             </div>
                         </div>
 
+                        <!-- Role Selection -->
+                        <div class="row mb-3">
+                            <label for="role" class="col-md-4 col-form-label text-md-end">{{ __('Register as') }}</label>
+
+                            <div class="col-md-6">
+                                <select id="role" class="form-select @error('role') is-invalid @enderror" name="role" required>
+                                    <option value="" disabled selected>{{ __('Select your role') }}</option>
+                                    <option value="investor">{{ __('Investor') }}</option>
+                                    <option value="entrepreneur">{{ __('Entrepreneur') }}</option>
+                                </select>
+
+                                @error('role')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                        </div>
+
                         <div class="row mb-0">
                             <div class="col-md-6 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
+                                <button type="submit" class="btn btn-secondary">
                                     {{ __('Register') }}
                                 </button>
                             </div>
