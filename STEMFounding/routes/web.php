@@ -64,19 +64,26 @@ Route::post('/project/create', function (Request $request) {
     return redirect('/project/detail/' . $project->id);
 })->middleware(['auth', 'role:entrepeneur']);
 
-
+/*
+    Ruta para desactivar un proyecto.
+    Solo accesible para usuarios con rol de admin.
+*/
+ 
+    Route::post('/projects/activate-or-deactivate', function (Request $request) {
+        $project = app(ProjectController::class)->updateStateProject($request);
+        return redirect('/project/detail/' . $project->id);
+    });
+        
+ 
 
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-
-Auth::routes();
-
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+    
 
 
 /*
-    Ruta para mostrar la lista de proyectos, solo accesible para usuarios autenticados.
+    Ruta para mostrar la lista de usuarios, solo accesible para usuarios autenticados.
     Paginación de 10 proyectos por página.
 */
 Route::get('/user', function () {
@@ -84,5 +91,15 @@ Route::get('/user', function () {
 })->middleware('auth');
 
 Route::get('/', function () {
+    return redirect('/user');
+});
+
+/*
+    Ruta para actualizar un rol.
+  TO DO  Solo accesible para usuarios con rol de admin.
+*/
+
+Route::post('/user/update', function (Request $request) {
+    $user = app(UserController::class)->updateRoleUser($request);
     return redirect('/user');
 });

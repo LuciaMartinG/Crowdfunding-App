@@ -20,7 +20,21 @@
                 
             @if (Auth::user()->role == 'admin')
             <a href="/project/delete/{{ $project->id }}" class="btn btn-danger btn-sm mb-3 w-auto" onclick="return confirm('¿Are you sure?');">Delete Project</a>
-        @endif
+            @endif
+
+            @if (Auth::user()->role == 'admin' || Auth::user()->role == 'entrepeneur')
+            <form action="/projects/activate-or-deactivate" method="POST">
+                @csrf
+                <input type="hidden" name="id" value="{{ $project->id }}">
+                <select name="state" required>
+                    <option value="active" {{ $project->state === 'active' ? 'selected' : '' }}>Active</option>
+                    <option value="inactive" {{ $project->state === 'inactive' ? 'selected' : '' }}>Inactive</option>
+                </select>
+                <button type="submit">Update state</button>
+            </form>
+                <p>Current state: <span id="currentState">{{ $project->state }}</span></p>
+                
+            @endif
         </div>
     </div>
 

@@ -49,40 +49,56 @@ class ProjectController extends Controller
 
     }
 
-    function updateStateProject(Request $request){ // $request me permite acceder a los datos de la petición, similar $_POST
-
-        $id = $request->input('id');
-
-        $project = Project::find($id);
-
-        $project->state = $request->input('state');
+    // function updateStateProject(Request $request) {
+    //     // Obtener el ID y el estado del proyecto desde la solicitud
+    //     $id = $request->input('id');
+    //     $state = $request->input('state');
+    
+    //     // Buscar el proyecto por ID
+    //     $project = Project::find($id);
        
+    //     $project->state = $request->input('state');
+    //     // Actualizar el estado del proyecto
+    //     $project->state = $state;
+    
+    //     // Guardar los cambios
+    //     $project->save();
 
-        $project->save();
+    //     return $project;
+    
+       
+    // }
 
-        return $project;
-
-    }
-
-    function activateOrDeactivateProject (Request $request){ // Función para que el emprendedor solo pueda poner que el estado sea activo o inactivo
-
+    
+    function activateProject(Request $request) {
         $id = $request->input('id');
-
+      
         $project = Project::find($id);
+        $state= $project->state;
 
-        $state = $request->input('state');
-        if (!in_array($state, ['activo', 'inactivo'])) {
-            return response()->json(['error' => 'Estado no permitido. Solo se permite "activo" o "inactivo".'], 400);
-        }
-
-        // Actualizar el estado del proyecto
-        $project->state = $state;
-
-        // Guardar los cambios
-        $project->save();
-
-        return $project;
-
+        if($state == 'active'){
+            $state = 'inactive';
+            }else{
+                $state = 'active';
     }
+        $project->state = $state;
+        $project->save();
+        return $project;
+    
 
+}
+
+    function activateOrRejectProject(Request $request) {
+        $state = $request->input('state');
+
+        if($state == 'active'){
+            $state = 'inactive';
+            }else{
+                $state = 'activo';
+    }
+    $state->save();
+    return $state;
+
+
+}
 }
