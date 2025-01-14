@@ -7,11 +7,13 @@
 <div class="container">
     <div class="row">
         @foreach($projectList as $project)
-        <a href="project/detail/{{ $project->id }}" class="card col-12 col-md-6 col-lg-3">
-            <!-- <img src="{{ $project->image_url }}" alt=""> -->
-            <h2>{{ $project->title }}</h2>
-            <h3>{{ $project->description }}</h3>
-        </a>
+            @if(in_array($project->state, ['active', 'inactive']))
+                <a href="project/detail/{{ $project->id }}" class="card col-12 col-md-6 col-lg-3">
+                    <!-- <img src="{{ $project->image_url }}" alt=""> -->
+                    <h2>{{ $project->title }}</h2>
+                    <h3>{{ $project->description }}</h3>
+                </a>
+            @endif
         @endforeach
     </div>
 
@@ -24,5 +26,6 @@
     @endif
 
 </div>
+
 
 @endsection

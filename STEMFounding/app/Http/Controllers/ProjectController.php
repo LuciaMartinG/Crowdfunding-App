@@ -49,25 +49,25 @@ class ProjectController extends Controller
 
     }
 
-    // function updateStateProject(Request $request) {
-    //     // Obtener el ID y el estado del proyecto desde la solicitud
-    //     $id = $request->input('id');
-    //     $state = $request->input('state');
+    function updateStateProject(Request $request) {
+        // Obtener el ID y el estado del proyecto desde la solicitud
+        $id = $request->input('id');
+        $state = $request->input('state');
     
-    //     // Buscar el proyecto por ID
-    //     $project = Project::find($id);
+        // Buscar el proyecto por ID
+        $project = Project::find($id);
        
-    //     $project->state = $request->input('state');
-    //     // Actualizar el estado del proyecto
-    //     $project->state = $state;
+        $project->state = $request->input('state');
+        // Actualizar el estado del proyecto
+        $project->state = $state;
     
-    //     // Guardar los cambios
-    //     $project->save();
+        // Guardar los cambios
+        $project->save();
 
-    //     return $project;
+        return $project;
     
        
-    // }
+    }
 
     
     function activateProject(Request $request) {
@@ -101,4 +101,16 @@ class ProjectController extends Controller
 
 
 }
+
+public function showActiveAndInactiveProjects()
+{
+    // Obtener todos los proyectos cuyo estado sea 'active' o 'inactive'
+    $projectList = Project::whereIn('state', ['active', 'inactive'])->paginate(10); // 10 proyectos por página
+
+    // Retornar la vista con los proyectos
+    return view('projectList', ['projectList' => $projectList]);
+}
+
+
+
 }
