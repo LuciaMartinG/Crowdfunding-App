@@ -5,6 +5,12 @@
 @section('content')
 
 <div class="container">
+        @if (Auth::user()->role == 'admin')
+            <div class="mb-4">
+            <a href="/projects/pending/" class="btn btn-danger btn-sm mb-3 w-auto">Pending Projects</a>
+            </div>
+        @endif
+
     <div class="row">
         @foreach($projectList as $project)
             @if(in_array($project->state, ['active', 'inactive']))

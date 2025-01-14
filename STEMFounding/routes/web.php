@@ -35,6 +35,7 @@ use Illuminate\Support\Facades\DB;
         Paginación de 10 proyectos por página.
     */
     Route::get('/project', [ProjectController::class, 'showActiveAndInactiveProjects'])->middleware('auth');
+    Route::get('/projects/pending', [ProjectController::class, 'showPendingProjects'])->middleware('auth','role:admin');
 
     Route::get('/', function () {
         return redirect('/project');
@@ -79,6 +80,11 @@ use Illuminate\Support\Facades\DB;
         $project = app(ProjectController::class)->updateStateProject($request);
         return redirect('/project/detail/' . $project->id);
     });
+
+    // Ruta para actualizar el estado del proyecto, solo accesible para administradores
+    Route::post('/projects/{id}/updateState', [ProjectController::class, 'activateOrRejectProject'])
+    ->middleware(['auth', 'role:admin']);  // Asegura que el usuario esté autenticado y sea admin
+
  
 
     Auth::routes();

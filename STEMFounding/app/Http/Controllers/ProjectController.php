@@ -69,48 +69,48 @@ class ProjectController extends Controller
        
     }
 
-    
-    function activateProject(Request $request) {
-        $id = $request->input('id');
-      
+    public function activateOrRejectProject(Request $request, $id)
+    {
+        // Obtener el proyecto por su ID
         $project = Project::find($id);
-        $state= $project->state;
-
-        if($state == 'active'){
-            $state = 'inactive';
-            }else{
-                $state = 'active';
-    }
-        $project->state = $state;
-        $project->save();
-        return $project;
     
-
-}
-
-    function activateOrRejectProject(Request $request) {
+        // Obtener el valor de 'state' del formulario
         $state = $request->input('state');
-
-        if($state == 'active'){
-            $state = 'inactive';
-            }else{
-                $state = 'activo';
+    
+        // Verificar si el estado es válido y actualizar el estado del proyecto
+        if ($state === 'active') {
+            $project->state = 'active';
+        } elseif ($state === 'rejected') {
+            $project->state = 'rejected';
+        }
+    
+        // Guardar los cambios en el proyecto
+        $project->save();
+    
+        // Redirigir de nuevo a la lista de proyectos pendientes con un mensaje de éxito
+        return redirect('/projects/pending')->with('success', 'Proyecto actualizado con éxito.');
     }
-    $state->save();
-    return $state;
+    
+ 
+
+    public function showActiveAndInactiveProjects()
+    {
+        // Obtener todos los proyectos cuyo estado sea 'active' o 'inactive'
+        $projectList = Project::whereIn('state', ['active', 'inactive'])->paginate(10); // 10 proyectos por página
+
+        // Retornar la vista con los proyectos
+        return view('projectList', ['projectList' => $projectList]);
+    }
+
+    public function showPendingProjects()
+    {
+        // Obtener todos los proyectos cuyo estado sea 'active' o 'inactive'
+        $pendingProjectList = Project::whereIn('state', ['pending'])->paginate(10); // 10 proyectos por página
+
+        // Retornar la vista con los proyectos
+        return view('pendingProjectList', ['pendingProjectList' => $pendingProjectList]);
+    }
+
+    }
 
 
-}
-
-public function showActiveAndInactiveProjects()
-{
-    // Obtener todos los proyectos cuyo estado sea 'active' o 'inactive'
-    $projectList = Project::whereIn('state', ['active', 'inactive'])->paginate(10); // 10 proyectos por página
-
-    // Retornar la vista con los proyectos
-    return view('projectList', ['projectList' => $projectList]);
-}
-
-
-
-}
