@@ -24,7 +24,7 @@
             </ul>
             <ul class="nav">
                 <li class="nav-item">
-                    <a href="/users/{{ Auth::user()->id }}" class="nav-link text-white">{{ Auth::user()->name }}</a>
+                    <a href="/user/detail/{{ Auth::user()->id }}" class="nav-link text-white">{{ Auth::user()->name }}</a>
                 </li>
                 <li class="nav-item">
                     <form action="/logout" method="POST" class="d-inline">

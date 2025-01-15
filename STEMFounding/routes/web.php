@@ -101,10 +101,20 @@ use Illuminate\Support\Facades\DB;
         return view('userList', ['userList' => User::paginate(10)]);
     })->middleware('auth');
 
-    Route::get('/', function () {
-        return redirect('/user');
-    });
 
+        /*
+        Ruta para mostrar el detalle de usuario específico.
+        La ruta recibe el ID del usuario y muestra su información.
+    */
+    Route::get('/user/detail/{id}', function ($id) {
+        $user = User::findOrFail($id); // Encuentra al usuario o lanza un error 404
+        $userProjects = Project::where('user_id', $id)->get(); // Recupera los proyectos del usuario
+    
+        return view('userDetail', [
+            'user' => $user,
+            'userProjects' => $userProjects,
+        ]);
+    })->middleware('auth');
     /*
         Ruta para actualizar un rol.
     TO DO  Solo accesible para usuarios con rol de admin.

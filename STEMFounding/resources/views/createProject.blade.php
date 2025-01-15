@@ -49,7 +49,7 @@
                     <!-- Limit date -->
                     <div class="mb-3">
                     <label for="limit_date" class="form-label">Deadline</label>
-                    <input type="date" class="form-control" id="limit_date" name="limit_date" required min="2025" max="2026-01-01">
+                    <input type="date" class="form-control" id="limit_date" name="limit_date" required min="{{ date(format: 'Y-m-d') }}">
                 </div>
 
 

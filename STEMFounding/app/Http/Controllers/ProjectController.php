@@ -9,23 +9,34 @@ class ProjectController extends Controller
 {
     public function createProject(Request $request)
     {
-        // Crear película con los datos recibidos
+        // Validación de los datos del proyecto
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',  // El título es obligatorio, es una cadena y máximo 255 caracteres
+            'description' => 'required|string|max:1000',  // La descripción es obligatoria, es una cadena y máximo 1000 caracteres
+            'image_url' => 'required|string|max:1000',  // La URL de la imagen es opcional, pero si está presente debe ser una URL válida
+            'video_url' => 'required|string|max:1000',  // La URL del video es opcional, pero si está presente debe ser una URL válida
+            'min_investment' => 'required|numeric|min:1',  // Mínima inversión es obligatoria
+            'max_investment' => 'required|numeric|min:1|gte:min_investment',  // Máxima inversión es obligatoria, debe ser mayor o igual que la mínima inversión
+            'limit_date' => 'required|date|after_or_equal:today',  // La fecha límite es obligatoria, debe ser una fecha posterior o igual al día actual
+        ]);
+    
+        // Crear el proyecto con los datos validados
         $project = Project::create([
             'user_id' => auth()->id(),
-            'title' => $request->input('title'),
-            'description' => $request->input('description'),
-            'image_url' => $request->input('image_url'),
-            'video_url' => $request->input('video_url'),
-            'min_investment' => $request->input('min_investment'),
-            'max_investment' => $request->input('max_investment'),
-            'limit_date' => $request->input('limit_date'),
-            'state' => 'pending', //para que por defecto se cree un proyecto en estado "pendiente"
+            'title' => $validated['title'],
+            'description' => $validated['description'],
+            'image_url' => $validated['image_url'],
+            'video_url' => $validated['video_url'],
+            'min_investment' => $validated['min_investment'],
+            'max_investment' => $validated['max_investment'],
+            'limit_date' => $validated['limit_date'],
+            'state' => 'pending',  // Para que por defecto se cree un proyecto en estado "pendiente"
             'current_investment' => 0,
         ]);
-
+    
         return $project;
     }
-
+    
     function updateProject(Request $request){ // $request me permite acceder a los datos de la petición, similar $_POST
 
         $id = $request->input('id');

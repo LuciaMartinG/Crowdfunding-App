@@ -5,6 +5,7 @@
 @section('content')
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 <div class="container">
+@if (Auth::user()->role == 'admin')
     <div class="row">
         @foreach($userList as $user)
             <div class="col-md-4 mb-3">
@@ -31,6 +32,7 @@
             </div>
         @endforeach
     </div>
+    
 
     @if( ! $userList->onFirstPage() )
         <a href="{{$userList->previousPageUrl()}}" class="btn btn-secondary">Previous page</a>
@@ -41,5 +43,5 @@
     @endif
 
 </div>
-
+@endif
 @endsection
