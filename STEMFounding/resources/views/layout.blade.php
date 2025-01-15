@@ -4,19 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title')</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"> -->
+        <!-- Scripts -->
+        @vite(['resources/sass/app.scss', 'resources/js/app.js'])
 </head>
 <body class="d-flex flex-column min-vh-100">
     <!-- Header -->
-    <header class="bg-dark text-white py-3">
+    <header class="bg-secondary text-white py-3">
         <nav class="container d-flex justify-content-between align-items-center">
             <ul class="nav">
                 <li class="nav-item">
-                    <a href="/" class="nav-link text-white">Projects</a>
+                    <a href="/project" class="nav-link text-white">Projects</a>
                 </li>
                 @if(Auth::user()->role == 'entrepeneur')
                     <li class="nav-item">
-                        <a href="/project/create" class="btn btn-primary ms-3">Create Project</a>
+                        <a href="/project/create" class="btn btn-secondary ms-3">Create Project</a>
                     </li>
                 @endif
             </ul>
@@ -40,7 +42,8 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-dark text-white text-center py-3 mt-auto">
+     <br>
+    <footer class="bg-secondary text-white text-center py-3 mt-auto">
         <p class="mb-0">© 2024 STEMFounding | All Rights Reserved</p>
     </footer>
 
