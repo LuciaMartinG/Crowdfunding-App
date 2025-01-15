@@ -11,6 +11,14 @@
         <h3 class="text-muted">{{ $user->email }}</h3>
     </div>
 
+      <!-- Botón para editar perfil -->
+    @if(Auth::user() && (Auth::user()->role == 'entrepreneur' || Auth::user()->role == 'investor'))
+        <!-- Botón para editar perfil solo visible para "emprendedor" e "inversor" -->
+        <div class="mb-4">
+            <a href="/user/update" class="btn btn-primary">Edit Profile</a> <!-- Redirige a la página de edición del perfil -->
+        </div>
+    @endif
+
     <!-- Proyectos del usuario -->
     <h2 class="mb-4">Projects by {{ $user->name }}</h2>
 

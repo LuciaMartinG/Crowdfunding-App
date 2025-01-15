@@ -117,11 +117,35 @@ use Illuminate\Support\Facades\DB;
     })->middleware('auth');
     /*
         Ruta para actualizar un rol.
-    TO DO  Solo accesible para usuarios con rol de admin.
     */
 
-    Route::post('/user/update', function (Request $request) {
+    Route::post('/user/updateRole', function (Request $request) {
         $user = app(UserController::class)->updateRoleUser($request);
         return redirect('/user');
-    });
+    })->middleware(['auth', 'role:admin']);
+    
+     /*
+        Ruta para procesar la solicitud de actualización del usuario 
+    */
 
+    /*
+        Ruta para mostrar el formulario de edición del perfil.
+        Solo accesible para usuarios con rol de entrepreneur o investor.
+    */
+    Route::get('/user/update', function () {
+        $user = auth()->user();  // Obtener el usuario autenticado
+        return view('updateUser', ['user' => $user]); //Pasarlo a la vista
+    })->middleware(['auth', 'role:entrepreneur,investor']);
+    
+    
+    
+    // Ruta para mostrar el formulario de creación de un nuevo proyecto.
+    // Solo accesible para usuarios con rol de entrepreneur.
+   
+    Route::post('/user/update', function (Request $request) {
+        $user = app(UserController::class)->updateUser($request);
+        return redirect("/user/detail/{$user->id}");
+    })->middleware(['auth', 'role:entrepreneur,investor']);
+        
+        
+    

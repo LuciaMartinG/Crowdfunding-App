@@ -15,7 +15,7 @@
                         <h5 class="card-title fs-5 fw-bold">{{ $user->name }}</h5>
                         <p class="card-text">Email: {{ $user->email }}</p>
                         <p class="card-text">Role: {{ ucfirst($user->role) }}</p>
-                        <form action="/user/update" method="POST">
+                        <form action="/user/updateRole" method="POST">
                             @csrf
                             <input type="hidden" name="id" value="{{ $user->id }}">
                             <div class="mb-2">
