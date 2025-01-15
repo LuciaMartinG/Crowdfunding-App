@@ -4,90 +4,68 @@
 
 @section('content')
 
-<div class="container">
-    <div class="row">
-
-
-
-        <div class="col-12 col-md-4">
-            <img src="{{ $project->image_url }}" alt="">
-        </div>
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <!-- Tarjeta para mostrar el proyecto -->
         <div class="col-12 col-md-8">
-            <h2>{{ $project->title }}</h2>
-            <h3> Max investment: {{ $project->max_investment }}</h3>
-            <h3>Current investment: {{ $project->current_investment }}</h3>
-            <p>{{ $project->description }}<p>
-                
-            @if (Auth::user()->role == 'admin')
-            <a href="/project/delete/{{ $project->id }}" class="btn btn-danger btn-sm mb-3 w-auto" onclick="return confirm('¿Are you sure?');">Delete Project</a>
-            @endif
-
-            @if (Auth::user()->role == 'admin' || Auth::user()->role == 'entrepeneur')
-            <form action="/projects/activate-or-deactivate" method="POST">
-                @csrf
-                <input type="hidden" name="id" value="{{ $project->id }}">
-                <select name="state" required>
-                    <option value="active" {{ $project->state === 'active' ? 'selected' : '' }}>Active</option>
-                    <option value="inactive" {{ $project->state === 'inactive' ? 'selected' : '' }}>Inactive</option>
-                </select>
-                <button type="submit">Update state</button>
-            </form>
-                <p>Current state: <span id="currentState">{{ $project->state }}</span></p>
-                
-            @endif
-        </div>
-    </div>
-
-    <!-- Seccion para enviar comentarios -->
-    {{-- @auth
-    <div class="row mt-4">
-        <div class="col-12">
-            <!-- Formulario para enviar un comentario -->
-            <form action="/updates/create" method="POST">
-                <!-- Token CSRF para proteger el formulario contra ataques CSRF -->
-                @csrf
-                
-                <!-- Campo oculto para enviar el ID de la película -->
-                <input type="hidden" name="projectId" value="{{ $project->id }}">
-                
-                <!-- Campo de texto para el comentario -->
-                <div class="mb-3">
-                    <label for="updateText" class="form-label">Add update</label>
-                    <textarea class="form-control" id="updateText" name="updateText" rows="3" required></textarea>
-                </div>
-                
-                <!-- Botón para enviar el formulario -->
-                <button type="submit" class="btn btn-primary">Submit</button>
-            </form>
-        </div>
-    </div>
-    @endauth
-
-    <!-- Mostrar comentarios existentes -->
-    <div class="row mt-4">
-        @foreach($movie->comments as $comment)
-
-        <div class="card mb-4">
-            <div class="card-body">
-                <p>{{$comment->text}}</p>
-
-                <div class="d-flex justify-content-between">
-                    <div class="d-flex flex-row align-items-center">
-                        <img src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/img%20(31).webp" alt="avatar" width="25" height="25" />
-                        <!-- Enlace al detalle del usuario -->
-                        <a href="/users/{{ $comment->user->id }}" class="small mb-0 ms-2">{{$comment->user->name}}</a>
+            <div class="card shadow-lg border-0">
+                <div class="row g-0">
+                    <!-- Imagen del proyecto -->
+                    <div class="col-md-4">
+                        <img src="{{ $project->image_url }}" alt="{{ $project->title }}" class="img-fluid rounded-start" />
                     </div>
-                    
-                    <!-- Enlace para eliminar comentario solo para administradores -->
-                    @if (Auth::user()->role == 'admin')
-                        <a href="/comments/delete/{{ $comment->id }}" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar este comentario?');">Eliminar</a>
-                    @endif
+                    <!-- Datos del proyecto -->
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <h2 class="card-title">{{ $project->title }}</h2>
+                            <p class="card-text">{{ $project->description }}</p>
+                            <h5 class="card-subtitle mb-2 text-muted">Deadline: {{ $project->limit_date }}</h5>
+                            <h5 class="card-subtitle mb-2 text-muted">Money raised: {{ $project->current_investment }} / {{ $project->max_investment }}</h5>
+                            
+                            <!-- Barra de Progreso -->
+                            <div class="progress mb-3">
+                                <!-- Calcula el porcentaje de inversión recaudada -->
+                                @php
+                                    $percentage = ($project->current_investment / $project->max_investment) * 100;
+                                    if($percentage > 100) $percentage = 100;  // Asegúrate de que no se pase de 100%
+                                @endphp
+
+                                <!-- Barra de Progreso que se ajusta según el porcentaje calculado -->
+                                <div class="progress-bar bg-secondary" role="progressbar" style="width: {{ $percentage }}%;" aria-valuenow="{{ $percentage }}" aria-valuemin="0" aria-valuemax="100">
+                                    {{ round($percentage, 2) }}% 
+                                </div>
+                            </div>
+                            @if (Auth::user()->role == 'admin')
+                                <a href="/project/delete/{{ $project->id }}" class="btn btn-danger btn-sm mb-3 w-auto" onclick="return confirm('¿Are you sure?');">Delete Project</a>
+                            @endif
+
+                            @if (Auth::user()->role == 'admin' || Auth::user()->role == 'entrepreneur')
+                                <form action="/projects/activate-or-deactivate" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="id" value="{{ $project->id }}">
+                                    @if ($project->state == 'active')
+                                        <button type="submit" name="state" value="inactive" class="btn btn-danger btn-sm mb-3">Disable Project</button>
+                                    @elseif ($project->state == 'inactive')
+                                        <button type="submit" name="state" value="active" class="btn btn-success btn-sm mb-3">Enable Project</button>
+                                    @endif
+                                </form>
+                                <p>Current state: <span id="currentState">{{ $project->state }}</span></p>
+                            @endif
+                                                        <!-- Botón "Edit" visible solo para el usuario con rol 'entrepreneur' -->
+                                                        @if (Auth::user()->role == 'entrepreneur')
+                                <a href="/project/edit/{{ $project->id }}" class="btn btn-warning btn-sm mt-3">Edit Project</a>
+                            @endif
+
+                            <!-- Botón "Found" visible solo para el usuario con rol 'investor' -->
+                            @if (Auth::user()->role == 'investor')
+                                <a href="/project/fund/{{ $project->id }}" class="btn btn-success btn-sm mt-3">Found Project</a>
+                            @endif
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-
-        @endforeach
-    </div>--}}
+    </div>
 </div>
 
-@endsection 
+@endsection

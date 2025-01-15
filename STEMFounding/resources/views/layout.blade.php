@@ -16,7 +16,7 @@
                 <li class="nav-item">
                     <a href="/project" class="nav-link text-white">Projects</a>
                 </li>
-                @if(Auth::user()->role == 'entrepeneur')
+                @if(Auth::user()->role == 'entrepreneur')
                     <li class="nav-item">
                         <a href="/project/create" class="btn btn-secondary ms-3">Create Project</a>
                     </li>

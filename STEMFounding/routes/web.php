@@ -56,20 +56,20 @@ use Illuminate\Support\Facades\DB;
 
     /*
         Ruta para mostrar el formulario de creación de un nuevo proyecto.
-        Solo accesible para usuarios con rol de entrepeneur.
+        Solo accesible para usuarios con rol de entrepreneur.
     */
     Route::get('/project/create', function () {
         return view('createProject');
-    })->middleware(['auth', 'role:entrepeneur']);
+    })->middleware(['auth', 'role:entrepreneur']);
 
     /*
         Ruta para procesar la creación de un nuevo proyecto.
-        Solo accesible para usuarios con rol de entrepeneur.
+        Solo accesible para usuarios con rol de entrepreneur.
     */
     Route::post('/project/create', function (Request $request) {
         $project = app(ProjectController::class)->createProject($request);
         return redirect('/project/detail/' . $project->id);
-    })->middleware(['auth', 'role:entrepeneur']);
+    })->middleware(['auth', 'role:entrepreneur']);
 
     /*
         Ruta para desactivar un proyecto.

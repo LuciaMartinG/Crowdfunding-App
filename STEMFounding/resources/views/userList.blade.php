@@ -21,7 +21,7 @@
                             <div class="mb-2">
                                 <label for="role-{{ $user->id }}" class="form-label">Change Role</label>
                                 <select id="role-{{ $user->id }}" name="role" class="form-select" required>
-                                    <option value="entrepeneur" {{ $user->role === 'entrepeneur' ? 'selected' : '' }}>Entrepeneur</option>
+                                    <option value="entrepreneur" {{ $user->role === 'entrepreneur' ? 'selected' : '' }}>entrepreneur</option>
                                     <option value="investor" {{ $user->role === 'investor' ? 'selected' : '' }}>Investor</option>
                                 </select>
                             </div>
