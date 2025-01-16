@@ -121,7 +121,7 @@ use Illuminate\Support\Facades\DB;
 
     Route::post('/user/updateRole', function (Request $request) {
         $user = app(UserController::class)->updateRoleUser($request);
-        return redirect('/user');
+        return redirect('/user/detail/' . $user->id);
     })->middleware(['auth', 'role:admin']);
     
      /*

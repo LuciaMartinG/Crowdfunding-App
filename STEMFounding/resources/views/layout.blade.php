@@ -21,6 +21,11 @@
                         <a href="/project/create" class="btn btn-secondary ms-3">Create Project</a>
                     </li>
                 @endif
+                @if(Auth::user()->role == 'admin')
+                    <li class="nav-item">
+                        <a href="/user" class="btn btn-secondary text-white ms-3">Users</a>
+                    </li>
+                @endif
             </ul>
             <ul class="nav">
                 <li class="nav-item">

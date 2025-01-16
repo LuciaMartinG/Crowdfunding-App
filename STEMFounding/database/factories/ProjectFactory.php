@@ -20,7 +20,7 @@ class ProjectFactory extends Factory
         return [
             'title' => fake()->sentence(5),
             'description'=> fake()->sentence(10),
-            'image_url'=> fake()->imageUrl(300, 450, 'finances', true, 'finances_img'), 
+            'image_url'=> 'https://itequia.com/wp-content/uploads/2023/09/magnitud.jpg', 
             'video_url'=> fake()->sentence(5),
             'min_investment' =>fake()->randomFloat(2, 100, 100000),
             'max_investment'=> fake()->randomFloat(2, 10000, 500000),

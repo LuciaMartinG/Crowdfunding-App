@@ -10,23 +10,12 @@
         @foreach($userList as $user)
             <div class="col-md-4 mb-3">
                 <div class="card">
-                    <img src="https://definicion.de/wp-content/uploads/2019/07/perfil-de-usuario.png" class="card-img-top img-fluid" alt="{{ $user->name }}">
+                    <img src="{{ $user->photo ?? 'https://via.placeholder.com/150' }}" class="card-img-top img-fluid" alt="{{ $user->name }}">
                     <div class="card-body">
                         <h5 class="card-title fs-5 fw-bold">{{ $user->name }}</h5>
                         <p class="card-text">Email: {{ $user->email }}</p>
                         <p class="card-text">Role: {{ ucfirst($user->role) }}</p>
-                        <form action="/user/updateRole" method="POST">
-                            @csrf
-                            <input type="hidden" name="id" value="{{ $user->id }}">
-                            <div class="mb-2">
-                                <label for="role-{{ $user->id }}" class="form-label">Change Role</label>
-                                <select id="role-{{ $user->id }}" name="role" class="form-select" required>
-                                    <option value="entrepreneur" {{ $user->role === 'entrepreneur' ? 'selected' : '' }}>entrepreneur</option>
-                                    <option value="investor" {{ $user->role === 'investor' ? 'selected' : '' }}>Investor</option>
-                                </select>
-                            </div>
-                            <button type="submit" class="btn btn-secondary">Update Role</button>
-                        </form>
+                        <a href="user/detail/{{ $user->id }}" class="btn btn-secondary">View Details</a>
                     </div>
                 </div>
             </div>
