@@ -39,7 +39,7 @@
                                 <a href="/project/delete/{{ $project->id }}" class="btn btn-danger btn-sm mb-3 w-auto" onclick="return confirm('¿Are you sure?');">Delete Project</a>
                             @endif
 
-                            @if (Auth::user()->role == 'admin' || Auth::user()->role == 'entrepreneur')
+                            @if (Auth::user()->role == 'admin')
                                 <form action="/projects/activate-or-deactivate" method="POST">
                                     @csrf
                                     <input type="hidden" name="id" value="{{ $project->id }}">
@@ -50,10 +50,6 @@
                                     @endif
                                 </form>
                                 <p>Current state: <span id="currentState">{{ $project->state }}</span></p>
-                            @endif
-                                                        <!-- Botón "Edit" visible solo para el usuario con rol 'entrepreneur' -->
-                                                        @if (Auth::user()->role == 'entrepreneur')
-                                <a href="/project/edit/{{ $project->id }}" class="btn btn-warning btn-sm mt-3">Edit Project</a>
                             @endif
 
                             <!-- Botón "Found" visible solo para el usuario con rol 'investor' -->

@@ -29,24 +29,54 @@
                     </div>
                     @endif
 
-                    <!-- Botón "Change Role" que abre el modal (solo visible para admin) -->
-                    @if(Auth::user() && (Auth::user()->role == 'admin'))
-                    <button class="btn btn-secondary text-white" data-bs-toggle="modal" data-bs-target="#changeRoleModal">Change Role</button>
-                    <!-- Botón para banear al usuario -->
-                    <form action="/user/ban" method="POST" class="mt-3">
+                 <!-- Botón "Change Role" que abre el modal (solo visible para admin) -->
+            @if(Auth::user() && (Auth::user()->role == 'admin'))
+                <div class="d-flex flex-column align-items-start mb-4">
+                    <!-- Botón "Change Role" -->
+                    <button class="btn btn-outline-primary btn-lg mb-3" data-bs-toggle="modal" data-bs-target="#changeRoleModal">
+                        <i class="bi bi-pencil-square"></i> Change Role
+                    </button>
+
+                    <!-- Separador para una mejor separación visual -->
+                    <hr class="w-100 my-3">
+
+                    <!-- Formulario para Banear o Desbanear -->
+                    <form action="/user/ban" method="POST">
                         @csrf
                         <input type="hidden" name="id" value="{{ $user->id }}">
-                        <button type="submit" class="btn btn-danger">Ban User</button>
-                    </form>
-                    @endif
 
+                        <!-- Botón para Banear o Desbanear -->
+                        <div class="d-flex align-items-center mb-3">
+                            @if ($user->banned)
+                                <button type="submit" name="state" value="unban" class="btn btn-success btn-lg">
+                                    <i class="bi bi-unlock"></i> Unban User
+                                </button>
+                            @else
+                                <button type="submit" name="state" value="ban" class="btn btn-danger btn-lg">
+                                    <i class="bi bi-lock"></i> Ban User
+                                </button>
+                            @endif
+                        </div>
+                    </form>
+
+                    <!-- Estado Actual -->
+                    <div class="alert alert-info w-100">
+                        <strong>Current state:</strong> 
+                        <span class="fw-bold" id="currentState">{{ $user->banned ? 'Banned' : 'Active' }}</span>
+                    </div>
+                </div>
+            @endif
+
+                    
                     <!-- Recuadro con saldo actual -->
                     <div class="mt-4">
                         <p><strong>Current Balance:</strong> {{ number_format($user->balance, 2) }} €</p>
                     </div>
 
+                    @if(Auth::check() && (Auth::user()->role == 'entrepreneur' || Auth::user()->role == 'investor'))
                     <!-- Botón "Modify Balance" que abre el modal -->
                     <button class="btn btn-info text-white" data-bs-toggle="modal" data-bs-target="#modifyBalanceModal">Modify Balance</button>
+                    @endif
                 </div>
             </div>
         </div>
@@ -80,8 +110,9 @@
     </div>
     @endif
 
-    <!-- Modal para modificar el saldo -->
-    @if(Auth::user() && (Auth::user()->role == 'admin'))
+
+<!-- Modal para modificar el saldo -->
+@if(Auth::check() && (Auth::user()->role == 'entrepreneur' || Auth::user()->role == 'investor'))
     <div class="modal fade" id="modifyBalanceModal" tabindex="-1" aria-labelledby="modifyBalanceModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -90,27 +121,51 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form action="/user/updateBalance" method="POST">
-                        @csrf
-                        <input type="hidden" name="id" value="{{ $user->id }}">
-                        <div class="mb-3">
-                            <label for="amount" class="form-label">Amount</label>
-                            <input type="number" class="form-control" id="amount" name="amount" step="1" min="0" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="transaction_type" class="form-label">Transaction Type</label>
-                            <select class="form-select" name="transaction_type" id="transaction_type" required>
-                                <option value="deposit">Deposit</option>
-                                <option value="withdrawal">Withdrawal</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Update Balance</button>
-                    </form>
+                    <!-- Lógica para el inversor -->
+                    @if(Auth::user()->role == 'investor')
+                        <form action="/user/updateBalance" method="POST">
+                            @csrf
+                            <input type="hidden" name="id" value="{{ $user->id }}">
+                            <div class="mb-3">
+                                <label for="amount" class="form-label">Amount</label>
+                                <input type="number" class="form-control" id="amount" name="amount" step="1" min="0" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="transaction_type" class="form-label">Transaction Type</label>
+                                <select class="form-select" name="transaction_type" id="transaction_type" required>
+                                    <option value="deposit">Deposit</option>
+                                    <option value="withdrawal">Withdrawal</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Update Balance</button>
+                        </form>
+                    @elseif(Auth::user()->role == 'entrepreneur')
+                        <!-- Lógica para el emprendedor -->
+                        <form action="/user/updateBalance" method="POST">
+                            @csrf
+                            <input type="hidden" name="id" value="{{ $user->id }}">
+                            <div class="mb-3">
+                                <label for="amount" class="form-label">Amount</label>
+                                <input type="number" class="form-control" id="amount" name="amount" step="1" min="0" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="transaction_type" class="form-label">Transaction Type</label>
+                                <select class="form-select" name="transaction_type" id="transaction_type" required>
+                                    <option value="withdrawal">Withdrawal</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Withdraw Balance</button>
+                        </form>
+                    @else
+                        <!-- Mensaje en caso de roles no permitidos -->
+                        <p class="text-danger">You do not have permission to modify the balance.</p>
+                    @endif
                 </div>
             </div>
         </div>
     </div>
-    @endif
+@endif
+
 
     <!-- Proyectos del usuario -->
     <h2 class="mb-4">Projects by {{ $user->name }}</h2>

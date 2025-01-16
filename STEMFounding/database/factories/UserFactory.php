@@ -32,6 +32,7 @@ class UserFactory extends Factory
             'balance' => fake()->randomFloat(2, 0, 100000),
             'role' => fake()->randomElement(['entrepreneur', 'investor']),
             'photo'=> 'https://www.clarin.com/2024/04/25/HKCtyMwSF_2000x1500__1.jpg',
+            'banned' => $this->faker->boolean(10)
         ];
     }
 

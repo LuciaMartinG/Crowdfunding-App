@@ -81,6 +81,16 @@ use Illuminate\Support\Facades\DB;
         return redirect('/project/detail/' . $project->id);
     });
 
+    /*
+        Ruta para desactivar un proyecto.
+        Solo accesible para usuarios con rol de emprendedor(proyectos propios).
+    */
+
+    Route::post('/projects/user/activate-or-deactivate', function (Request $request) {
+        $project = app(ProjectController::class)->updateStateProject($request);
+        return redirect('/user/projects');
+    });
+
     // Ruta para actualizar el estado del proyecto, solo accesible para administradores
     Route::post('/projects/{id}/updateState', [ProjectController::class, 'activateOrRejectProject'])
     ->middleware(['auth', 'role:admin']);  // Asegura que el usuario esté autenticado y sea admin
@@ -146,4 +156,21 @@ use Illuminate\Support\Facades\DB;
         $user = app(UserController::class)->updateUser($request);
         return redirect('/user/detail/' . $user->id);
     })->middleware('auth'); //SI PONEMOS ENTREPRENEUR E INVESTOR NO FUNCIONA
-        
+    
+
+    // Ruta para actualizar el saldo del usuario
+    Route::post('/user/updateBalance', function (Request $request) {
+        $user = app(UserController::class)->updateBalance($request);
+        return redirect('/user/detail/' . $user->id)->with('success', 'Balance updated successfully!');
+    })->middleware('auth');
+
+    //Ruta para banear al usuario//
+
+    Route::post('/user/ban', function (Request $request) {
+        $user = app(UserController::class)->toggleBan($request);
+        return redirect('/user/detail/' . $user->id)->with('success', 'Banned successfully!');
+    })->middleware('auth');
+
+   
+    Route::get('/user/projects', [ProjectController::class, 'showUserProjects'])->middleware('auth')->name('user.projects');
+

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Project;
+use Illuminate\Support\Facades\Auth;
+
 
 class ProjectController extends Controller
 {
@@ -122,6 +124,24 @@ class ProjectController extends Controller
         return view('pendingProjectList', ['pendingProjectList' => $pendingProjectList]);
     }
 
+    // app/Http/Controllers/ProjectController.php
+
+
+
+    public function showUserProjects()
+    {
+        // Obtener el usuario logueado
+        $user = Auth::user();
+
+        // Obtener los proyectos asociados con ese usuario
+        $projects = $user->projects;  // Esta es la relación 'hasMany' definida en el modelo User
+
+        // Pasar los proyectos a la vista
+        return view('userProjects', ['projects' => $projects]);
     }
+}
+
+
+
 
 

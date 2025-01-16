@@ -60,7 +60,55 @@ class UserController extends Controller
     return $user;
 }
 
-    
-    
-    
+    public function updateBalance(Request $request)
+    {
+        // Validar los datos de entrada
+        $request->validate([
+            'id' => 'required|exists:users,id', // Asegura que el ID exista en la tabla de usuarios
+            'amount' => 'required|numeric|min:0', // El monto debe ser un número positivo
+            'transaction_type' => 'required|in:deposit,withdrawal', // Solo permite "deposit" o "withdrawal"
+        ]);
+
+        // Obtener el usuario por ID
+        $user = User::find($request->input('id'));
+
+        // Lógica para el depósito o retiro
+        $amount = $request->input('amount');
+        if ($request->input('transaction_type') === 'deposit') {
+            $user->balance += $amount; // Sumar al balance
+        } elseif ($request->input('transaction_type') === 'withdrawal') {
+            if ($user->balance < $amount) {
+                return response()->json(['error' => 'Insufficient balance for withdrawal.'], 400);
+            }
+            $user->balance -= $amount; // Restar del balance
+        }
+
+        // Guardar los cambios
+        $user->save();
+
+        return $user;
+
+    }
+
+    public function toggleBan(Request $request)
+{
+    // Obtener un solo usuario por su ID
+    $user = User::find($request->id);
+
+    // Alternar el estado de baneado del usuario
+    if ($user->banned) {
+        $user->banned = false;  // Desbanear
+        $message = 'Usuario desbaneado correctamente.';
+    } else {
+        $user->banned = true;   // Bannear
+        $message = 'Usuario baneado correctamente.';
+    }
+
+    $user->save();  // Guardar el estado actualizado del usuario
+
+    return $user;
+
+
+}
+
 }
