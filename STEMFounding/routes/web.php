@@ -132,20 +132,18 @@ use Illuminate\Support\Facades\DB;
         Ruta para mostrar el formulario de edición del perfil.
         Solo accesible para usuarios con rol de entrepreneur o investor.
     */
-    Route::get('/user/update', function () {
+    Route::get('/user/update/{id}', function () {
         $user = auth()->user();  // Obtener el usuario autenticado
         return view('updateUser', ['user' => $user]); //Pasarlo a la vista
-    })->middleware(['auth', 'role:entrepreneur,investor']);
+    })->middleware('auth'); //SI PONEMOS ENTREPRENEUR E INVESTOR NO FUNCIONA
     
     
     
-    // Ruta para mostrar el formulario de creación de un nuevo proyecto.
-    // Solo accesible para usuarios con rol de entrepreneur.
+    // Ruta para procesar el updateUser
+    // Solo accesible para usuarios con rol de entrepreneur e investor.
    
     Route::post('/user/update', function (Request $request) {
         $user = app(UserController::class)->updateUser($request);
-        return redirect("/user/detail/{$user->id}");
-    })->middleware(['auth', 'role:entrepreneur,investor']);
+        return redirect('/user/detail/' . $user->id);
+    })->middleware('auth'); //SI PONEMOS ENTREPRENEUR E INVESTOR NO FUNCIONA
         
-        
-    

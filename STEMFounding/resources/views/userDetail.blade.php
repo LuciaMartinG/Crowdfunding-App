@@ -15,7 +15,7 @@
     @if(Auth::user() && (Auth::user()->role == 'entrepreneur' || Auth::user()->role == 'investor'))
         <!-- Botón para editar perfil solo visible para "emprendedor" e "inversor" -->
         <div class="mb-4">
-            <a href="/user/update" class="btn btn-primary">Edit Profile</a> <!-- Redirige a la página de edición del perfil -->
+            <a href="/user/update/{{ $user->id }}" class="btn btn-primary">Edit Profile</a> <!-- Redirige a la página de edición del perfil -->
         </div>
     @endif
 
