@@ -71,6 +71,17 @@ use Illuminate\Support\Facades\DB;
         return redirect('/project/detail/' . $project->id);
     })->middleware(['auth', 'role:entrepreneur']);
 
+    
+    // Ruta para procesar el updateProject
+
+   
+    Route::post('/project/update', function (Request $request) {
+        $project = app(ProjectController::class)->updateProject($request);
+        return redirect('/project/detail/1');
+    })->middleware('auth');
+
+    
+
     /*
         Ruta para desactivar un proyecto.
         Solo accesible para usuarios con rol de admin.
@@ -79,6 +90,16 @@ use Illuminate\Support\Facades\DB;
     Route::post('/projects/activate-or-deactivate', function (Request $request) {
         $project = app(ProjectController::class)->updateStateProject($request);
         return redirect('/project/detail/' . $project->id);
+    });
+
+    /*
+        Ruta para desactivar un proyecto.
+        Solo accesible para usuarios con rol de emprendedor(proyectos propios).
+    */
+
+    Route::post('/projects/user/activate-or-deactivate', function (Request $request) {
+        $project = app(ProjectController::class)->updateStateProject($request);
+        return redirect('/user/projects');
     });
 
     // Ruta para actualizar el estado del proyecto, solo accesible para administradores
@@ -117,11 +138,50 @@ use Illuminate\Support\Facades\DB;
     })->middleware('auth');
     /*
         Ruta para actualizar un rol.
-    TO DO  Solo accesible para usuarios con rol de admin.
     */
 
-    Route::post('/user/update', function (Request $request) {
+    Route::post('/user/updateRole', function (Request $request) {
         $user = app(UserController::class)->updateRoleUser($request);
-        return redirect('/user');
-    });
+        return redirect('/user/detail/' . $user->id);
+    })->middleware(['auth', 'role:admin']);
+    
+     /*
+        Ruta para procesar la solicitud de actualización del usuario 
+    */
+
+    /*
+        Ruta para mostrar el formulario de edición del perfil.
+        Solo accesible para usuarios con rol de entrepreneur o investor.
+    */
+    Route::get('/user/update/{id}', function () {
+        $user = auth()->user();  // Obtener el usuario autenticado
+        return view('updateUser', ['user' => $user]); //Pasarlo a la vista
+    })->middleware('auth'); //SI PONEMOS ENTREPRENEUR E INVESTOR NO FUNCIONA
+    
+    
+    
+    // Ruta para procesar el updateUser
+    // Solo accesible para usuarios con rol de entrepreneur e investor.
+   
+    Route::post('/user/update', function (Request $request) {
+        $user = app(UserController::class)->updateUser($request);
+        return redirect('/user/detail/' . $user->id);
+    })->middleware('auth'); //SI PONEMOS ENTREPRENEUR E INVESTOR NO FUNCIONA
+    
+
+    // Ruta para actualizar el saldo del usuario
+    Route::post('/user/updateBalance', function (Request $request) {
+        $user = app(UserController::class)->updateBalance($request);
+        return redirect('/user/detail/' . $user->id)->with('success', 'Balance updated successfully!');
+    })->middleware('auth');
+
+    //Ruta para banear al usuario//
+
+    Route::post('/user/ban', function (Request $request) {
+        $user = app(UserController::class)->toggleBan($request);
+        return redirect('/user/detail/' . $user->id)->with('success', 'Banned successfully!');
+    })->middleware('auth');
+
+   
+    Route::get('/user/projects', [ProjectController::class, 'showUserProjects'])->middleware('auth')->name('user.projects');
 

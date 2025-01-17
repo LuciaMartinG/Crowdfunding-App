@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Project;
+use Illuminate\Support\Facades\Auth;
+
 
 class ProjectController extends Controller
 {
@@ -37,30 +39,39 @@ class ProjectController extends Controller
         return $project;
     }
     
-    function updateProject(Request $request){ // $request me permite acceder a los datos de la petición, similar $_POST
+    public function updateProject(Request $request){ // $request me permite acceder a los datos de la petición, similar $_POST
 
+        // Obtener el ID del proyecto desde el request
         $id = $request->input('id');
 
+
+        // Buscar el proyecto en la base de datos
         $project = Project::find($id);
 
-        $project->title = $request->input('title');
-        $project->description = $request->input('description');
-        $project->image_url = $request->input('image_url');
-        $project->video_url = $request->input('video_url');
-        $project->min_investment = $request->input('min_investment');
-        $project->max_investment = $request->input('max_investment');
-        $project->limit_date = $request->input('limit_date');
-        $project->state = $request->input('state');
-        $project->current_investment = $request->input('current_investment');
 
+        // Actualizar los datos del proyecto con valores proporcionados, o mantener los actuales
+        $project->title = $request->input('title', $project->title);
+        $project->description = $request->input('description', $project->description);
+        $project->image_url = $request->input('image_url', $project->image_url);
+        $project->video_url = $request->input('video_url', $project->video_url);
+        $project->min_investment = $request->input('min_investment', $project->min_investment);
+        $project->max_investment = $request->input('max_investment', $project->max_investment);
+        $project->limit_date = $request->input('limit_date', $project->limit_date);
+        $project->state = $request->input('state', $project->state);
+        // Sumar el valor de current_investment con el valor proporcionado en la petición
+        $amountToAdd = $request->input('current_investment', 0); // Si no se pasa el valor, se suma 0
+        $project->current_investment += $amountToAdd;  // Sumar el valor
+
+        // Guardar los cambios
         $project->save();
 
         return $project;
+}
 
 
-    }
+    
 
-    function updateStateProject(Request $request) {
+   public function updateStateProject(Request $request) {
         // Obtener el ID y el estado del proyecto desde la solicitud
         $id = $request->input('id');
         $state = $request->input('state');
@@ -122,6 +133,25 @@ class ProjectController extends Controller
         return view('pendingProjectList', ['pendingProjectList' => $pendingProjectList]);
     }
 
+    // app/Http/Controllers/ProjectController.php
+
+
+
+    public function showUserProjects()
+    {
+        // Obtener el usuario logueado
+        $user = Auth::user();
+
+        // Obtener los proyectos asociados con ese usuario
+        $projects = $user->projects;  // Esta es la relación 'hasMany' definida en el modelo User
+
+        // Pasar los proyectos a la vista
+        return view('userProjects', ['projects' => $projects]);
     }
 
 
+
+
+
+
+}

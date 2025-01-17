@@ -15,6 +15,6 @@ class RoleMiddleware
             return $next($request);
         }
 
-        redirect('/');
+       redirect('/');
     }
 }

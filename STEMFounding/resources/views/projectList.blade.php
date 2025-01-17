@@ -23,7 +23,7 @@
                         <div class="card-body">
                             <h5 class="card-title fw-bold">{{ $project->title }}</h5>
                             <p class="card-text">{{ $project->description }}</p>
-                            <a href="project/detail/{{ $project->id }}" class="btn btn-secondary">View Details</a>
+                            <a href="project/detail/{{ $project->id }}" class="btn btn-secondary text-white">View Details</a>
                         </div>
                     </div>
                 </div>

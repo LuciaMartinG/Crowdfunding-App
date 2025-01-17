@@ -19,8 +19,8 @@
                         <div class="card-body">
                             <h2 class="card-title">{{ $project->title }}</h2>
                             <p class="card-text">{{ $project->description }}</p>
-                            <h5 class="card-subtitle mb-2 text-muted">Deadline: {{ $project->limit_date }}</h5>
-                            <h5 class="card-subtitle mb-2 text-muted">Money raised: {{ $project->current_investment }} / {{ $project->max_investment }}</h5>
+                            <h5 class="card-subtitle mb-2">Deadline: {{ $project->limit_date }}</h5>
+                            <h5 class="card-subtitle mb-2 ">Money raised: {{ $project->current_investment }} / {{ $project->max_investment }}</h5>
                             
                             <!-- Barra de Progreso -->
                             <div class="progress mb-3">
@@ -39,7 +39,7 @@
                                 <a href="/project/delete/{{ $project->id }}" class="btn btn-danger btn-sm mb-3 w-auto" onclick="return confirm('¿Are you sure?');">Delete Project</a>
                             @endif
 
-                            @if (Auth::user()->role == 'admin' || Auth::user()->role == 'entrepreneur')
+                            @if (Auth::user()->role == 'admin')
                                 <form action="/projects/activate-or-deactivate" method="POST">
                                     @csrf
                                     <input type="hidden" name="id" value="{{ $project->id }}">
@@ -51,14 +51,32 @@
                                 </form>
                                 <p>Current state: <span id="currentState">{{ $project->state }}</span></p>
                             @endif
-                                                        <!-- Botón "Edit" visible solo para el usuario con rol 'entrepreneur' -->
-                                                        @if (Auth::user()->role == 'entrepreneur')
-                                <a href="/project/edit/{{ $project->id }}" class="btn btn-warning btn-sm mt-3">Edit Project</a>
-                            @endif
 
                             <!-- Botón "Found" visible solo para el usuario con rol 'investor' -->
                             @if (Auth::user()->role == 'investor')
-                                <a href="/project/fund/{{ $project->id }}" class="btn btn-success btn-sm mt-3">Found Project</a>
+                                <button 
+                                            class="btn btn-warning btn-sm mt-3" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#editFoundsModal-{{ $project->id }}">
+                                            Add Founds
+                                        </button>
+                                        
+                                        @include('addFoundsModal', ['project' => $project])
+                            @endif
+
+                            <!-- Botón "Edit Project" y Modal visible solo si el proyecto pertenece al usuario autenticado -->
+                            @if ($project->user_id == Auth::id())
+                            <button 
+                                            class="btn btn-warning btn-sm mt-3" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#editProjectModal-{{ $project->id }}">
+                                            Edit Project
+                                        </button>
+
+                                <!-- Modal para editar proyecto -->
+                                @include('editProjectModal', ['project' => $project])
+                                
+                                </div>
                             @endif
                         </div>
                     </div>
