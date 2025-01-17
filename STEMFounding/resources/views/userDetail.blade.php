@@ -25,7 +25,7 @@
                     <!-- Botón para editar perfil -->
                     @if(Auth::user() && (Auth::user()->role == 'entrepreneur' || Auth::user()->role == 'investor'))
                     <div class="mb-4">
-                        <a href="/user/update/{{ $user->id }}" class="btn btn-primary text-white">Edit Profile</a>
+                        <a href="/user/update/{{ $user->id }}" class="btn btn-secondary text-white">Edit Profile</a>
                     </div>
                     @endif
 
@@ -75,7 +75,7 @@
 
                     @if(Auth::check() && (Auth::user()->role == 'entrepreneur' || Auth::user()->role == 'investor'))
                     <!-- Botón "Modify Balance" que abre el modal -->
-                    <button class="btn btn-info text-white" data-bs-toggle="modal" data-bs-target="#modifyBalanceModal">Modify Balance</button>
+                    <button class="btn btn-secondary text-white" data-bs-toggle="modal" data-bs-target="#modifyBalanceModal">Modify Balance</button>
                     @endif
                 </div>
             </div>
@@ -137,7 +137,7 @@
                                     <option value="withdrawal">Withdrawal</option>
                                 </select>
                             </div>
-                            <button type="submit" class="btn btn-primary">Update Balance</button>
+                            <button type="submit" class="btn btn-secondary text-white">Update Balance</button>
                         </form>
                     @elseif(Auth::user()->role == 'entrepreneur')
                         <!-- Lógica para el emprendedor -->
@@ -154,7 +154,7 @@
                                     <option value="withdrawal">Withdrawal</option>
                                 </select>
                             </div>
-                            <button type="submit" class="btn btn-primary">Withdraw Balance</button>
+                            <button type="submit" class="btn btn-secondary text-white">Withdraw Balance</button>
                         </form>
                     @else
                         <!-- Mensaje en caso de roles no permitidos -->

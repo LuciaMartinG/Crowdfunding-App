@@ -71,6 +71,17 @@ use Illuminate\Support\Facades\DB;
         return redirect('/project/detail/' . $project->id);
     })->middleware(['auth', 'role:entrepreneur']);
 
+    
+    // Ruta para procesar el updateProject
+
+   
+    Route::post('/project/update', function (Request $request) {
+        $project = app(ProjectController::class)->updateProject($request);
+        return redirect('/project/detail/1');
+    })->middleware('auth');
+
+    
+
     /*
         Ruta para desactivar un proyecto.
         Solo accesible para usuarios con rol de admin.
