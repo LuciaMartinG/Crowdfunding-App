@@ -33,7 +33,7 @@
             @if(Auth::user() && (Auth::user()->role == 'admin'))
                 <div class="d-flex flex-column align-items-start mb-4">
                     <!-- Botón "Change Role" -->
-                    <button class="btn btn-outline-primary btn-lg mb-3" data-bs-toggle="modal" data-bs-target="#changeRoleModal">
+                    <button class="btn btn-secondary text-white btn-lg mb-3" data-bs-toggle="modal" data-bs-target="#changeRoleModal">
                         <i class="bi bi-pencil-square"></i> Change Role
                     </button>
 
@@ -59,11 +59,8 @@
                         </div>
                     </form>
 
-                    <!-- Estado Actual -->
-                    <div class="alert alert-info w-100">
-                        <strong>Current state:</strong> 
-                        <span class="fw-bold" id="currentState">{{ $user->banned ? 'Banned' : 'Active' }}</span>
-                    </div>
+                    
+                   
                 </div>
             @endif
 

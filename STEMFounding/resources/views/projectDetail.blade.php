@@ -54,7 +54,14 @@
 
                             <!-- Botón "Found" visible solo para el usuario con rol 'investor' -->
                             @if (Auth::user()->role == 'investor')
-                                <a href="/project/fund/{{ $project->id }}" class="btn btn-success btn-sm mt-3">Found Project</a>
+                                <button 
+                                            class="btn btn-warning btn-sm mt-3" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#editFoundsModal-{{ $project->id }}">
+                                            Add Founds
+                                        </button>
+                                        
+                                        @include('addFoundsModal', ['project' => $project])
                             @endif
 
                             <!-- Botón "Edit Project" y Modal visible solo si el proyecto pertenece al usuario autenticado -->
@@ -68,6 +75,7 @@
 
                                 <!-- Modal para editar proyecto -->
                                 @include('editProjectModal', ['project' => $project])
+                                
                                 </div>
                             @endif
                         </div>

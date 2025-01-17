@@ -58,7 +58,9 @@ class ProjectController extends Controller
         $project->max_investment = $request->input('max_investment', $project->max_investment);
         $project->limit_date = $request->input('limit_date', $project->limit_date);
         $project->state = $request->input('state', $project->state);
-        $project->current_investment = $request->input('current_investment', $project->current_investment);
+        // Sumar el valor de current_investment con el valor proporcionado en la petición
+        $amountToAdd = $request->input('current_investment', 0); // Si no se pasa el valor, se suma 0
+        $project->current_investment += $amountToAdd;  // Sumar el valor
 
         // Guardar los cambios
         $project->save();
