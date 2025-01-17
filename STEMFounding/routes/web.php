@@ -5,8 +5,10 @@ use App\Models\Project;
 use App\Models\User;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\InvestmentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+
 
     Route::get('/', function () {
         return view('home');
@@ -185,3 +187,7 @@ use Illuminate\Support\Facades\DB;
    
     Route::get('/user/projects', [ProjectController::class, 'showUserProjects'])->middleware('auth')->name('user.projects');
 
+   
+    //Ruta para invertir//
+    Route::post('/invest', [InvestmentController::class, 'invest'])->middleware('auth');
+    
