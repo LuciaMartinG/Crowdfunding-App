@@ -7,13 +7,13 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form action="/project/update" method="POST">
+                <form action="/invest" method="POST">
                     @csrf
-                    <input type="hidden" name="id" value="{{ $project->id }}">
+                    <input type="hidden" name="project_id" value="{{ $project->id }}">
 
                     <div class="mb-3">
-                        <label for="fund_amount" class="form-label">Amount to Add</label>
-                        <input type="number" class="form-control" id="fund_amount" name="current_investment" min="1" step="0.01" required>
+                        <label for="investment_amount" class="form-label">Amount to Add</label>
+                        <input type="number" class="form-control" id="investment_amount" name="investment_amount" min="1" step="0.01" required>
                     </div>
 
                     <button type="submit" class="btn btn-secondary text-white">Add Fund</button>

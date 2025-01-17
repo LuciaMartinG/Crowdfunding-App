@@ -52,4 +52,11 @@ class User extends Authenticatable
     public function projects() {
         return $this->hasMany(Project::class);
     }
+
+    public function investedProjects()
+{
+    return $this->belongsToMany(Project::class, 'investments')
+                ->withPivot('investment_amount')
+                ->withTimestamps();
+}
 }
