@@ -12,8 +12,20 @@
                     <input type="hidden" name="project_id" value="{{ $project->id }}">
 
                     <div class="mb-3">
-                        <label for="investment_amount" class="form-label">Amount to Add</label>
-                        <input type="number" class="form-control" id="investment_amount" name="investment_amount" min="1" step="0.01" required>
+                        <label for="investment_amount" class="form-label">Amount to Add (€)</label>
+                        <input 
+                            type="number" 
+                            class="form-control" 
+                            id="investment_amount" 
+                            name="investment_amount" 
+                            min="10" 
+                            step="0.01" 
+                            value="10" 
+                            required
+                        >
+                        <small class="form-text text-muted">
+                            The minimum investment amount is €10.
+                        </small>
                     </div>
 
                     <button type="submit" class="btn btn-secondary text-white">Add Fund</button>
