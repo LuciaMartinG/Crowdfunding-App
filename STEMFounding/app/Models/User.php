@@ -59,4 +59,9 @@ class User extends Authenticatable
                 ->withPivot('investment_amount')
                 ->withTimestamps();
 }
+
+    public function updates()
+    {
+        return $this->hasMany(Update::class);
+    }
 }

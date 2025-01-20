@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Project;
 use Illuminate\Support\Facades\Auth;
+use App\Models\ProjectUpdate;
 
 
 class ProjectController extends Controller
@@ -38,18 +39,25 @@ class ProjectController extends Controller
     
         return $project;
     }
-    
-    public function updateProject(Request $request){ // $request me permite acceder a los datos de la petición, similar $_POST
-
+    public function updateProject(Request $request)
+    {
         // Obtener el ID del proyecto desde el request
         $id = $request->input('id');
-
-
+    
         // Buscar el proyecto en la base de datos
         $project = Project::find($id);
-
-
-        // Actualizar los datos del proyecto con valores proporcionados, o mantener los actuales
+    
+        // Verificar si el proyecto existe
+        if (!$project) {
+            return redirect()->back()->with('error', 'Project not found');
+        }
+    
+        // Verificar si el usuario autenticado es el dueño del proyecto y que esté activo
+        if (auth()->user()->id !== $project->user_id || $project->state !== 'active') {
+            return redirect()->back()->with('error', 'You are not authorized to update this project');
+        }
+    
+        // Actualizar los datos del proyecto
         $project->title = $request->input('title', $project->title);
         $project->description = $request->input('description', $project->description);
         $project->image_url = $request->input('image_url', $project->image_url);
@@ -58,15 +66,23 @@ class ProjectController extends Controller
         $project->max_investment = $request->input('max_investment', $project->max_investment);
         $project->limit_date = $request->input('limit_date', $project->limit_date);
         $project->state = $request->input('state', $project->state);
-        // Sumar el valor de current_investment con el valor proporcionado en la petición
-        $amountToAdd = $request->input('current_investment', 0); // Si no se pasa el valor, se suma 0
-        $project->current_investment += $amountToAdd;  // Sumar el valor
-
-        // Guardar los cambios
+    
+        // Guardar los cambios en el proyecto
         $project->save();
-
+    
+        // Crear una nueva actualización para el proyecto
+        ProjectUpdate::create([
+            'project_id' => $project->id,
+            'user_id' => auth()->user()->id,
+            'title' => $request->input('title', $project->title),
+            'description' => $request->input('description', $project->description),
+            'image_url' => $request->input('image_url', $project->image_url),
+        ]);
+    
         return $project;
-}
+    }
+    
+    
 
 
     
