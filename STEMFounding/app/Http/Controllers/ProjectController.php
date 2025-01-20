@@ -130,7 +130,7 @@ class ProjectController extends Controller
                                           ->count();
 
             if ($activeProjectsCount >= 2) {
-                return redirect()->back()->with('error', 'El emprendedor ya tiene 2 proyectos activos.');
+                return redirect()->back()->with('error', ' The user already has 2 active projects.');
             }
             // Si no tiene más de 2 proyectos activos, cambiar el estado del proyecto a 'active'
             $project->state = 'active';
