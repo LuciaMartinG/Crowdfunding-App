@@ -108,26 +108,49 @@ class ProjectController extends Controller
     }
 
     public function activateOrRejectProject(Request $request, $id)
-    {
-        // Obtener el proyecto por su ID
-        $project = Project::find($id);
-    
-        // Obtener el valor de 'state' del formulario
-        $state = $request->input('state');
-    
-        // Verificar si el estado es válido y actualizar el estado del proyecto
+{
+    // Obtener el proyecto por su ID
+    $project = Project::find($id);
+
+    // Verificar si el proyecto fue encontrado
+    if (!$project) {
+        return redirect()->back()->with('error', 'El proyecto no existe.');
+    }
+
+    // Obtener el valor de 'state' del formulario
+    $state = $request->input('state');
+
+    // Verificar si el proyecto pertenece al administrador
+    if (Auth::user()->role == 'admin') {
+        // Si se va a activar el proyecto
         if ($state === 'active') {
+            // Verificar que el emprendedor no tenga más de 2 proyectos activos
+            $activeProjectsCount = Project::where('user_id', $project->user_id)
+                                          ->where('state', 'active')
+                                          ->count();
+
+            if ($activeProjectsCount >= 2) {
+                return redirect()->back()->with('error', 'El emprendedor ya tiene 2 proyectos activos.');
+            }
+            // Si no tiene más de 2 proyectos activos, cambiar el estado del proyecto a 'active'
             $project->state = 'active';
-        } elseif ($state === 'rejected') {
+        }
+
+        // Si se va a rechazar el proyecto
+        elseif ($state === 'rejected') {
             $project->state = 'rejected';
         }
-    
+
         // Guardar los cambios en el proyecto
         $project->save();
-    
+
         // Redirigir de nuevo a la lista de proyectos pendientes con un mensaje de éxito
         return redirect('/projects/pending')->with('success', 'Proyecto actualizado con éxito.');
     }
+
+    return redirect()->back()->with('error', 'No tienes permisos para cambiar el estado de este proyecto.');
+}
+
     
  
 
