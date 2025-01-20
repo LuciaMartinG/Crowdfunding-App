@@ -10,9 +10,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 
-    Route::get('/', function () {
-        return view('home');
-    });
+Route::get('/', function () {
+    return view('projectList', ['projectList' => Project::whereIn('state', ['active', 'inactive'])->paginate(10)]);
+});
 
     Auth::routes();
 
@@ -36,9 +36,9 @@ use Illuminate\Support\Facades\DB;
     Route::get('/project', [ProjectController::class, 'showActiveAndInactiveProjects'])->middleware('auth');
     Route::get('/projects/pending', [ProjectController::class, 'showPendingProjects'])->middleware('auth','role:admin');
 
-    Route::get('/', function () {
-        return redirect('/project');
-    });
+    // Route::get('/', function () {
+    //     return redirect('/project');
+    // });
 
     /*
         Ruta para mostrar el detalle de proyecto específico.

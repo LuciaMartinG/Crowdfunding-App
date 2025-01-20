@@ -5,7 +5,7 @@
 @section('content')
 
 <div class="container">
-    @if (Auth::user()->role == 'admin')
+    @if (Auth::check() && Auth::user()->role == 'admin') <!-- Solo muestra esto si el usuario está autenticado y es admin -->
         <div class="mb-4">
             <a href="/projects/pending/" class="btn btn-danger btn-sm mb-3 w-auto">Pending Projects</a>
         </div>
