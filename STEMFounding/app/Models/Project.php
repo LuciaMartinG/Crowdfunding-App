@@ -41,4 +41,9 @@ class Project extends Model
                     ->withTimestamps();
     }
 
+    public function updates()
+    {
+        return $this->hasMany(Update::class);
+    }
+
 }
