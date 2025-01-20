@@ -36,6 +36,18 @@
                                     {{ round($percentage, 2) }}% 
                                 </div>
                             </div>
+                            <!-- Mostrar las actualizaciones del proyecto -->
+                            <h4 class="mb-3">Project Updates</h4>
+                            @forelse ($project->updates as $update)
+                                <div class="update mb-3 p-3 border rounded">
+                                    <h5 class="update-title">{{ $update->title }}</h5>
+                                    <p class="update-description">{{ $update->description }}</p>
+                                    <p><strong>Updated by:</strong> {{ $update->user->name }} | <strong>On:</strong> {{ $update->updated_at->format('d-m-Y H:i') }}</p>
+                                </div>
+                            @empty
+                                <p>No updates available for this project.</p>
+                            @endforelse
+
                             @if (Auth::user()->role == 'admin')
                                 <a href="/project/delete/{{ $project->id }}" class="btn btn-danger btn-sm mb-3 w-auto" onclick="return confirm('¿Are you sure?');">Delete Project</a>
                             @endif

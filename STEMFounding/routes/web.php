@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Models\Project;
 use App\Models\User;
+use App\Models\ProjectUpdate;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\InvestmentController;
@@ -47,6 +48,9 @@ Route::get('/', function () {
     Route::get('/project/detail/{id}', function ($id) {
         return view('projectDetail', ['project' => Project::find($id)]);
     })->middleware('auth');
+
+    // Route::get('/project/detail/{id}', [ProjectController::class, 'showUpdates'])->middleware('auth');
+
 
     Route::get('/project/delete/{id}', function ($id) {
         Project::destroy($id);

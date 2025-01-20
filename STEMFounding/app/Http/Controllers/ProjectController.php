@@ -165,7 +165,21 @@ class ProjectController extends Controller
         return view('userProjects', ['projects' => $projects]);
     }
 
-
+    // Método para mostrar el detalle del proyecto
+    public function showUpdates($id)
+    {
+        // Obtener el proyecto por ID
+        $project = Project::find($id);
+    
+        // Obtener las actualizaciones del proyecto
+        $updates = $project->updates; // Esto obtiene todas las actualizaciones relacionadas con el proyecto
+    
+        // Retornar la vista con el proyecto y las actualizaciones
+        return view('projectDetail', [
+            'project' => $project,
+            'updates' => $updates,
+        ]);
+    }
 
 
 
