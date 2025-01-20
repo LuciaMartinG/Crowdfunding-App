@@ -63,6 +63,14 @@
                             </div>
                         </div>
 
+                        <div class="row mb-3">
+                            <label for="photo" class="col-md-4 col-form-label text-md-end">{{ __('Photo') }}</label>
+
+                            <div class="col-md-6">
+                                <input id="photo" type="url" class="form-control" name="photo" required >
+                            </div>
+                        </div>
+
                         <!-- Role Selection -->
                         <div class="row mb-3">
                             <label for="role" class="col-md-4 col-form-label text-md-end">{{ __('Register as') }}</label>

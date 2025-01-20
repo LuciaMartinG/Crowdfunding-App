@@ -18,6 +18,7 @@
                     <div class="col-md-8">
                         <div class="card-body">
                             <h2 class="card-title">{{ $project->title }}</h2>
+                            <h4 class="user">User: {{ $project->user->name }}</h4>
                             <p class="card-text">{{ $project->description }}</p>
                             <h5 class="card-subtitle mb-2">Deadline: {{ $project->limit_date }}</h5>
                             <h5 class="card-subtitle mb-2 ">Money raised: {{ $project->current_investment }} / {{ $project->max_investment }}</h5>
