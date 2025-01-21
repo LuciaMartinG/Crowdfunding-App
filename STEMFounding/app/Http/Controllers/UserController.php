@@ -101,4 +101,17 @@ class UserController extends Controller
 
 }
 
+public function listUsers(Request $request)
+    {
+        $banned = $request->input('banned');
+
+        $userList = User::when(!is_null($banned), function ($query) use ($banned) {
+            return $query->where('banned', $banned);
+        })->paginate(10);
+
+        return view('userList', [
+            'userList' => $userList,
+        ]);
+    }
+
 }

@@ -122,10 +122,9 @@ Route::get('/', function () {
         Ruta para mostrar la lista de usuarios, solo accesible para usuarios autenticados.
         Paginación de 10 proyectos por página.
     */
-    Route::get('/user', function () {
-        return view('userList', ['userList' => User::paginate(10)]);
-    })->middleware('auth');
-
+    Route::get('/user', [UserController::class, 'listUsers'])
+    ->middleware('auth')
+    ->name('users.list');
 
         /*
         Ruta para mostrar el detalle de usuario específico.
