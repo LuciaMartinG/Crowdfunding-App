@@ -30,24 +30,56 @@
         </form>
     </div>
 
-    <div class="row">
-        @foreach($projectList as $project)
-            @if($project->state == 'active' || $project->state == 'inactive')
-                <div class="col-12 col-md-6 col-lg-4 mb-4">
-                    <div class="card">
-                        <!-- Imagen del proyecto -->
-                        <img src="https://imgs.search.brave.com/5BFgigCdSRNQjIo1mp9FL0jaX6J6Rt4HdCPn3cfsvjQ/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9mcmFt/ZXJ1c2VyY29udGVu/dC5jb20vaW1hZ2Vz/L3JpNWp4ellReFBD/SHVyWmdYZU9scmVj/RWdkVS5wbmc" 
-                             class="card-img-top img-fluid" alt="{{ $project->title }}" >
-                        <div class="card-body">
-                            <h5 class="card-title fw-bold">{{ $project->title }}</h5>
-                            <p class="card-text">{{ $project->description }}</p>
-                            <a href="project/detail/{{ $project->id }}" class="btn btn-secondary text-white">View Details</a>
+    <!-- Si el estado seleccionado es "inactive", mostrar un carrusel -->
+    @if(request('state') == 'inactive')
+        <div id="inactiveProjectsCarousel" class="carousel slide" data-bs-ride="carousel" style="max-width: 800px; margin: 0 auto;">
+            <div class="carousel-inner">
+                @foreach($projectList as $index => $project)
+                    @if($project->state == 'inactive')
+                        <div class="carousel-item @if($index == 0) active @endif">
+                            <div class="card">
+                                <img src="https://imgs.search.brave.com/5BFgigCdSRNQjIo1mp9FL0jaX6J6Rt4HdCPn3cfsvjQ/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9mcmFt/ZXJ1c2VyY29udGVu/dC5jb20vaW1hZ2Vz/L3JpNWp4ellReFBD/SHVyWmdYZU9scmVj/RWdkVS5wbmc" 
+                                     class="card-img-top img-fluid" alt="{{ $project->title }}" >
+                                <div class="card-body">
+                                    <h5 class="card-title fw-bold">{{ $project->title }}</h5>
+                                    <p class="card-text">{{ $project->description }}</p>
+                                    <a href="project/detail/{{ $project->id }}" class="btn btn-secondary text-white">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+                @endforeach
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#inactiveProjectsCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#inactiveProjectsCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+    @else
+        <!-- Si no se selecciona 'inactive', mostrar los proyectos en modo estándar -->
+        <div class="row">
+            @foreach($projectList as $project)
+                @if($project->state == 'active' || $project->state == 'inactive')
+                    <div class="col-12 col-md-6 col-lg-4 mb-4">
+                        <div class="card">
+                            <!-- Imagen del proyecto -->
+                            <img src="https://imgs.search.brave.com/5BFgigCdSRNQjIo1mp9FL0jaX6J6Rt4HdCPn3cfsvjQ/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9mcmFt/ZXJ1c2VyY29udGVu/dC5jb20vaW1hZ2Vz/L3JpNWp4ellReFBD/SHVyWmdYZU9scmVj/RWdkVS5wbmc" 
+                                 class="card-img-top img-fluid" alt="{{ $project->title }}" >
+                            <div class="card-body">
+                                <h5 class="card-title fw-bold">{{ $project->title }}</h5>
+                                <p class="card-text">{{ $project->description }}</p>
+                                <a href="project/detail/{{ $project->id }}" class="btn btn-secondary text-white">View Details</a>
+                            </div>
                         </div>
                     </div>
-                </div>
-            @endif
-        @endforeach
-    </div>
+                @endif
+            @endforeach
+        </div>
+    @endif
 
     <!-- Paginación de Proyectos -->
     <div class="d-flex justify-content-between mt-4">
