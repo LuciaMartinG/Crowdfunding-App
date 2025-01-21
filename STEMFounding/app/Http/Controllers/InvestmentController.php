@@ -89,11 +89,9 @@ class InvestmentController extends Controller
 
         }
     
-        // Verificar que no hayan pasado 24 horas desde la inversión
-        $timeElapsed = now()->diffInHours($investment->created_at);
-        if ($timeElapsed > 24) {
-            return redirect()->route('investments.show', ['id' => $investment->project_id])->with('success', 'Han pasado más de 24 horas,no puedes retirar la inversión.');
-
+        if ($investment->created_at->addHours(24)->isPast()) {
+            return redirect()->route('investments.show', ['id' => $investment->project_id])
+                ->with('error', 'More than 24 hours have passed. You cannot withdraw the investment.');
         }
     
         // Obtener el proyecto relacionado
