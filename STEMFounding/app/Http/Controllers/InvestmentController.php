@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Project;
 use App\Models\Investment;
+use Illuminate\Support\Facades\Auth;
+
 
 class InvestmentController extends Controller
 {
@@ -34,6 +36,9 @@ class InvestmentController extends Controller
         // Actualizar el current_investment del proyecto
         $project->current_investment += $request->investment_amount;
         $project->save();
+
+        $user->balance -= $request->investment_amount;
+        $user->save();
     
         // Crear la inversión en la tabla investments
         $investment = Investment::create([
@@ -46,14 +51,70 @@ class InvestmentController extends Controller
         return redirect()->back()->with('success', 'Investment successful!');
     }
 
-    public function myInvestments()
+    public function projectInvestments()
     {
-        // Obtener las inversiones del usuario autenticado
-        $investments = Investment::with('project')
-            ->where('user_id', auth()->user()->id)
+        $user = Auth::user();
+
+        // Obtener los proyectos en los que el usuario ha invertido
+        $projects = Project::whereHas('investments', function($query) use ($user) {
+        $query->where('user_id', $user->id); // Filtra las inversiones que pertenecen al usuario
+        })->paginate(10); // Paginación de proyectos
+        
+        return view('myInvestments', ['projects' => $projects]);
+    }
+
+    public function showInvestments($id)
+    {
+        // Obtener el proyecto por ID
+        $project = Project::findOrFail($id);
+
+        // Obtener las inversiones del usuario autenticado para ese proyecto
+        $investments = Investment::where('project_id', $project->id)
+            ->where('user_id', Auth::id())
             ->get();
 
-            return view('myInvestments', ['investments' => $investments]);
+        // Pasar el proyecto y las inversiones a la vista
+        return view('projectInvestments',['investments' => $investments]);
     }
+
+    public function withdrawInvestment($investmentId)
+    {
+        // Obtener la inversión
+        $investment = Investment::findOrFail($investmentId);
+        $user = auth()->user(); // Usuario autenticado
+    
+        // Verificar que la inversión sea de este usuario
+        if ($investment->user_id !== $user->id) {
+            return redirect()->route('investments.show', ['id' => $investment->project_id])->with('success', 'No puedes retirar la inversión.');
+
+        }
+    
+        // Verificar que no hayan pasado 24 horas desde la inversión
+        $timeElapsed = now()->diffInHours($investment->created_at);
+        if ($timeElapsed > 24) {
+            return redirect()->route('investments.show', ['id' => $investment->project_id])->with('success', 'Han pasado más de 24 horas,no puedes retirar la inversión.');
+
+        }
+    
+        // Obtener el proyecto relacionado
+        $project = $investment->project;
+    
+        // Actualizar el saldo del proyecto
+        $project->current_investment -= $investment->investment_amount; // Reducir la cantidad invertida en el proyecto
+        $project->save();
+    
+        // Eliminar la inversión
+        $investment->delete();
+    
+        // Si quieres devolver el dinero al inversor, esto dependerá de la lógica que estés utilizando para manejar el saldo de los usuarios
+        // Aquí asumimos que tienes un campo de saldo en la tabla de usuarios.
+        $user->balance += $investment->investment_amount; // Aumentar el saldo del inversor con el monto de la inversión
+        $user->save();
+    
+        // Redirigir a la página de inversiones con un mensaje de éxito
+        return redirect()->route('investments.show', ['id' => $investment->project_id])->with('success', 'Inversión retirada correctamente.');
+
+    }
+    
     
 }

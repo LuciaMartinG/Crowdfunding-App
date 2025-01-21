@@ -5,17 +5,17 @@
 @section('content')
 
 <div class="container my-5">
-        @if(session('success'))
-            <div class="alert alert-success">
-                {{ session('success') }}
-            </div>
-        @endif
+    @if(session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+    @endif
 
-        @if(session('error'))
-            <div class="alert alert-danger">
-                {{ session('error') }}
-            </div>
-        @endif
+    @if(session('error'))
+        <div class="alert alert-danger">
+            {{ session('error') }}
+        </div>
+    @endif
 
     <div class="row justify-content-center">
         <!-- Tarjeta para mostrar el proyecto -->
@@ -48,62 +48,67 @@
                                     {{ round($percentage, 2) }}% 
                                 </div>
                             </div>
+                        
                         <!-- Mostrar las actualizaciones del proyecto -->
                         <h4 class="mb-3">Project Updates</h4>
-                            @forelse ($project->updates as $update)
-                                <div class="update mb-3 p-3 border rounded">
-                                    <h5 class="update-title">{{ $update->title }}</h5>
-                                    <p class="update-description">{{ $update->description }}</p>
-                                    <p><strong>Updated by:</strong> {{ $update->user->name }} | <strong>On:</strong> {{ $update->updated_at->format('d-m-Y H:i') }}</p>
-                                </div>
-                            @empty
-                                <p>No updates available for this project.</p>
-                            @endforelse
+                        @forelse ($project->updates as $update)
+                            <div class="update mb-3 p-3 border rounded">
+                                <h5 class="update-title">{{ $update->title }}</h5>
+                                <p class="update-description">{{ $update->description }}</p>
+                                <p><strong>Updated by:</strong> {{ $update->user->name }} | <strong>On:</strong> {{ $update->updated_at->format('d-m-Y H:i') }}</p>
+                            </div>
+                        @empty
+                            <p>No updates available for this project.</p>
+                        @endforelse
 
-                            @if(Auth::check() && Auth::user()->role == 'admin')
-                                <a href="/project/delete/{{ $project->id }}" class="btn btn-danger btn-sm mb-3 w-auto" onclick="return confirm('¿Are you sure?');">Delete Project</a>
-                            @endif
+                        @if(Auth::check() && Auth::user()->role == 'admin')
+                            <a href="/project/delete/{{ $project->id }}" class="btn btn-danger btn-sm mb-3 w-auto" onclick="return confirm('¿Are you sure?');">Delete Project</a>
+                        @endif
 
-                            @if(Auth::check() && Auth::user()->role == 'admin')
-                                <form action="/projects/activate-or-deactivate" method="POST">
-                                    @csrf
-                                    <input type="hidden" name="id" value="{{ $project->id }}">
-                                    @if ($project->state == 'active')
-                                        <button type="submit" name="state" value="inactive" class="btn btn-danger btn-sm mb-3">Disable Project</button>
-                                    @elseif ($project->state == 'inactive')
-                                        <button type="submit" name="state" value="active" class="btn btn-success btn-sm mb-3">Enable Project</button>
-                                    @endif
-                                </form>
-                                <p>Current state: <span id="currentState">{{ $project->state }}</span></p>
-                            @endif
+                        @if(Auth::check() && Auth::user()->role == 'admin')
+                            <form action="/projects/activate-or-deactivate" method="POST">
+                                @csrf
+                                <input type="hidden" name="id" value="{{ $project->id }}">
+                                @if ($project->state == 'active')
+                                    <button type="submit" name="state" value="inactive" class="btn btn-danger btn-sm mb-3">Disable Project</button>
+                                @elseif ($project->state == 'inactive')
+                                    <button type="submit" name="state" value="active" class="btn btn-success btn-sm mb-3">Enable Project</button>
+                                @endif
+                            </form>
+                            <p>Current state: <span id="currentState">{{ $project->state }}</span></p>
+                        @endif
 
-                            <!-- Botón "Found" visible solo para el usuario con rol 'investor' -->
-                            @if (Auth::check() && Auth::user()->role == 'investor')
-                                <button 
-                                            class="btn btn-warning btn-sm mt-3" 
-                                            data-bs-toggle="modal" 
-                                            data-bs-target="#editFoundsModal-{{ $project->id }}">
-                                            Add Founds
-                                        </button>
-                                        
-                                        @include('addFoundsModal', ['project' => $project])
-                            @endif
+                        <!-- Verificar si el usuario ha invertido en el proyecto -->
+                        @if (Auth::check() && Auth::user()->role == 'investor' && $project->investments->where('user_id', Auth::id())->count() > 0)
+                            <a href="{{ url('/project/investments/' . $project->id) }}" class="btn btn-info btn-sm mt-3">View My Investments</a>
+                        @endif
 
-                            <!-- Botón "Edit Project" y Modal visible solo si el proyecto pertenece al usuario autenticado -->
-                            @if ($project->user_id == Auth::id())
+                        <!-- Botón "Found" visible solo para el usuario con rol 'investor' -->
+                        @if (Auth::check() && Auth::user()->role == 'investor')
                             <button 
-                                            class="btn btn-warning btn-sm mt-3" 
-                                            data-bs-toggle="modal" 
-                                            data-bs-target="#editProjectModal-{{ $project->id }}">
-                                            Edit Project
-                                        </button>
+                                        class="btn btn-warning btn-sm mt-3" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#editFoundsModal-{{ $project->id }}">
+                                        Add Founds
+                                    </button>
+                                    
+                                    @include('addFoundsModal', ['project' => $project])
+                        @endif
 
-                                <!-- Modal para editar proyecto -->
-                                @include('editProjectModal', ['project' => $project])
-                                
-                                </div>
-                            @endif
-                        </div>
+                        <!-- Botón "Edit Project" y Modal visible solo si el proyecto pertenece al usuario autenticado -->
+                        @if ($project->user_id == Auth::id())
+                        <button 
+                                        class="btn btn-warning btn-sm mt-3" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#editProjectModal-{{ $project->id }}">
+                                        Edit Project
+                                    </button>
+
+                            <!-- Modal para editar proyecto -->
+                            @include('editProjectModal', ['project' => $project])
+                            
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>

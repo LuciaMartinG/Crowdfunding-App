@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Project;
 use Illuminate\Support\Facades\Auth;
 use App\Models\ProjectUpdate;
+use Carbon\Carbon;
 
 
 class ProjectController extends Controller
@@ -83,10 +84,6 @@ class ProjectController extends Controller
     }
     
     
-
-
-    
-
    public function updateStateProject(Request $request) {
         // Obtener el ID y el estado del proyecto desde la solicitud
         $id = $request->input('id');
@@ -153,15 +150,29 @@ class ProjectController extends Controller
 
     
  
+public function showActiveAndInactiveProjects()
+{
+    $projectList = Project::whereIn('state', ['active', 'inactive'])->paginate(10); // 10 proyectos por página
+    $now = Carbon::now();
 
-    public function showActiveAndInactiveProjects()
-    {
-        // Obtener todos los proyectos cuyo estado sea 'active' o 'inactive'
-        $projectList = Project::whereIn('state', ['active', 'inactive'])->paginate(10); // 10 proyectos por página
+    foreach ($projectList as $project) {
+        // Desactivar proyectos que alcanzaron la financiación máxima
+        if ($project->current_investment >= $project->max_investment) {
+            $project->state = 'inactive';
+            $project->save();
+        }
 
-        // Retornar la vista con los proyectos
-        return view('projectList', ['projectList' => $projectList]);
+        // Desactivar proyectos cuya fecha límite expiró sin alcanzar la financiación mínima
+        if ($project->deadline < $now && $project->current_investment < $project->min_investment) {
+            $project->state = 'inactive';
+            $project->save();
+        }
     }
+
+    return view('projectList', ['projectList' => $projectList]);
+}
+
+
 
     public function showPendingProjects()
     {
