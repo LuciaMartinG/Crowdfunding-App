@@ -106,8 +106,7 @@ class InvestmentController extends Controller
         // Eliminar la inversión
         $investment->delete();
     
-        // Si quieres devolver el dinero al inversor, esto dependerá de la lógica que estés utilizando para manejar el saldo de los usuarios
-        // Aquí asumimos que tienes un campo de saldo en la tabla de usuarios.
+       
         $user->balance += $investment->investment_amount; // Aumentar el saldo del inversor con el monto de la inversión
         $user->save();
     
@@ -115,6 +114,32 @@ class InvestmentController extends Controller
         return redirect()->route('investments.show', ['id' => $investment->project_id])->with('success', 'Inversión retirada correctamente.');
 
     }
+
+    public function showInvestors($projectId)
+{
+    // Obtener el proyecto por su ID
+    $project = Project::findOrFail($projectId);
+
+    // Obtener todos los inversores que han invertido en este proyecto
+    $investors = $project->investments()
+                        ->with('user')  // Obtener la información del usuario (inversor)
+                        ->get();  // Obtener todas las inversiones
+
+    // Mapear los inversores y sus cantidades invertidas
+    $investorsWithAmount = $investors->map(function ($investment) {
+        return [
+            'user' => $investment->user->name,  // Nombre del inversor
+            'investment_amount' => $investment->investment_amount,  // Cantidad invertida
+        ];
+    });
+
+    // Pasar los inversores y sus cantidades a la vista
+    return view('projectInvestors', [
+        'project' => $project,
+        'investorsWithAmount' => $investorsWithAmount,
+    ]);
+}
+
     
     
 }

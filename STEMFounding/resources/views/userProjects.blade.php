@@ -65,7 +65,9 @@
                                                 <button type="submit" name="state" value="active" class="btn btn-success btn-sm mb-3">Enable Project</button>
                                             @endif
                                         </form>
-
+                                        @if(Auth::check() && Auth::user()->role == 'entrepreneur')
+                                <a href="{{ route('projects.investors', ['id' => $project->id]) }}" class="btn btn-info btn-sm">Ver Inversores</a>
+                                        @endif
                                         <!-- Botón para abrir el modal -->
                                         <button 
                                             class="btn btn-warning btn-sm mt-3" 

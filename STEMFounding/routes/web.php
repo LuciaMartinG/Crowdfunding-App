@@ -202,6 +202,13 @@ Route::get('/', function () {
     ->middleware(['auth', 'role:investor'])
     ->name('investments.show');
 
+    // Ruta para borrar las inversiones de un proyecto específico
     Route::delete('/investments/withdraw/{investment}', [InvestmentController::class, 'withdrawInvestment'])
     ->middleware(['auth', 'role:investor'])
     ->name('investments.withdraw');
+
+    //Ruta para ver los usuarios que han invertido en cada proyecto
+    Route::get('/project/{id}/investors', [InvestmentController::class, 'showInvestors'])
+    ->middleware(['auth', 'role:entrepreneur'])
+    ->name('projects.investors');
+
