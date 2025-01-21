@@ -29,50 +29,44 @@
                     </div>
                     @endif
 
-                 <!-- Botón "Change Role" que abre el modal (solo visible para admin) -->
-            @if(Auth::user() && (Auth::user()->role == 'admin'))
-                <div class="d-flex flex-column align-items-start mb-4">
-                    <!-- Botón "Change Role" -->
-                    <button class="btn btn-secondary text-white btn-lg mb-3" data-bs-toggle="modal" data-bs-target="#changeRoleModal">
-                        <i class="bi bi-pencil-square"></i> Change Role
-                    </button>
+                    <!-- Botón "Change Role" y formulario de ban solo visible para admin -->
+                    @if(Auth::user() && Auth::user()->role == 'admin')
+                        <div class="d-flex flex-column align-items-start mb-4">
+                            <!-- Botón "Change Role" -->
+                            <button class="btn btn-secondary text-white btn-lg mb-3" data-bs-toggle="modal" data-bs-target="#changeRoleModal">
+                                <i class="bi bi-pencil-square"></i> Change Role
+                            </button>
 
-                    <!-- Separador para una mejor separación visual -->
-                    <hr class="w-100 my-3">
+                            <!-- Formulario para Banear o Desbanear -->
+                            @if(Auth::id() !== $user->id) <!-- Verificar que el admin no esté viendo su propio perfil -->
+                                <form action="/user/ban" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="id" value="{{ $user->id }}">
 
-                    <!-- Formulario para Banear o Desbanear -->
-                    <form action="/user/ban" method="POST">
-                        @csrf
-                        <input type="hidden" name="id" value="{{ $user->id }}">
-
-                        <!-- Botón para Banear o Desbanear -->
-                        <div class="d-flex align-items-center mb-3">
-                            @if ($user->banned)
-                                <button type="submit" name="state" value="unban" class="btn btn-success btn-lg">
-                                    <i class="bi bi-unlock"></i> Unban User
-                                </button>
-                            @else
-                                <button type="submit" name="state" value="ban" class="btn btn-danger btn-lg">
-                                    <i class="bi bi-lock"></i> Ban User
-                                </button>
+                                    <div class="d-flex align-items-center mb-3">
+                                        @if($user->banned)
+                                            <button type="submit" name="state" value="unban" class="btn btn-success btn-lg">
+                                                <i class="bi bi-unlock"></i> Unban User
+                                            </button>
+                                        @else
+                                            <button type="submit" name="state" value="ban" class="btn btn-danger btn-lg">
+                                                <i class="bi bi-lock"></i> Ban User
+                                            </button>
+                                        @endif
+                                    </div>
+                                </form>
                             @endif
                         </div>
-                    </form>
+                    @endif
 
-                    
-                   
-                </div>
-            @endif
-
-                    
                     <!-- Recuadro con saldo actual -->
                     <div class="mt-4">
                         <p><strong>Current Balance:</strong> {{ number_format($user->balance, 2) }} €</p>
                     </div>
 
+                    <!-- Botón "Modify Balance" solo para emprendedores o inversores -->
                     @if(Auth::check() && (Auth::user()->role == 'entrepreneur' || Auth::user()->role == 'investor'))
-                    <!-- Botón "Modify Balance" que abre el modal -->
-                    <button class="btn btn-secondary text-white" data-bs-toggle="modal" data-bs-target="#modifyBalanceModal">Modify Balance</button>
+                        <button class="btn btn-secondary text-white" data-bs-toggle="modal" data-bs-target="#modifyBalanceModal">Modify Balance</button>
                     @endif
                 </div>
             </div>
@@ -80,7 +74,7 @@
     </div>
 
     <!-- Modal para cambiar el rol -->
-    @if(Auth::user() && (Auth::user()->role == 'admin'))
+    @if(Auth::user() && Auth::user()->role == 'admin')
     <div class="modal fade" id="changeRoleModal" tabindex="-1" aria-labelledby="changeRoleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -107,9 +101,8 @@
     </div>
     @endif
 
-
-<!-- Modal para modificar el saldo -->
-@if(Auth::check() && (Auth::user()->role == 'entrepreneur' || Auth::user()->role == 'investor'))
+    <!-- Modal para modificar el saldo -->
+    @if(Auth::check() && (Auth::user()->role == 'entrepreneur' || Auth::user()->role == 'investor'))
     <div class="modal fade" id="modifyBalanceModal" tabindex="-1" aria-labelledby="modifyBalanceModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -161,8 +154,7 @@
             </div>
         </div>
     </div>
-@endif
-
+    @endif
 
     <!-- Proyectos del usuario -->
     <h2 class="mb-4">Projects by {{ $user->name }}</h2>

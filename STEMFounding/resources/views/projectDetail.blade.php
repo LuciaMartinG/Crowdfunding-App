@@ -60,11 +60,11 @@
                                 <p>No updates available for this project.</p>
                             @endforelse
 
-                            @if (Auth::user()->role == 'admin')
+                            @if(Auth::check() && Auth::user()->role == 'admin')
                                 <a href="/project/delete/{{ $project->id }}" class="btn btn-danger btn-sm mb-3 w-auto" onclick="return confirm('¿Are you sure?');">Delete Project</a>
                             @endif
 
-                            @if (Auth::user()->role == 'admin')
+                            @if(Auth::check() && Auth::user()->role == 'admin')
                                 <form action="/projects/activate-or-deactivate" method="POST">
                                     @csrf
                                     <input type="hidden" name="id" value="{{ $project->id }}">
@@ -78,7 +78,7 @@
                             @endif
 
                             <!-- Botón "Found" visible solo para el usuario con rol 'investor' -->
-                            @if (Auth::user()->role == 'investor')
+                            @if (Auth::check() && Auth::user()->role == 'investor')
                                 <button 
                                             class="btn btn-warning btn-sm mt-3" 
                                             data-bs-toggle="modal" 

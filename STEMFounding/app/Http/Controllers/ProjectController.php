@@ -204,7 +204,25 @@ class ProjectController extends Controller
         ]);
     }
 
-
+    public function showProjects($id)
+    {
+        // Buscar el proyecto por ID
+        $project = Project::find($id);
+    
+        // Verificar si el proyecto existe
+        if (!$project) {
+            abort(404, 'Project not found');
+        }
+    
+        // Verificar si el estado del proyecto es 'pending' y si el usuario no es admin
+        if ($project->state === 'pending' && Auth::user()?->role !== 'admin') {
+            abort(403, 'You are not authorized to view this project.');
+        }
+    
+        // Retornar la vista con los detalles del proyecto
+        return view('projectDetail', ['project' => $project]);
+    }
+    
 
 
 }
