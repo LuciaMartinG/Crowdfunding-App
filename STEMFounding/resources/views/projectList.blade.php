@@ -50,14 +50,14 @@
                     @endif
                 @endforeach
             </div>
-            <button class="carousel-control-prev" type="button" data-bs-target="#inactiveProjectsCarousel" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Previous</span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#inactiveProjectsCarousel" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Next</span>
-            </button>
+            <button class="carousel-control-prev position-absolute top-50 start-0 translate-middle-y" type="button" data-bs-target="#inactiveProjectsCarousel" data-bs-slide="prev" style="z-index: 10;">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next position-absolute top-50 end-0 translate-middle-y" type="button" data-bs-target="#inactiveProjectsCarousel" data-bs-slide="next" style="z-index: 10;">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
         </div>
     @else
         <!-- Si no se selecciona 'inactive', mostrar los proyectos en modo estándar -->
