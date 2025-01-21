@@ -204,24 +204,31 @@ class ProjectController extends Controller
         ]);
     }
 
-    public function showProjects($id)
+    public function showProjects(Request $request)
     {
-        // Buscar el proyecto por ID
-        $project = Project::find($id);
+        // Obtener el valor de 'state' desde la solicitud GET
+        $state = $request->input('state');
     
-        // Verificar si el proyecto existe
-        if (!$project) {
-            abort(404, 'Project not found');
+        // Crear la consulta inicial
+        $query = Project::query();
+    
+        // Si se pasa un estado, filtrar los proyectos por el estado
+        if ($state) {
+            $query->where('state', $state);
         }
     
-        // Verificar si el estado del proyecto es 'pending' y si el usuario no es admin
-        if ($project->state === 'pending' && Auth::user()?->role !== 'admin') {
-            abort(403, 'You are not authorized to view this project.');
+        // Filtrar para que los proyectos con estado 'pending' solo se muestren a administradores
+        if (Auth::user() && Auth::user()->role !== 'admin') {
+            $query->where('state', '!=', 'pending'); // Si el usuario no es admin, no mostrar proyectos 'pending'
         }
     
-        // Retornar la vista con los detalles del proyecto
-        return view('projectDetail', ['project' => $project]);
+        // Obtener los proyectos con paginación (10 proyectos por página)
+        $projectList = $query->paginate(10);
+    
+        // Retornar la vista con los proyectos filtrados
+        return view('projectList', ['projectList' => $projectList]);
     }
+    
     
 
 

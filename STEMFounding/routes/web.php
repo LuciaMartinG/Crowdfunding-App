@@ -45,12 +45,11 @@ Route::get('/', function () {
         Ruta para mostrar el detalle de proyecto específico.
         La ruta recibe el ID del proyecto y muestra su información.
     */
-    // Route::get('/project/detail/{id}', function ($id) {
-    //     return view('projectDetail', ['project' => Project::find($id)]);
-    // });
+    Route::get('/project/detail/{id}', function ($id) {
+        return view('projectDetail', ['project' => Project::find($id)]);
+    });
 
-    Route::get('/project/detail/{id}', [ProjectController::class, 'showProjects']); //solo se pueden ver los activos e inactivos excepto el admin que puede verlos todos
-
+    Route::get('/projects', [ProjectController::class, 'showProjects'])->name('projects.list'); 
 
     Route::get('/project/delete/{id}', function ($id) {
         Project::destroy($id);
