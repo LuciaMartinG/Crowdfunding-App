@@ -45,5 +45,15 @@ class InvestmentController extends Controller
         // Redirigir al usuario con un mensaje de éxito
         return redirect()->back()->with('success', 'Investment successful!');
     }
+
+    public function myInvestments()
+    {
+        // Obtener las inversiones del usuario autenticado
+        $investments = Investment::with('project')
+            ->where('user_id', auth()->user()->id)
+            ->get();
+
+            return view('myInvestments', ['investments' => $investments]);
+    }
     
 }

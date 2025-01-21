@@ -193,3 +193,8 @@ Route::get('/', function () {
     //Ruta para invertir//
     Route::post('/invest', [InvestmentController::class, 'invest'])->middleware('auth');
     
+    //Ruta para ver los proyectos en los que ha invertido el usuario INVERSOR
+    Route::get('/investments/my-projects', [InvestmentController::class, 'myInvestments'])
+    ->middleware(['auth', 'role:investor']);
+  
+

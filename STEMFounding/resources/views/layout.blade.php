@@ -36,6 +36,12 @@
                         <a href="/user" class="btn btn-secondary text-white ms-3">Users</a>
                     </li>
                 @endif
+
+                @if(Auth::check() && Auth::user()->role == 'investor')
+                    <li class="nav-item">
+                        <a href="/investments/my-projects" class="btn btn-secondary text-white ms-3">My investments</a>
+                    </li>
+                @endif
             </ul>
             <ul class="nav">
                 @if(Auth::check()) <!-- Verifica si el usuario está autenticado -->
