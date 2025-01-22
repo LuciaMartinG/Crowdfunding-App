@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native'; // Para navegar despu�
 
 const CreateProject = () => {
     // Establecer el estado para los campos del formulario
+    // const [userId, setUserId] = useState('');
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [imageUrl, setImageUrl] = useState('');
@@ -12,7 +13,7 @@ const CreateProject = () => {
     const [minInvestment, setMinInvestment] = useState('');
     const [maxInvestment, setMaxInvestment] = useState('');
     const [limitDate, setLimitDate] = useState('');
-    const [currentInvestment, setCurrentInvestment] = useState('');
+    // const [currentInvestment, setCurrentInvestment] = useState('');
 
     const navigation = useNavigation(); // Hook para navegar después de crear el proyecto
 
@@ -20,14 +21,15 @@ const CreateProject = () => {
     const handleSubmit = async () => {
         // Verificar si todos los campos están completos
         if (
+            // !userId ||
             !title || 
             !description || 
             !imageUrl || 
             !videoUrl || 
             !minInvestment || 
             !maxInvestment || 
-            !limitDate ||
-            !currentInvestment
+            !limitDate
+            // !currentInvestment
         ) {
             Alert.alert('Error', 'Please fill out all fields.');
             return;
@@ -36,21 +38,22 @@ const CreateProject = () => {
         try {
             // Preparar los datos del proyecto
             const projectData = {
+                // userId: userId,
                 title,
                 description,
                 image_url: imageUrl,
                 video_url: videoUrl,
                 min_investment: parseFloat(minInvestment),
                 max_investment: parseFloat(maxInvestment),
-                limit_date: limitDate,
-                current_investment: parseFloat(currentInvestment)
+                limit_date: limitDate
+                // current_investment: parseFloat(currentInvestment)
             };
             console.log(projectData);
 
 
             // Llamar a la función postInsertProject desde projectService
             const response = await postInsertProject(projectData);
-
+console.log(response);
             // Si la respuesta es exitosa, navegar a la pantalla de Projects
             if (response.status === 200) {
                 Alert.alert('Success', 'Project created successfully!');
@@ -119,12 +122,12 @@ const CreateProject = () => {
                 onChangeText={setLimitDate}
             />
 
-            <TextInput
+            {/* <TextInput
                 style={styles.input}
                 placeholder="Current investment"
                 value={currentInvestment}
                 onChangeText={setCurrentInvestment}
-            />
+            /> */}
 
             <Button title="Create Project" onPress={handleSubmit} />
         </View>
