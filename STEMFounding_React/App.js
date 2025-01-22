@@ -1,9 +1,10 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { StyleSheet, View, Text, Button } from 'react-native';
 import Project from './src/pages/Project';
 import ProjectDetail from './src/pages/ProjectDetail'; // Asegúrate de importar ProjectDetail
-import { StyleSheet, View, Text } from 'react-native';
+import CreateProject from './src/pages/CreateProject'; // Importa la pantalla CreateProject
 
 const Stack = createStackNavigator();
 
@@ -21,18 +22,31 @@ export default function App() {
                     <Stack.Screen
                         name="Projects"
                         component={Project}
-                        options={{
+                        options={({ navigation }) => ({
                             headerTitle: () => (
                                 <Text style={styles.headerTitle}>Projects</Text>
                             ),
-                        }}
+                            headerRight: () => (
+                                <Button
+                                    title="Create Project"
+                                    onPress={() => navigation.navigate('CreateProject')}
+                                    color="#55877e" // Cambia el color del texto del botón a verde
+                                />
+                            ),
+                        })}
                     />
-                    {/* Asegúrate de agregar la pantalla ProjectDetail */}
                     <Stack.Screen
                         name="ProjectDetail"
                         component={ProjectDetail}
                         options={{
                             headerTitle: 'Project Details', // Título del header para esta pantalla
+                        }}
+                    />
+                    <Stack.Screen
+                        name="CreateProject"
+                        component={CreateProject} // Pantalla de crear proyecto
+                        options={{
+                            headerTitle: 'Create New Project', // Título del header para la pantalla de creación
                         }}
                     />
                 </Stack.Navigator>
