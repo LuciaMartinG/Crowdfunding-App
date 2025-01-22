@@ -25,7 +25,7 @@ Route::delete('/project/{id}', function ($id) {
     return Project::destroy($id);
 });
 
-Route::post('/project', [ProjectController::class, 'createProject']);
+Route::post('/project', [ProjectController::class, 'createProjectPostman']);
 
 Route::put('/project', [ProjectController::class, 'updateProject']);
 
