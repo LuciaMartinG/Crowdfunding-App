@@ -45,7 +45,7 @@ const CreateProject = () => {
                 limit_date: limitDate,
                 current_investment: parseFloat(currentInvestment)
             };
-
+            console.log(projectData);
 
 
             // Llamar a la función postInsertProject desde projectService
