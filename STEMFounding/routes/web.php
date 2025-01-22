@@ -49,8 +49,10 @@ Route::get('/', function () {
     //     return view('projectDetail', ['project' => Project::find($id)]);
     // });
 
-    Route::get('/project/detail/{id}', [ProjectController::class, 'showProjectDetails'])->middleware('auth'); //filtro para que se pueda ver los detalles de proyectos pending el admin
-
+    Route::get('/project/detail/{id}', [ProjectController::class, 'showProjectDetails'])
+    ->middleware('auth')
+    ->name('projects.show');
+    
     Route::get('/projects', [ProjectController::class, 'showProjects'])->name('projects.list'); 
 
     Route::get('/project/delete/{id}', function ($id) {
@@ -187,8 +189,11 @@ Route::get('/', function () {
 
    
     Route::get('/user/projects', [ProjectController::class, 'showUserProjects'])->middleware('auth')->name('user.projects');
+    
+    //Ruta para añadir actualizaciones
+    Route::post('/projects/{projectId}/comments', [ProjectController::class, 'addUpdates'])
+    ->name('projects.comments.add');
 
-   
     //Ruta para invertir//
     Route::post('/invest', [InvestmentController::class, 'invest'])->middleware('auth');
     

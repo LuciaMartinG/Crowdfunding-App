@@ -71,45 +71,46 @@ class ProjectController extends Controller
     }
     public function updateProject(Request $request)
     {
+        // Inicializar las variables
+        $message = '';
+        $type = 'error'; // Por defecto, el tipo de mensaje será error
+        
         // Obtener el ID del proyecto desde el request
         $id = $request->input('id');
-    
+        
         // Buscar el proyecto en la base de datos
         $project = Project::find($id);
-    
+        
         // Verificar si el proyecto existe
         if (!$project) {
-            return redirect()->back()->with('error', 'Project not found');
+            $message = 'Project not found';
         }
-    
         // Verificar si el usuario autenticado es el dueño del proyecto y que esté activo
-        if (auth()->user()->id !== $project->user_id || $project->state !== 'active') {
-            return redirect()->back()->with('error', 'You are not authorized to update this project');
+        else if (auth()->user()->id !== $project->user_id || $project->state !== 'active') {
+            $message = 'You are not authorized to update this project';
+        }
+        // Si todo está bien, proceder con la actualización
+        else {
+            // Actualizar los datos del proyecto
+            $project->title = $request->input('title', $project->title);
+            $project->description = $request->input('description', $project->description);
+            $project->image_url = $request->input('image_url', $project->image_url);
+            $project->video_url = $request->input('video_url', $project->video_url);
+            $project->min_investment = $request->input('min_investment', $project->min_investment);
+            $project->max_investment = $request->input('max_investment', $project->max_investment);
+            $project->limit_date = $request->input('limit_date', $project->limit_date);
+            $project->state = $request->input('state', $project->state);
+    
+            // Guardar los cambios en el proyecto
+            $project->save();
+    
+            // Establecer el mensaje de éxito
+            $message = 'Project updated successfully!';
+            $type = 'success'; // Cambiar tipo de mensaje a éxito
         }
     
-        // Actualizar los datos del proyecto
-        $project->title = $request->input('title', $project->title);
-        $project->description = $request->input('description', $project->description);
-        $project->image_url = $request->input('image_url', $project->image_url);
-        $project->video_url = $request->input('video_url', $project->video_url);
-        $project->min_investment = $request->input('min_investment', $project->min_investment);
-        $project->max_investment = $request->input('max_investment', $project->max_investment);
-        $project->limit_date = $request->input('limit_date', $project->limit_date);
-        $project->state = $request->input('state', $project->state);
-    
-        // Guardar los cambios en el proyecto
-        $project->save();
-    
-        // Crear una nueva actualización para el proyecto
-        ProjectUpdate::create([
-            'project_id' => $project->id,
-            'user_id' => auth()->user()->id,
-            'title' => $request->input('title', $project->title),
-            'description' => $request->input('description', $project->description),
-            'image_url' => $request->input('image_url', $project->image_url),
-        ]);
-    
-        return $project;
+        // Redirigir con el mensaje adecuado
+        return redirect()->back()->with($type, $message);
     }
     
     
@@ -134,49 +135,58 @@ class ProjectController extends Controller
     }
 
     public function activateOrRejectProject(Request $request, $id)
-{
-    // Obtener el proyecto por su ID
-    $project = Project::find($id);
-
-    // Verificar si el proyecto fue encontrado
-    if (!$project) {
-        return redirect()->back()->with('error', 'El proyecto no existe.');
-    }
-
-    // Obtener el valor de 'state' del formulario
-    $state = $request->input('state');
-
-    // Verificar si el proyecto pertenece al administrador
-    if (Auth::user()->role == 'admin') {
-        // Si se va a activar el proyecto
-        if ($state === 'active') {
-            // Verificar que el emprendedor no tenga más de 2 proyectos activos
-            $activeProjectsCount = Project::where('user_id', $project->user_id)
-                                          ->where('state', 'active')
-                                          ->count();
-
-            if ($activeProjectsCount >= 2) {
-                return redirect()->back()->with('error', ' The user already has 2 active projects.');
+    {
+        // Inicializar las variables
+        $message = '';
+        $type = 'error'; // Por defecto, el tipo de mensaje será error
+        
+        // Obtener el proyecto por su ID
+        $project = Project::find($id);
+    
+        // Verificar si el proyecto fue encontrado
+        if (!$project) {
+            $message = 'El proyecto no existe.';
+        }
+        // Verificar si el proyecto pertenece al administrador
+        else if (Auth::user()->role == 'admin') {
+            // Obtener el valor de 'state' del formulario
+            $state = $request->input('state');
+    
+            // Si se va a activar el proyecto
+            if ($state === 'active') {
+                // Verificar que el emprendedor no tenga más de 2 proyectos activos
+                $activeProjectsCount = Project::where('user_id', $project->user_id)
+                                              ->where('state', 'active')
+                                              ->count();
+    
+                if ($activeProjectsCount >= 2) {
+                    $message = 'The user already has 2 active projects.';
+                }
+                else {
+                    // Cambiar el estado del proyecto a 'active'
+                    $project->state = 'active';
+                    $message = 'Proyecto actualizado con éxito.';
+                    $type = 'success'; // Cambiar tipo de mensaje a éxito
+                }
             }
-            // Si no tiene más de 2 proyectos activos, cambiar el estado del proyecto a 'active'
-            $project->state = 'active';
+            // Si se va a rechazar el proyecto
+            elseif ($state === 'rejected') {
+                $project->state = 'rejected';
+                $message = 'Proyecto actualizado con éxito.';
+                $type = 'success'; // Cambiar tipo de mensaje a éxito
+            }
+    
+            // Guardar los cambios en el proyecto
+            $project->save();
         }
-
-        // Si se va a rechazar el proyecto
-        elseif ($state === 'rejected') {
-            $project->state = 'rejected';
+        else {
+            $message = 'No tienes permisos para cambiar el estado de este proyecto.';
         }
-
-        // Guardar los cambios en el proyecto
-        $project->save();
-
-        // Redirigir de nuevo a la lista de proyectos pendientes con un mensaje de éxito
-        return redirect('/projects/pending')->with('success', 'Proyecto actualizado con éxito.');
+    
+        // Redirigir con el mensaje adecuado
+        return redirect()->back()->with($type, $message);
     }
-
-    return redirect()->back()->with('error', 'No tienes permisos para cambiar el estado de este proyecto.');
-}
-
+    
     
  
 public function showActiveAndInactiveProjects()
@@ -228,21 +238,49 @@ public function showActiveAndInactiveProjects()
         return view('userProjects', ['projects' => $projects]);
     }
 
-    // Método para mostrar el detalle del proyecto
-    public function showUpdates($id)
+    
+    // public function showUpdates($id)
+    // {
+    //     // Obtener el proyecto por ID
+    //     $project = Project::find($id);
+    
+    //     // Obtener las actualizaciones del proyecto
+    //     $updates = $project->updates; // Esto obtiene todas las actualizaciones relacionadas con el proyecto
+    
+    //     // Retornar la vista con el proyecto y las actualizaciones
+    //     return view('projectDetail', [
+    //         'project' => $project,
+    //         'updates' => $updates,
+    //     ]);
+    // }
+
+    public function addUpdates(Request $request, $projectId)
     {
-        // Obtener el proyecto por ID
-        $project = Project::find($id);
-    
-        // Obtener las actualizaciones del proyecto
-        $updates = $project->updates; // Esto obtiene todas las actualizaciones relacionadas con el proyecto
-    
-        // Retornar la vista con el proyecto y las actualizaciones
-        return view('projectDetail', [
-            'project' => $project,
-            'updates' => $updates,
+        // Validar los datos del request
+        $request->validate([
+            'title' => 'nullable|string|max:255',        
+            'description' => 'nullable|string|max:1000', 
+            'image_url' => 'nullable|url',             
         ]);
+    
+        // Verificar que el proyecto existe
+        $project = Project::find($projectId);
+    
+        // Crear el comentario
+        $update = ProjectUpdate::create([
+            'project_id' => $project->id,                 // ID del proyecto del contexto
+            'user_id' => auth()->user()->id,              // ID del usuario autenticado
+            'title' => $request->input('title'),          // Título del comentario
+            'description' => $request->input('description'), // Descripción del comentario
+            'image_url' => $request->input('image_url'),  // URL de la imagen
+        ]);
+    
+        // Redirigir al detalle del proyecto con un mensaje de éxito
+        return redirect()->route('projects.show', $projectId)
+            ->with('success', 'Update added successfully');
     }
+    
+
 
 public function showProjects(Request $request)
 {

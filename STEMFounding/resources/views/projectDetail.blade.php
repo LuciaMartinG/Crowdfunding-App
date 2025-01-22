@@ -103,9 +103,14 @@
                                         data-bs-target="#editProjectModal-{{ $project->id }}">
                                         Edit Project
                                     </button>
+                
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCommentModal">
+                            Add Comment
+                        </button>
 
                             <!-- Modal para editar proyecto -->
                             @include('editProjectModal', ['project' => $project])
+                            @include('addUpdatesModal', ['project' => $project])
                             
                             </div>
                         @endif

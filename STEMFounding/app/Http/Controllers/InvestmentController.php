@@ -11,45 +11,52 @@ use Illuminate\Support\Facades\Auth;
 class InvestmentController extends Controller
 {
     public function invest(Request $request)
-    {
-        // Validar que la inversión sea mayor o igual a 10
-        $request->validate([
-            'investment_amount' => 'required|numeric|min:10',
-        ]);
-    
-        // Obtener al usuario autenticado
-        $user = auth()->user();
-        
-        // Obtener el proyecto
-        $project = Project::find($request->project_id);
-    
-        // Verificar si el proyecto existe
-        if (!$project) {
-            return redirect()->back()->with('error', 'Project not found.');
-        }
-    
-        // Verificar que el monto de la inversión sea mayor o igual a 10 euros
-        if ($request->investment_amount < 10) {
-            return redirect()->back()->with('error', 'The minimum investment amount is 10 euros.');
-        }
-    
+{
+    // Validar que la inversión sea mayor o igual a 10
+    $request->validate([
+        'investment_amount' => 'required|numeric|min:10',
+    ]);
+
+    // Inicializar un mensaje de respuesta
+    $message = '';
+
+    // Obtener al usuario autenticado y el proyecto
+    $user = auth()->user();
+    $project = Project::find($request->project_id);
+
+    // Verificar si el proyecto existe
+    if (!$project) {
+        $message = 'Project not found.';
+    } 
+    // Verificar que el monto de la inversión sea mayor o igual a 10 euros
+    else if ($request->investment_amount < 10) {
+        $message = 'The minimum investment amount is 10 euros.';
+    } 
+    // Si todo está bien, proceder con la inversión
+    else {
         // Actualizar el current_investment del proyecto
         $project->current_investment += $request->investment_amount;
         $project->save();
 
+        // Descontar el balance del usuario
         $user->balance -= $request->investment_amount;
         $user->save();
-    
+
         // Crear la inversión en la tabla investments
-        $investment = Investment::create([
+        Investment::create([
             'user_id' => $user->id,
             'project_id' => $request->project_id,
             'investment_amount' => $request->investment_amount,
         ]);
-    
-        // Redirigir al usuario con un mensaje de éxito
-        return redirect()->back()->with('success', 'Investment successful!');
+
+        // Establecer el mensaje de éxito
+        $message = 'Investment successful!';
     }
+
+    // Redirigir al usuario con el mensaje apropiado (ya sea de error o éxito)
+    return redirect()->back()->with($message ? 'success' : 'error', $message);
+}
+
 
     public function projectInvestments()
     {
@@ -79,39 +86,47 @@ class InvestmentController extends Controller
 
     public function withdrawInvestment($investmentId)
     {
+        // Inicializar el mensaje de respuesta
+        $message = '';
+        $type = 'error'; // Por defecto, el mensaje será de tipo error
+    
         // Obtener la inversión
         $investment = Investment::findOrFail($investmentId);
         $user = auth()->user(); // Usuario autenticado
     
         // Verificar que la inversión sea de este usuario
         if ($investment->user_id !== $user->id) {
-            return redirect()->route('investments.show', ['id' => $investment->project_id])->with('success', 'No puedes retirar la inversión.');
-
+            $message = 'No puedes retirar la inversión.';
+        }
+        // Verificar si han pasado más de 24 horas
+        else if ($investment->created_at->addHours(24)->isPast()) {
+            $message = 'More than 24 hours have passed. You cannot withdraw the investment.';
+        }
+        // Si todo está bien, proceder con el retiro
+        else {
+            // Obtener el proyecto relacionado
+            $project = $investment->project;
+    
+            // Actualizar el saldo del proyecto
+            $project->current_investment -= $investment->investment_amount; // Reducir la cantidad invertida en el proyecto
+            $project->save();
+    
+            // Eliminar la inversión
+            $investment->delete();
+    
+            // Actualizar el saldo del usuario
+            $user->balance += $investment->investment_amount; // Aumentar el saldo del inversor con el monto de la inversión
+            $user->save();
+    
+            // Establecer el mensaje de éxito
+            $message = 'Inversión retirada correctamente.';
+            $type = 'success'; // Cambiar tipo de mensaje a éxito
         }
     
-        if ($investment->created_at->addHours(24)->isPast()) {
-            return redirect()->route('investments.show', ['id' => $investment->project_id])
-                ->with('error', 'More than 24 hours have passed. You cannot withdraw the investment.');
-        }
-    
-        // Obtener el proyecto relacionado
-        $project = $investment->project;
-    
-        // Actualizar el saldo del proyecto
-        $project->current_investment -= $investment->investment_amount; // Reducir la cantidad invertida en el proyecto
-        $project->save();
-    
-        // Eliminar la inversión
-        $investment->delete();
-    
-       
-        $user->balance += $investment->investment_amount; // Aumentar el saldo del inversor con el monto de la inversión
-        $user->save();
-    
-        // Redirigir a la página de inversiones con un mensaje de éxito
-        return redirect()->route('investments.show', ['id' => $investment->project_id])->with('success', 'Inversión retirada correctamente.');
-
+        // Redirigir a la página de inversiones con el mensaje adecuado
+        return redirect()->route('investments.show', ['id' => $investment->project_id])->with($type, $message);
     }
+    
 
     public function showInvestors($projectId)
 {
