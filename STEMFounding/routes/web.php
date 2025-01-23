@@ -193,6 +193,20 @@ Route::get('/', function () {
     Route::post('/projects/{projectId}/comments', [ProjectController::class, 'addUpdates'])
     ->name('projects.comments.add');
 
+    // Ruta para eliminar actualizaciones
+    Route::get('/comment/delete/{id}', function ($id) {
+    $update = ProjectUpdate::find($id);
+    ProjectUpdate::destroy($id);
+    $projectId = $update->project_id;
+    return redirect()->route('projects.show', ['id' => $projectId])->with('success', 'Update deleted successfully.');
+    })->name('projects.comments.delete');
+        
+
+    // Ruta para actualizar actualizaciones
+    Route::put('/projects/edit/{updateId}', [ProjectController::class, 'editUpdate']) 
+    ->name('projects.comments.edit');
+
+
     //Ruta para invertir//
     Route::post('/invest', [InvestmentController::class, 'invest'])->middleware('auth');
     

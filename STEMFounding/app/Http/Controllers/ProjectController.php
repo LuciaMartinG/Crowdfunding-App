@@ -303,51 +303,85 @@ public function showActiveAndInactiveProjects()
     return redirect()->route('projects.show', $projectId)->with($message === 'Update added successfully' ? 'success' : 'error', $message);
 }
 
+   
 
-public function showProjects(Request $request)
+    public function editUpdate(Request $request, $updateId)
 {
-    // Obtener el valor de 'state' desde la solicitud GET
-    $state = $request->input('state');
+    $message = '';
+    $update = ProjectUpdate::find($updateId);
 
-    // Crear la consulta inicial
-    $query = Project::query();
+    if (!$update) {
+        $message = 'Update not found.';
+    } 
+    else if ($update->user_id !== auth()->user()->id || $update->project->user_id !== auth()->user()->id) {
+        $message = 'You do not have permission to update this update.';
+    } 
+    else {
+        $request->validate([
+            'title' => 'nullable|string|max:255',
+            'description' => 'nullable|string|max:1000',
+            'image_url' => 'nullable|url',
+        ]);
 
-    // Si se pasa un estado, filtrar los proyectos por el estado
-    if ($state) {
-        $query->where('state', $state);
+        $update->update([
+            'title' => $request->input('title', $update->title),
+            'description' => $request->input('description', $update->description),
+            'image_url' => $request->input('image_url', $update->image_url),
+        ]);
+
+        $message = 'Update updated successfully.';
     }
 
-    // Filtrar para que los proyectos con estado 'pending' solo se muestren a administradores
-    if (Auth::user() && Auth::user()->role !== 'admin') {
-        $query->where('state', '!=', 'pending'); // Si el usuario no es admin, no mostrar proyectos 'pending'
-    }
-
-    // Obtener los proyectos con paginación (10 proyectos por página)
-    $projectList = $query->paginate(10);
-
-    // Retornar la vista con los proyectos filtrados
-    return view('projectList', ['projectList' => $projectList]);
-}
-
-    
-public function showProjectDetails($id)
-{
-    // Buscar el proyecto por ID
-    $project = Project::find($id);
-    
-    // Verificar si el proyecto existe
-    if (!$project) {
-        abort(404, 'Project not found');
-    }
-
-    // Verificar si el estado del proyecto es 'pending' y si el usuario no es admin
-    if ($project->state === 'pending' && Auth::user()?->role !== 'admin') {
-        abort(403, 'You are not authorized to view this project.');
-    }
-
-    // Si todo está bien, retornar la vista con los detalles del proyecto
-    return view('projectDetail', ['project' => $project]);
+    return redirect()->route('projects.show', $update ? $update->project_id : null)->with('message', $message);
 }
 
 
-}
+
+
+    public function showProjects(Request $request)
+    {
+        // Obtener el valor de 'state' desde la solicitud GET
+        $state = $request->input('state');
+
+        // Crear la consulta inicial
+        $query = Project::query();
+
+        // Si se pasa un estado, filtrar los proyectos por el estado
+        if ($state) {
+            $query->where('state', $state);
+        }
+
+        // Filtrar para que los proyectos con estado 'pending' solo se muestren a administradores
+        if (Auth::user() && Auth::user()->role !== 'admin') {
+            $query->where('state', '!=', 'pending'); // Si el usuario no es admin, no mostrar proyectos 'pending'
+        }
+
+        // Obtener los proyectos con paginación (10 proyectos por página)
+        $projectList = $query->paginate(10);
+
+        // Retornar la vista con los proyectos filtrados
+        return view('projectList', ['projectList' => $projectList]);
+    }
+
+        
+    public function showProjectDetails($id)
+    {
+        // Buscar el proyecto por ID
+        $project = Project::find($id);
+        
+        // Verificar si el proyecto existe
+        if (!$project) {
+            abort(404, 'Project not found');
+        }
+
+        // Verificar si el estado del proyecto es 'pending' y si el usuario no es admin
+        if ($project->state === 'pending' && Auth::user()?->role !== 'admin') {
+            abort(403, 'You are not authorized to view this project.');
+        }
+
+        // Si todo está bien, retornar la vista con los detalles del proyecto
+        return view('projectDetail', ['project' => $project]);
+    }
+
+
+    }
