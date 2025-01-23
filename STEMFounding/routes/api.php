@@ -47,3 +47,6 @@ Route::delete('/user/{id}', function ($id) {
 Route::post('/user', [RegisterController::class, 'createUser']);
 
 Route::put('/user', [UserController::class, 'updateUser']);
+
+Route::get('/userProjects/{id}', [ProjectController::class, 'showUserProjectsPostman']);
+

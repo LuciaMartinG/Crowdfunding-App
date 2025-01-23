@@ -7,6 +7,7 @@ use App\Models\Project;
 use Illuminate\Support\Facades\Auth;
 use App\Models\ProjectUpdate;
 use Carbon\Carbon;
+use App\Models\User;
 
 
 class ProjectController extends Controller
@@ -238,6 +239,17 @@ public function showActiveAndInactiveProjects()
         return view('userProjects', ['projects' => $projects]);
     }
 
+    public function showUserProjectsPostman($id)
+    {
+        // Obtener el usuario logueado
+        $user = User::find($id);
+
+        // Obtener los proyectos asociados con ese usuario
+        $projects = $user->projects;  // Esta es la relación 'hasMany' definida en el modelo User
+
+        // Pasar los proyectos a la vista
+        return response()->json($projects);
+    }
     
     // public function showUpdates($id)
     // {
