@@ -104,7 +104,7 @@
                                         Edit Project
                                     </button>
                 
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCommentModal">
+                        <button type="button" class="btn btn-primary btn-sm mt-3" data-bs-toggle="modal" data-bs-target="#addCommentModal">
                             Add Comment
                         </button>
 

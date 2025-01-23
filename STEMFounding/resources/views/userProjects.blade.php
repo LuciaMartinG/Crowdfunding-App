@@ -66,11 +66,11 @@
                                             @endif
                                         </form>
                                         @if(Auth::check() && Auth::user()->role == 'entrepreneur')
-                                <a href="{{ route('projects.investors', ['id' => $project->id]) }}" class="btn btn-info btn-sm">Ver Inversores</a>
+                                <a href="{{ route('projects.investors', ['id' => $project->id]) }}" class="btn btn-info btn-sm">View investors</a>
                                         @endif
                                         <!-- Botón para abrir el modal -->
                                         <button 
-                                            class="btn btn-warning btn-sm mt-3" 
+                                            class="btn btn-warning btn-sm" 
                                             data-bs-toggle="modal" 
                                             data-bs-target="#editProjectModal-{{ $project->id }}">
                                             Edit Project

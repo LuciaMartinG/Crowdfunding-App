@@ -255,31 +255,41 @@ public function showActiveAndInactiveProjects()
     // }
 
     public function addUpdates(Request $request, $projectId)
-    {
-        // Validar los datos del request
-        $request->validate([
-            'title' => 'nullable|string|max:255',        
-            'description' => 'nullable|string|max:1000', 
-            'image_url' => 'nullable|url',             
-        ]);
-    
-        // Verificar que el proyecto existe
-        $project = Project::find($projectId);
-    
-        // Crear el comentario
+{
+
+    $request->validate([
+        'title' => 'nullable|string|max:255',        
+        'description' => 'nullable|string|max:1000', 
+        'image_url' => 'nullable|url',             
+    ]);
+
+    $message = '';
+    $project = Project::find($projectId);
+
+    if (!$project) {
+        $message = 'Project not found.';
+    } 
+    else if ($project->state !== 'active') {
+        $message = 'Updates can only be added to active projects.';
+    } 
+    else if ($project->user_id !== auth()->user()->id) {
+        $message = 'Only the project owner can add updates.';
+    } 
+  
+    else {
         $update = ProjectUpdate::create([
             'project_id' => $project->id,                 // ID del proyecto del contexto
             'user_id' => auth()->user()->id,              // ID del usuario autenticado
-            'title' => $request->input('title'),          // Título del comentario
-            'description' => $request->input('description'), // Descripción del comentario
+            'title' => $request->input('title'),          // Título de la actualización
+            'description' => $request->input('description'), // Descripción de la actualización
             'image_url' => $request->input('image_url'),  // URL de la imagen
         ]);
-    
-        // Redirigir al detalle del proyecto con un mensaje de éxito
-        return redirect()->route('projects.show', $projectId)
-            ->with('success', 'Update added successfully');
+
+        $message = 'Update added successfully';
     }
-    
+
+    return redirect()->route('projects.show', $projectId)->with($message === 'Update added successfully' ? 'success' : 'error', $message);
+}
 
 
 public function showProjects(Request $request)
