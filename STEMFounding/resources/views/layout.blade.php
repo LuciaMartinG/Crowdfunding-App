@@ -12,16 +12,11 @@
     <header class="bg-secondary text-white py-3">
         <nav class="container d-flex justify-content-between align-items-center">
             <ul class="nav">
-               <li class="nav-item dropdown">
-                    <a href="#" class="nav-link dropdown-toggle text-white" id="projectsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+               
+                    <a href="/project" class="btn btn-secondary text-white ms-3">
                         Projects
                     </a>
-                    <ul class="dropdown-menu" aria-labelledby="projectsDropdown">
-                        <li><a class="dropdown-item" href="/projects?state=active">Active</a></li>
-                        <li><a class="dropdown-item" href="/projects?state=inactive">Inactive</a></li>
-                        <li><a class="dropdown-item" href="/projects">All Projects</a></li>
-                    </ul>
-                </li>
+                    
                 @if(Auth::check() && Auth::user()->role == 'entrepreneur')
                     <li class="nav-item">
                         <a href="/project/create" class="btn btn-secondary text-white ms-3">Create Project</a>

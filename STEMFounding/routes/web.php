@@ -34,7 +34,7 @@ Route::get('/', function () {
         Ruta para mostrar la lista de proyectos activos e inactivos,accesible para todos los usuarios.
         Paginación de 10 proyectos por página.
     */
-    Route::get('/project', [ProjectController::class, 'showActiveAndInactiveProjects'])->middleware('auth');
+    Route::get('/project', [ProjectController::class, 'showActiveAndInactiveProjects']);
     Route::get('/projects/pending', [ProjectController::class, 'showPendingProjects'])->middleware('auth','role:admin');
 
     // Route::get('/', function () {
@@ -50,7 +50,6 @@ Route::get('/', function () {
     // });
 
     Route::get('/project/detail/{id}', [ProjectController::class, 'showProjectDetails'])
-    ->middleware('auth')
     ->name('projects.show');
     
     Route::get('/projects', [ProjectController::class, 'showProjects'])->name('projects.list'); 
