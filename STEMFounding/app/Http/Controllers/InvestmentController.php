@@ -153,6 +153,45 @@ class InvestmentController extends Controller
     ]);
 }
 
+public function showInvestorsPostman($projectId)
+{
+    try {
+        // Obtener el proyecto por su ID
+        $project = Project::findOrFail($projectId);
+
+        // Obtener todos los inversores que han invertido en este proyecto
+        $investors = $project->investments()
+                            ->with('user') // Cargar información del usuario (inversor)
+                            ->get();
+
+        // Mapear los inversores y sus cantidades invertidas
+        $investorsWithAmount = $investors->map(function ($investment) {
+            return [
+                'user_name' => $investment->user->name, // Nombre del inversor
+                'investment_amount' => $investment->investment_amount, // Cantidad invertida
+            ];
+        });
+
+        // Respuesta JSON exitosa
+        return response()->json([
+            'success' => true,
+            'project' => [
+                'id' => $project->id,
+                'title' => $project->title,
+                'description' => $project->description,
+            ],
+            'investors' => $investorsWithAmount,
+        ], 200);
+    } catch (\Exception $e) {
+        // Manejo de errores
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to retrieve project investors.',
+            'error' => $e->getMessage(),
+        ], 500);
+    }
+}
+
     
     
 }
