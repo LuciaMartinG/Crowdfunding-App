@@ -27,7 +27,7 @@ Route::delete('/project/{id}', function ($id) {
 
 Route::post('/project', [ProjectController::class, 'createProjectPostman']);
 
-Route::put('/project', [ProjectController::class, 'updateProject']);
+Route::put('/updateProject', [ProjectController::class, 'updateProject']);
 
 
 
@@ -49,4 +49,6 @@ Route::post('/user', [RegisterController::class, 'createUser']);
 Route::put('/user', [UserController::class, 'updateUser']);
 
 Route::get('/userProjects/{id}', [ProjectController::class, 'showUserProjectsPostman']);
+
+Route::put('/updateProjectPostman', [ProjectController::class, 'updateProjectPostman']);
 

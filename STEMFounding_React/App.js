@@ -6,6 +6,8 @@ import Project from './src/pages/Project';
 import ProjectDetail from './src/pages/ProjectDetail'; 
 import CreateProject from './src/pages/CreateProject'; 
 import MyProjects from './src/pages/MyProjects';  // Importa el nuevo componente
+import EditProject from './src/pages/EditProject';  // Importa el nuevo componente
+
 
 const Stack = createStackNavigator();
 
@@ -62,6 +64,13 @@ export default function App() {
                         component={MyProjects} 
                         options={{
                             headerTitle: 'My Projects',
+                        }}
+                    />
+                    <Stack.Screen
+                        name="EditProject"
+                        component={EditProject} 
+                        options={{
+                            headerTitle: 'Edit Project',
                         }}
                     />
                 </Stack.Navigator>

@@ -8,3 +8,8 @@ export const getUserProjects = (userId) => API.get('/userProjects/'+userId);
 export const postInsertProject = (projectData) => {
     return API.post('/project', projectData); // Se pasan los datos del proyecto en el cuerpo de la solicitud
 };
+
+// Actualiza un proyecto existente
+export const updateProject = (projectData) => {
+    return API.put('/updateProjectPostman', projectData); // Enviar los datos del proyecto en el cuerpo de la solicitud
+};

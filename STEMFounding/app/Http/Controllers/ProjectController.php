@@ -113,6 +113,55 @@ class ProjectController extends Controller
         // Redirigir con el mensaje adecuado
         return redirect()->back()->with($type, $message);
     }
+
+    public function updateProjectPostman(Request $request)
+{
+    // Inicializar las variables
+    $message = '';
+    $type = 'error'; // Por defecto, el tipo de mensaje será error
+
+    // Obtener el ID del proyecto desde el request
+    $id = $request->input('id');
+
+    // Buscar el proyecto en la base de datos
+    $project = Project::find($id);
+
+    // Verificar si el proyecto existe
+    if (!$project) {
+        $message = 'Project not found';
+    } 
+    // Verificar si el proyecto pertenece al usuario con ID 22 y está activo
+    else if ($project->user_id !== 22 || $project->state !== 'active') {
+        $message = 'You are not authorized to update this project';
+    } 
+    // Si todo está bien, proceder con la actualización
+    else {
+        // Actualizar los datos del proyecto
+        $project->title = $request->input('title', $project->title);
+        $project->description = $request->input('description', $project->description);
+        $project->image_url = $request->input('image_url', $project->image_url);
+        $project->video_url = $request->input('video_url', $project->video_url);
+        $project->min_investment = $request->input('min_investment', $project->min_investment);
+        $project->max_investment = $request->input('max_investment', $project->max_investment);
+        $project->limit_date = $request->input('limit_date', $project->limit_date);
+        $project->state = $request->input('state', $project->state);
+
+        // Guardar los cambios en el proyecto
+        $project->save();
+
+        // Establecer el mensaje de éxito
+        $message = 'Project updated successfully!';
+        $type = 'success'; // Cambiar tipo de mensaje a éxito
+    }
+
+    // Retornar respuesta en formato JSON para Postman
+    return response()->json([
+        'type' => $type,
+        'message' => $message,
+        'project' => $type === 'success' ? $project : null // Si fue exitoso, retorna el proyecto actualizado
+    ]);
+}
+
     
     
    public function updateStateProject(Request $request) {
