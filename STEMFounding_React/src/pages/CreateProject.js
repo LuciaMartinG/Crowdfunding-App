@@ -55,7 +55,7 @@ const CreateProject = () => {
             const response = await postInsertProject(projectData);
 console.log(response);
             // Si la respuesta es exitosa, navegar a la pantalla de Projects
-            if (response.status === 200) {
+            if (response.status === 201 || response.status === 200) {
                 Alert.alert('Success', 'Project created successfully!');
                 navigation.navigate('Projects'); // Cambia 'Projects' por el nombre correcto de la pantalla de proyectos
             } else {

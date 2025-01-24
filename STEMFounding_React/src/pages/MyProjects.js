@@ -1,32 +1,29 @@
-// src/pages/MyProjects.js
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native'; // Importamos el hook de navegación
-import { getUserProjects } from '../services/projectService'; // Asegúrate de importar el servicio adecuado
+import { useNavigation } from '@react-navigation/native';
+import { getUserProjects } from '../services/projectService';
 
 const MyProjects = () => {
-    const [projects, setProjects] = useState([]); // Almacenamos los proyectos
-    const [loading, setLoading] = useState(true);  // Estado de carga
-    const [error, setError] = useState(null);  // Para manejar los errores
-    const navigation = useNavigation(); // Hook de navegación
+    const [projects, setProjects] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const navigation = useNavigation();
 
-    // Carga de los proyectos al montar el componente
     useEffect(() => {
         async function fetchProjects() {
             try {
-                const response = await getUserProjects(22); // Llamada a la API para obtener los proyectos del usuario con ID 22
-                setProjects(response.data); // Guarda los proyectos en el estado
-                setLoading(false); // Cambia el estado de carga a falso
+                const response = await getUserProjects(22);
+                setProjects(response.data);
+                setLoading(false);
             } catch (error) {
-                setError('Error al cargar los proyectos'); // Muestra el error si ocurre uno
-                setLoading(false); // Cambia el estado de carga a falso
+                setError('Error al cargar los proyectos');
+                setLoading(false);
             }
         }
 
         fetchProjects();
-    }, []); // Solo se ejecuta una vez al montar el componente
+    }, []);
 
-    // Mostrar el contenido dependiendo del estado
     if (loading) {
         return (
             <View style={styles.container}>
@@ -54,13 +51,15 @@ const MyProjects = () => {
                         <Text style={styles.projectText}>Invested Amount: €{project.current_investment}</Text>
                         <Text style={styles.projectText}>Max Investment: €{project.max_investment}</Text>
                         <Text style={styles.projectText}>Status: {project.state}</Text>
-                        {/* Botón para editar el proyecto */}
-                        <TouchableOpacity
-                            style={styles.editButton}
-                            onPress={() => navigation.navigate('EditProject', { projectId: project.id})}
-                        >
-                            <Text style={styles.editButtonText}>Edit Project</Text>
-                        </TouchableOpacity>
+                        {/* Mostrar el botón solo si el estado del proyecto es "active" */}
+                        {project.state === 'active' && (
+                            <TouchableOpacity
+                                style={styles.editButton}
+                                onPress={() => navigation.navigate('EditProject', { projectId: project.id })}
+                            >
+                                <Text style={styles.editButtonText}>Edit Project</Text>
+                            </TouchableOpacity>
+                        )}
                     </View>
                 ))
             ) : (
@@ -74,7 +73,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 16,
-        backgroundColor: '#f9f5e9', // Fondo crema
+        backgroundColor: '#f9f5e9',
     },
     title: {
         fontSize: 22,
