@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { getUserProjects } from '../services/projectService';
-import { getProjectInvestors } from '../services/projectService';
+import { getUserProjects, activateOrReject } from '../services/projectService';
 
 const MyProjects = () => {
     const [projects, setProjects] = useState([]);
@@ -10,18 +9,31 @@ const MyProjects = () => {
     const [error, setError] = useState(null);
     const navigation = useNavigation();
 
-    useEffect(() => {
-        async function fetchProjects() {
-            try {
-                const response = await getUserProjects(22);
-                setProjects(response.data);
-                setLoading(false);
-            } catch (error) {
-                setError('Error al cargar los proyectos');
-                setLoading(false);
-            }
+    // Función para obtener proyectos del usuario
+    const fetchProjects = async () => {
+        try {
+            const response = await getUserProjects(22);
+            setProjects(response.data);
+            setLoading(false);
+        } catch (error) {
+            setError('Error al cargar los proyectos');
+            setLoading(false);
         }
+    };
 
+    // Función para cambiar el estado del proyecto
+    const handleToggleProjectState = async (projectId, currentState) => {
+        const newState = currentState === 'active' ? 'inactive' : 'active';
+        try {
+            await activateOrReject(projectId, {state:newState}); // Llamar al servicio con el nuevo estado
+            Alert.alert('Success', `Project has been ${newState === 'active' ? 'activated' : 'deactivated'} successfully.`);
+            fetchProjects(); // Recargar los proyectos para reflejar los cambios
+        } catch (error) {
+            Alert.alert('Error', 'Failed to update project state.');
+        }
+    };
+
+    useEffect(() => {
         fetchProjects();
     }, []);
 
@@ -52,7 +64,8 @@ const MyProjects = () => {
                         <Text style={styles.projectText}>Invested Amount: €{project.current_investment}</Text>
                         <Text style={styles.projectText}>Max Investment: €{project.max_investment}</Text>
                         <Text style={styles.projectText}>Status: {project.state}</Text>
-                        {/* Mostrar el botón solo si el estado del proyecto es "active" */}
+
+                        {/* Botón para editar proyecto */}
                         {project.state === 'active' && (
                             <TouchableOpacity
                                 style={styles.editButton}
@@ -61,12 +74,24 @@ const MyProjects = () => {
                                 <Text style={styles.editButtonText}>Edit Project</Text>
                             </TouchableOpacity>
                         )}
+
+                        {/* Botón para ver inversores */}
                         <TouchableOpacity
-                                style={styles.editButton}
-                                onPress={() => navigation.navigate('Investors', { projectId: project.id })}
-                            >
-                                <Text style={styles.editButtonText}>View Investors</Text>
-                            </TouchableOpacity>
+                            style={styles.editButton}
+                            onPress={() => navigation.navigate('Investors', { projectId: project.id })}
+                        >
+                            <Text style={styles.editButtonText}>View Investors</Text>
+                        </TouchableOpacity>
+
+                        {/* Botón para activar/desactivar proyecto */}
+                        <TouchableOpacity
+                            style={styles.toggleButton}
+                            onPress={() => handleToggleProjectState(project.id, project.state)}
+                        >
+                            <Text style={styles.toggleButtonText}>
+                                {project.state === 'active' ? 'Deactivate' : 'Activate'}
+                            </Text>
+                        </TouchableOpacity>
                     </View>
                 ))
             ) : (
@@ -129,6 +154,17 @@ const styles = StyleSheet.create({
         borderRadius: 8,
     },
     editButtonText: {
+        color: '#fff',
+        fontSize: 14,
+        textAlign: 'center',
+    },
+    toggleButton: {
+        marginTop: 10,
+        backgroundColor: '#FF5733',
+        padding: 10,
+        borderRadius: 8,
+    },
+    toggleButtonText: {
         color: '#fff',
         fontSize: 14,
         textAlign: 'center',

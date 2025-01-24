@@ -89,7 +89,7 @@
                         @endif
 
                         <!-- Botón "Found" visible solo para el usuario con rol 'investor' -->
-                        @if (Auth::check() && Auth::user()->role == 'investor')
+                        @if (Auth::check() && Auth::user()->role == 'investor' && $project->state == 'active')
                             <button 
                                         class="btn btn-warning btn-sm mt-3" 
                                         data-bs-toggle="modal" 

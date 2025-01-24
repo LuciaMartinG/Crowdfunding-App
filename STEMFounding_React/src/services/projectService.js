@@ -18,3 +18,9 @@ export const updateProject = (projectData) => {
 export const getProjectInvestors = (projectId) => {
     return API.get(`/projects/${projectId}/investors`); // Llamada GET al endpoint de inversores
 };
+
+
+// Actualiza el estado de un proyecto
+export const activateOrReject = (projectId, state) => {
+    return API.put(`/activateOrRejectProject/${projectId}`, { state });
+};

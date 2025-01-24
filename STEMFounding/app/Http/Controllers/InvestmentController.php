@@ -32,6 +32,9 @@ class InvestmentController extends Controller
     else if ($request->investment_amount < 10) {
         $message = 'The minimum investment amount is 10 euros.';
     } 
+    else if ($project->state === 'inactive' || $project->state === 'pending'){
+        $message = 'This project is not available';
+    }
     // Si todo está bien, proceder con la inversión
     else {
         // Actualizar el current_investment del proyecto

@@ -185,57 +185,98 @@ class ProjectController extends Controller
     }
 
     public function activateOrRejectProject(Request $request, $id)
-    {
-        // Inicializar las variables
-        $message = '';
-        $type = 'error'; // Por defecto, el tipo de mensaje será error
-        
-        // Obtener el proyecto por su ID
-        $project = Project::find($id);
-    
-        // Verificar si el proyecto fue encontrado
-        if (!$project) {
-            $message = 'El proyecto no existe.';
-        }
-        // Verificar si el proyecto pertenece al administrador
-        else if (Auth::user()->role == 'admin') {
-            // Obtener el valor de 'state' del formulario
-            $state = $request->input('state');
-    
-            // Si se va a activar el proyecto
-            if ($state === 'active') {
-                // Verificar que el emprendedor no tenga más de 2 proyectos activos
-                $activeProjectsCount = Project::where('user_id', $project->user_id)
-                                              ->where('state', 'active')
-                                              ->count();
-    
-                if ($activeProjectsCount >= 2) {
-                    $message = 'The user already has 2 active projects.';
-                }
-                else {
-                    // Cambiar el estado del proyecto a 'active'
-                    $project->state = 'active';
-                    $message = 'Proyecto actualizado con éxito.';
-                    $type = 'success'; // Cambiar tipo de mensaje a éxito
-                }
-            }
-            // Si se va a rechazar el proyecto
-            elseif ($state === 'rejected') {
-                $project->state = 'rejected';
+{
+    // Inicializar las variables
+    $message = '';
+    $type = 'error'; // Por defecto, el tipo de mensaje será error
+
+    // Obtener el proyecto por su ID
+    $project = Project::find($id);
+
+    // Verificar si el proyecto fue encontrado
+    if (!$project) {
+        $message = 'El proyecto no existe.';
+    } else {
+        // Obtener el valor de 'state' del formulario
+        $state = $request->input('state');
+
+        // Si se va a activar el proyecto
+        if ($state === 'active') {
+            // Verificar que el emprendedor no tenga más de 2 proyectos activos
+            $activeProjectsCount = Project::where('user_id', $project->user_id)
+                                          ->where('state', 'active')
+                                          ->count();
+
+            if ($activeProjectsCount >= 2) {
+                $message = 'The user already has 2 active projects.';
+            } else {
+                // Cambiar el estado del proyecto a 'active'
+                $project->state = 'active';
                 $message = 'Proyecto actualizado con éxito.';
                 $type = 'success'; // Cambiar tipo de mensaje a éxito
             }
-    
-            // Guardar los cambios en el proyecto
-            $project->save();
         }
-        else {
-            $message = 'No tienes permisos para cambiar el estado de este proyecto.';
+        // Si se va a rechazar el proyecto
+        else if ($state === 'rejected') {
+            $project->state = 'rejected';
+            $message = 'Proyecto actualizado con éxito.';
+            $type = 'success'; // Cambiar tipo de mensaje a éxito
         }
-    
-        // Redirigir con el mensaje adecuado
-        return redirect()->back()->with($type, $message);
+
+        // Guardar los cambios en el proyecto
+        $project->save();
     }
+
+    // Redirigir con el mensaje adecuado
+    return redirect()->back()->with($type, $message);
+}
+
+public function activateOrRejectProjectPostman(Request $request, $id)
+{
+    // Inicializar las variables
+    $message = '';
+    $type = 'error'; // Por defecto, el tipo de mensaje será error
+
+    // Obtener el proyecto por su ID
+    $project = Project::find($id);
+
+    // Verificar si el proyecto fue encontrado
+    if (!$project) {
+        $message = 'El proyecto no existe.';
+    } else {
+        // Obtener el valor de 'state' del formulario
+        $state = $request->input('state'); 
+
+        // Si se va a activar el proyecto
+        if ($state === 'active') {
+            // Verificar que el emprendedor no tenga más de 2 proyectos activos
+            $activeProjectsCount = Project::where('user_id', $project->user_id)
+                                          ->where('state', 'active')
+                                          ->count();
+
+            if ($activeProjectsCount >= 2) {
+                $message = 'The user already has 2 active projects.';
+            } else {
+                // Cambiar el estado del proyecto a 'active'
+                $project->state = 'active';
+                $message = 'Proyecto actualizado con éxito.';
+                $type = 'success'; // Cambiar tipo de mensaje a éxito
+            }
+        }
+        // Si se va a rechazar el proyecto
+        else if ($state === 'rejected') {
+            $project->state = 'rejected';
+            $message = 'Proyecto actualizado con éxito.';
+            $type = 'success'; // Cambiar tipo de mensaje a éxito
+        }
+
+        // Guardar los cambios en el proyecto
+        $project->save();
+    }
+
+    // Redirigir con el mensaje adecuado
+    return $project;
+}
     
     
  
@@ -244,19 +285,19 @@ public function showActiveAndInactiveProjects()
     $projectList = Project::whereIn('state', ['active', 'inactive'])->paginate(10); // 10 proyectos por página
     $now = Carbon::now();
 
-    foreach ($projectList as $project) {
-        // Desactivar proyectos que alcanzaron la financiación máxima
-        if ($project->current_investment >= $project->max_investment) {
-            $project->state = 'inactive';
-            $project->save();
-        }
+    // foreach ($projectList as $project) {
+    //     // Desactivar proyectos que alcanzaron la financiación máxima
+    //     if ($project->current_investment >= $project->max_investment) {
+    //         $project->state = 'inactive';
+    //         $project->save();
+    //     }
 
-        // Desactivar proyectos cuya fecha límite expiró sin alcanzar la financiación mínima
-        if ($project->deadline < $now && $project->current_investment < $project->min_investment) {
-            $project->state = 'inactive';
-            $project->save();
-        }
-    }
+    //     // Desactivar proyectos cuya fecha límite expiró sin alcanzar la financiación mínima
+    //     if ($project->deadline < $now && $project->current_investment < $project->min_investment) {
+    //         $project->state = 'inactive';
+    //         $project->save();
+    //     }
+    // }
 
     return view('projectList', ['projectList' => $projectList]);
 }
