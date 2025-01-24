@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { getUserProjects } from '../services/projectService';
+import { getProjectInvestors } from '../services/projectService';
 
 const MyProjects = () => {
     const [projects, setProjects] = useState([]);
@@ -60,6 +61,12 @@ const MyProjects = () => {
                                 <Text style={styles.editButtonText}>Edit Project</Text>
                             </TouchableOpacity>
                         )}
+                        <TouchableOpacity
+                                style={styles.editButton}
+                                onPress={() => navigation.navigate('Investors', { projectId: project.id })}
+                            >
+                                <Text style={styles.editButtonText}>View Investors</Text>
+                            </TouchableOpacity>
                     </View>
                 ))
             ) : (

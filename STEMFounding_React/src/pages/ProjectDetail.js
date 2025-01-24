@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import { getProjectById } from '../services/projectService';
 
+
 const ProjectDetail = () => {
     const route = useRoute();
     const { id } = route.params;  // Recibe el ID desde los parámetros de la ruta

@@ -164,24 +164,8 @@ public function showInvestorsPostman($projectId)
                             ->with('user') // Cargar información del usuario (inversor)
                             ->get();
 
-        // Mapear los inversores y sus cantidades invertidas
-        $investorsWithAmount = $investors->map(function ($investment) {
-            return [
-                'user_name' => $investment->user->name, // Nombre del inversor
-                'investment_amount' => $investment->investment_amount, // Cantidad invertida
-            ];
-        });
 
-        // Respuesta JSON exitosa
-        return response()->json([
-            'success' => true,
-            'project' => [
-                'id' => $project->id,
-                'title' => $project->title,
-                'description' => $project->description,
-            ],
-            'investors' => $investorsWithAmount,
-        ], 200);
+        return $investors;
     } catch (\Exception $e) {
         // Manejo de errores
         return response()->json([

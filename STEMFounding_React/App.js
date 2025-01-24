@@ -5,9 +5,9 @@ import { StyleSheet, View, Text, Button } from 'react-native';
 import Project from './src/pages/Project';
 import ProjectDetail from './src/pages/ProjectDetail'; 
 import CreateProject from './src/pages/CreateProject'; 
-import MyProjects from './src/pages/MyProjects';  // Importa el nuevo componente
-import EditProject from './src/pages/EditProject';  // Importa el nuevo componente
-
+import MyProjects from './src/pages/MyProjects';  
+import EditProject from './src/pages/EditProject';  
+import Investors from './src/pages/Investors';  
 
 const Stack = createStackNavigator();
 
@@ -71,6 +71,14 @@ export default function App() {
                         component={EditProject} 
                         options={{
                             headerTitle: 'Edit Project',
+                        }}
+                    />
+
+                    <Stack.Screen
+                        name="Investors"
+                        component={Investors} 
+                        options={{
+                            headerTitle: 'View investors',
                         }}
                     />
                 </Stack.Navigator>
