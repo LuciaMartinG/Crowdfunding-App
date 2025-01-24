@@ -5,8 +5,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\InvestmentController;
 use App\Models\Project;
 use App\Models\User;
+use App\Models\Investment;
 
 
 // Route::get('/user', function (Request $request) {
@@ -52,4 +54,4 @@ Route::get('/userProjects/{id}', [ProjectController::class, 'showUserProjectsPos
 
 Route::put('/updateProjectPostman', [ProjectController::class, 'updateProjectPostman']);
 
-Route::get('/projects/{projectId}/investors', [ProjectController::class, 'showInvestors']);
+Route::get('/projects/{projectId}/investors', [InvestmentController::class, 'showInvestors']);
