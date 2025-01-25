@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Button } from "react-native";
 import { getUserById } from "../services/projectService"; // Importación correcta
 
-const MyProfile = () => {
+const MyProfile = ({ navigation }) => {
   const userId = 22; // ID del entrepreneur
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true); // Estado para manejar la carga
@@ -48,6 +48,12 @@ const MyProfile = () => {
         <Text style={styles.label}>Current Balance:</Text>
         <Text style={styles.value}>€{user.balance}</Text>
       </View>
+
+      {/* Botón para navegar a EditUser y pasar los datos del usuario */}
+      <Button 
+        title="Edit Profile" 
+        onPress={() => navigation.navigate('EditUser', { user: user })} 
+      />
     </View>
   );
 };

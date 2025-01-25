@@ -9,6 +9,7 @@ import MyProjects from './src/pages/MyProjects';
 import EditProject from './src/pages/EditProject';  
 import Investors from './src/pages/Investors';  
 import MyProfile from './src/pages/MyProfile'; 
+import EditUser from './src/pages/EditUser'; 
 
 const Stack = createStackNavigator();
 
@@ -92,6 +93,13 @@ export default function App() {
                         component={MyProfile} 
                         options={{
                             headerTitle: 'My Profile',
+                        }}
+                    />
+                    <Stack.Screen
+                        name="EditUser"
+                        component={EditUser} 
+                        options={{
+                            headerTitle: 'Edit User',
                         }}
                     />
                 </Stack.Navigator>

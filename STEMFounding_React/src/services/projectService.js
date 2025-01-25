@@ -15,6 +15,11 @@ export const updateProject = (projectData) => {
     return API.put('/updateProjectPostman', projectData); // Enviar los datos del proyecto en el cuerpo de la solicitud
 };
 
+// Actualiza un usuario existente
+export const updateUser = (userData) => {
+    return API.put('/updateUser', userData); // Enviar los datos del usuario en el cuerpo de la solicitud
+};
+
 export const getProjectInvestors = (projectId) => {
     return API.get(`/projects/${projectId}/investors`); // Llamada GET al endpoint de inversores
 };
