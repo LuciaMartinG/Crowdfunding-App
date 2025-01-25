@@ -8,6 +8,7 @@ import CreateProject from './src/pages/CreateProject';
 import MyProjects from './src/pages/MyProjects';  
 import EditProject from './src/pages/EditProject';  
 import Investors from './src/pages/Investors';  
+import MyProfile from './src/pages/MyProfile'; 
 
 const Stack = createStackNavigator();
 
@@ -38,7 +39,12 @@ export default function App() {
                                     />
                                     <Button
                                         title="My Projects"
-                                        onPress={() => navigation.navigate('MyProjects')} // Agrega el botón para ir a "MyProjects"
+                                        onPress={() => navigation.navigate('MyProjects')} 
+                                        color="#55877e"
+                                    />
+                                    <Button
+                                        title="My Profile"
+                                        onPress={() => navigation.navigate('MyProfile')} 
                                         color="#55877e"
                                     />
                                 </View>
@@ -79,6 +85,13 @@ export default function App() {
                         component={Investors} 
                         options={{
                             headerTitle: 'View investors',
+                        }}
+                    />
+                    <Stack.Screen
+                        name="MyProfile"
+                        component={MyProfile} 
+                        options={{
+                            headerTitle: 'My Profile',
                         }}
                     />
                 </Stack.Navigator>
