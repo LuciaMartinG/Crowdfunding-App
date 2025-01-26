@@ -50,6 +50,8 @@ Route::post('/user', [RegisterController::class, 'createUser']);
 
 Route::put('/user', [UserController::class, 'updateUser']);
 
+Route::put('/updateUserBalance', [UserController::class, 'updateBalance']);
+
 Route::get('/userProjects/{id}', [ProjectController::class, 'showUserProjectsPostman']);
 
 Route::put('/updateProjectPostman', [ProjectController::class, 'updateProjectPostman']);

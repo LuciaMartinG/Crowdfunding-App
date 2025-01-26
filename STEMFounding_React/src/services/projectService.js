@@ -20,6 +20,11 @@ export const updateUser = (userData) => {
     return API.put('/user', userData); // Enviar los datos del usuario en el cuerpo de la solicitud
 };
 
+// Actualiza el saldo del usuario
+export const updateUserBalance = (balanceData) => {
+    return API.put('/updateUserBalance', balanceData); 
+};
+
 export const getProjectInvestors = (projectId) => {
     return API.get(`/projects/${projectId}/investors`); // Llamada GET al endpoint de inversores
 };
