@@ -151,47 +151,33 @@ class InvestmentController extends Controller
     // }
     
     public function showInvestors($projectId)
-{
-    // Inicializamos la variable de respuesta en caso de error
-    $response = (object)[
-        'success' => false,
-        'message' => 'Failed to retrieve project investors.',
-        'error' => null,
-    ];
-
-    try {
+    {
         // Obtener el proyecto por su ID
         $project = Project::findOrFail($projectId);
-
+    
         // Obtener todos los inversores que han invertido en este proyecto
         $investors = $project->investments()
                             ->with('user') // Cargar la información del usuario (inversor)
                             ->get();
-
-        // Crear una colección para almacenar los inversores y sus cantidades invertidas
+    
+        // Crear un arreglo para almacenar los inversores y sus cantidades invertidas
         $investorsWithAmount = collect();
-
+    
         // Recorrer las inversiones y agregar los datos al arreglo
         foreach ($investors as $investment) {
-            $investorsWithAmount->push((object)[
+            $investorsWithAmount[] = (object)[
                 'user' => $investment->user->name,  // Nombre del inversor
                 'investment_amount' => $investment->investment_amount,  // Cantidad invertida
-            ]);
+            ];
         }
-
-        // Si todo fue exitoso, modificamos la respuesta
-        $response->success = true;
-        $response->project = $project;  // Datos del proyecto
-        $response->investors = $investorsWithAmount;  // Inversores y sus inversiones
-    } catch (\Exception $e) {
-        // Si ocurre un error, almacenamos el error en la respuesta
-        $response->error = $e->getMessage();
+    
+        // Devolver los datos exitosos
+        return (object)[
+            'project' => $project,  // Datos del proyecto
+            'investors' => $investorsWithAmount,  // Inversores y sus inversiones
+        ];
     }
-
-    // Retornamos la respuesta (ya sea exitosa o con error) en una sola vez
-    return $response;
-}
-
+    
     
     
     
