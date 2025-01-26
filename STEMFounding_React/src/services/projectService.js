@@ -11,6 +11,10 @@ export const postInsertProject = (projectData) => {
     return API.post('/project', projectData); // Se pasan los datos del proyecto en el cuerpo de la solicitud
 };
 
+export const addUpdates = (projectId, projectData) => {
+    return API.post(`/addUpdate/${projectId}`, projectData); // Enviar el projectId en la URL
+};
+
 // Actualiza un proyecto existente
 export const updateProject = (projectData) => {
     return API.put('/updateProjectPostman', projectData); // Enviar los datos del proyecto en el cuerpo de la solicitud
