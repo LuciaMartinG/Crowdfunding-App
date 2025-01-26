@@ -212,7 +212,7 @@ Route::get('/', function () {
 Route::put('/projects/edit/{updateId}', function (Request $request, $updateId) {
     $response = app(ProjectController::class)->editUpdate($request, $updateId);
     return redirect()
-        ->route('projects.show', ['projectId' => $response->update ? $response->update->project_id : null])  // Redirige al proyecto
+        ->route('projects.show', ['id' => $response->update ? $response->update->project_id : null])  // Redirige al proyecto
         ->with($response->type, $response->message);  // Con el mensaje de éxito o error
     })->middleware('auth', 'role:entrepreneur') // Verifica que el usuario esté autenticado y sea emprendedor
      ->name('projects.comments.edit');
