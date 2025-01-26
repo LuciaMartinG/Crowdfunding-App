@@ -17,7 +17,12 @@ export const updateProject = (projectData) => {
 
 // Actualiza un usuario existente
 export const updateUser = (userData) => {
-    return API.put('/updateUser', userData); // Enviar los datos del usuario en el cuerpo de la solicitud
+    return API.put('/user', userData); // Enviar los datos del usuario en el cuerpo de la solicitud
+};
+
+// Actualiza el saldo del usuario
+export const updateUserBalance = (balanceData) => {
+    return API.put('/updateUserBalance', balanceData); 
 };
 
 export const getProjectInvestors = (projectId) => {

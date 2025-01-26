@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Image } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Image, Alert } from 'react-native';
 import { updateUser } from '../services/projectService'; // Importa la función updateUser
 
 const EditUser = ({ route, navigation }) => {
@@ -17,16 +17,24 @@ const EditUser = ({ route, navigation }) => {
       id: user.id, // Usa el ID del usuario
       name,
       email,
-      password: password || undefined, // Si no se ingresa una nueva contraseña, no la envíes
+      password: password || undefined, // Si no se ingresa nueva contraseña, se manda undefined
       photo: photo || user.photo, // Si no se ingresa una nueva URL, usa la anterior
     };
-    console.log('datos que se envian:', updatedUser);
+
+    console.log('Datos que se envían:', updatedUser);
+
     try {
       const response = await updateUser(updatedUser);
       console.log('User updated successfully:', response);
-      navigation.goBack(); // Vuelve a la pantalla anterior (MyProfile)
+
+      // Al actualizar correctamente, redirige a MyProfile con los datos actualizados
+      navigation.navigate('MyProfile', { updatedUser }); // Enviar datos actualizados a MyProfile
+
+      // O si prefieres ir a la pantalla anterior:
+      // navigation.goBack();
     } catch (error) {
       console.error('Error updating user:', error);
+      Alert.alert('Error', 'No se pudieron guardar los cambios. Por favor, inténtelo de nuevo.');
     }
   };
 
