@@ -208,9 +208,14 @@ Route::get('/', function () {
     })->name('projects.comments.delete');
         
 
-    // Ruta para actualizar actualizaciones
-    Route::put('/projects/edit/{updateId}', [ProjectController::class, 'editUpdate']) 
-    ->name('projects.comments.edit');
+    // Ruta para actualizar actualizaciones (usando PUT)
+Route::put('/projects/edit/{updateId}', function (Request $request, $updateId) {
+    $response = app(ProjectController::class)->editUpdate($request, $updateId);
+    return redirect()
+        ->route('projects.show', ['projectId' => $response->update ? $response->update->project_id : null])  // Redirige al proyecto
+        ->with($response->type, $response->message);  // Con el mensaje de éxito o error
+    })->middleware('auth', 'role:entrepreneur') // Verifica que el usuario esté autenticado y sea emprendedor
+     ->name('projects.comments.edit');
 
     //Ruta para invertir
     Route::post('/invest', function (Request $request) {

@@ -430,26 +430,29 @@ public function addUpdatesPostman(Request $request, $projectId)
     ];
 }
     
-   
-
-    public function editUpdate(Request $request, $updateId)
+public function editUpdate(Request $request, $updateId)
 {
     $message = '';
+    $type = 'error'; // Por defecto, error
     $update = ProjectUpdate::find($updateId);
 
+    // Verificar que el update existe
     if (!$update) {
         $message = 'Update not found.';
     } 
+    // Verificar si el usuario tiene permiso para actualizar este update
     else if ($update->user_id !== auth()->user()->id || $update->project->user_id !== auth()->user()->id) {
         $message = 'You do not have permission to update this update.';
     } 
     else {
+        // Validar la solicitud
         $request->validate([
             'title' => 'nullable|string|max:255',
             'description' => 'nullable|string|max:1000',
             'image_url' => 'nullable|url',
         ]);
 
+        // Actualizar la información del update
         $update->update([
             'title' => $request->input('title', $update->title),
             'description' => $request->input('description', $update->description),
@@ -457,12 +460,52 @@ public function addUpdatesPostman(Request $request, $projectId)
         ]);
 
         $message = 'Update updated successfully.';
+        $type = 'success'; // Cambiar el tipo a éxito
     }
 
-    return redirect()->route('projects.show', $update ? $update->project_id : null)->with('message', $message);
+    // Devolver el mensaje y el tipo en un objeto, junto con los detalles de la actualización si fue exitosa
+    return (object)[
+        'type' => $type,
+        'message' => $message,
+        'update' => $type === 'success' ? $update : null,
+    ];
 }
 
 
+    public function editUpdatePostman(Request $request, $updateId)
+    {
+        $message = '';
+        $type = 'error'; // Por defecto, error
+        $update = ProjectUpdate::find($updateId);
+
+        if (!$update) {
+            $message = 'Update not found.';
+        } else {
+            // Validar los datos de la solicitud
+            $request->validate([
+                'title' => 'nullable|string|max:255',
+                'description' => 'nullable|string|max:1000',
+                'image_url' => 'nullable|url',
+            ]);
+
+            // Actualizar la actualización
+            $update->update([
+                'title' => $request->input('title', $update->title),
+                'description' => $request->input('description', $update->description),
+                'image_url' => $request->input('image_url', $update->image_url),
+            ]);
+
+            $message = 'Update updated successfully.';
+            $type = 'success'; // Cambiar tipo a éxito
+        }
+
+        // Devolver el mensaje y el tipo en un objeto, junto con los detalles de la actualización si fue exitosa
+        return (object)[
+            'type' => $type,
+            'message' => $message,
+            'update' => $type === 'success' ? $update : null,
+        ];
+    }
 
 
     public function showProjects(Request $request)
