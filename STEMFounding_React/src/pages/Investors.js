@@ -15,9 +15,19 @@ const Investors = () => {
         async function fetchInvestors() {
             try {
                 const response = await getProjectInvestors(projectId); // Llamada al servicio
-                setInvestors(response.data);
+                
+                // Depuración: ver qué datos devuelve la API
+                console.log("API Response:", response);
+
+                // Verifica si los datos están dentro de 'data' y si existe 'investors'
+                if (response && response.data && Array.isArray(response.data.investors)) {
+                    setInvestors(response.data.investors); // Asumiendo que los inversores están dentro de 'data.investors'
+                } else {
+                    setInvestors([]); // Si no hay inversores, asignamos un arreglo vacío
+                }
                 setLoading(false);
             } catch (error) {
+                console.error("Error loading investors:", error); // Log de error para depurar
                 setError('Error loading investors');
                 setLoading(false);
             }
@@ -51,7 +61,7 @@ const Investors = () => {
             {investors.length > 0 ? (
                 investors.map((investor, index) => (
                     <View key={index} style={styles.investorCard}>
-                        <Text style={styles.investorName}>Name: {investor.user.name}</Text>
+                        <Text style={styles.investorName}>Name: {investor.user}</Text> {/* Nombre del inversor */}
                         <Text style={styles.investmentAmount}>Investment: €{investor.investment_amount}</Text>
                     </View>
                 ))

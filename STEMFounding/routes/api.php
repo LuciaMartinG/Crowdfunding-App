@@ -56,6 +56,6 @@ Route::get('/userProjects/{id}', [ProjectController::class, 'showUserProjectsPos
 
 Route::put('/updateProjectPostman', [ProjectController::class, 'updateProjectPostman']);
 
-Route::get('/projects/{projectId}/investors', [InvestmentController::class, 'showInvestorsPostman']);
+Route::get('/projects/{projectId}/investors', [InvestmentController::class, 'showInvestors']);
 
 Route::put('/activateOrRejectProject/{id}', [ProjectController::class, 'activateOrRejectProjectPostman']);
