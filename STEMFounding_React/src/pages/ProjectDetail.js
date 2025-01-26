@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
-import { getProjectById } from '../services/projectService';
+import { getProjectById, getProjectUpdates } from '../services/projectService'; // Importar getProjectUpdates
 
 const ProjectDetail = () => {
     const route = useRoute();
@@ -9,19 +9,25 @@ const ProjectDetail = () => {
     const { id } = route.params; // Recibe el ID desde los parámetros de la ruta
 
     const [project, setProject] = useState(null); // Almacenamos los detalles del proyecto
+    const [updates, setUpdates] = useState([]); // Almacenamos las actualizaciones del proyecto
 
-    // Carga de los detalles del proyecto al montar el componente
+    // Carga de los detalles del proyecto y actualizaciones al montar el componente
     useEffect(() => {
-        async function getProjectDetails() {
+        async function fetchData() {
             try {
+                // Obtener los detalles del proyecto
                 const projectResponse = await getProjectById(id);
                 setProject(projectResponse.data);
+
+                // Obtener las actualizaciones del proyecto
+                const updatesResponse = await getProjectUpdates(id);
+                setUpdates(updatesResponse.data);
             } catch (error) {
-                console.error('Error al cargar los detalles del proyecto:', error);
+                console.error('Error al cargar los datos del proyecto:', error);
             }
         }
 
-        getProjectDetails();
+        fetchData();
     }, [id]);
 
     // Función para calcular el progreso
@@ -87,6 +93,24 @@ const ProjectDetail = () => {
                                     <Text style={styles.investorsButtonText}>View Investors</Text>
                                 </TouchableOpacity>
                             </View>
+                        )}
+                    </View>
+
+                    {/* Sección de actualizaciones */}
+                    <View style={styles.updatesContainer}>
+                        <Text style={styles.updatesTitle}>Project Updates</Text>
+                        {updates.length > 0 ? (
+                            updates.map((update) => (
+                                <View key={update.id} style={styles.updateCard}>
+                                    <Text style={styles.updateTitle}>{update.title}</Text>
+                                    <Text style={styles.updateDescription}>{update.description}</Text>
+                                    <Text style={styles.updateDate}>
+                                        Updated on: {new Date(update.updated_at).toLocaleDateString()}
+                                    </Text>
+                                </View>
+                            ))
+                        ) : (
+                            <Text style={styles.noUpdatesText}>No updates available for this project.</Text>
                         )}
                     </View>
                 </View>
@@ -192,6 +216,46 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 16,
         fontWeight: 'bold',
+    },
+    updatesContainer: {
+        marginTop: 20,
+    },
+    updatesTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginBottom: 10,
+        color: '#333',
+    },
+    updateCard: {
+        padding: 15,
+        borderRadius: 10,
+        backgroundColor: '#fff',
+        marginBottom: 10,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
+    },
+    updateTitle: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        marginBottom: 5,
+        color: '#333',
+    },
+    updateDescription: {
+        fontSize: 14,
+        marginBottom: 5,
+        color: '#555',
+    },
+    updateDate: {
+        fontSize: 12,
+        color: '#888',
+    },
+    noUpdatesText: {
+        fontSize: 14,
+        color: '#888',
+        textAlign: 'center',
     },
 });
 

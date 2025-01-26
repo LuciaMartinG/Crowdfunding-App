@@ -4,6 +4,7 @@ export const getProjectList = () => API.get('/project');
 export const getProjectById = (id) => API.get('/project/'+id);
 export const getUserProjects = (userId) => API.get('/userProjects/'+userId);
 export const getUserById = (userId) => API.get('/user/'+userId);
+export const getProjectUpdates = (id) => API.get('/showUpdates/'+id);
 
 // Envía la solicitud POST para insertar un nuevo proyecto
 export const postInsertProject = (projectData) => {

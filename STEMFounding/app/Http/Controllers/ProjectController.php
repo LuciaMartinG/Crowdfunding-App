@@ -391,6 +391,44 @@ public function showActiveAndInactiveProjects()
     ];
 }
 
+public function addUpdatesPostman(Request $request, $projectId)
+{
+    $request->validate([
+        'title' => 'nullable|string|max:255',
+        'description' => 'nullable|string|max:1000',
+        'image_url' => 'nullable|url',
+    ]);
+
+    $message = '';
+    $type = 'error'; // Por defecto, error
+    $project = Project::find($projectId);
+    $update = null; // Inicializamos la variable de actualización
+
+    if (!$project) {
+        $message = 'Project not found.';
+    } else if ($project->state !== 'active') {
+        $message = 'Updates can only be added to active projects.';
+    } else if ($project->user_id !== 22) {
+        $message = 'Only the project owner can add updates.';
+    } else {
+        $update = ProjectUpdate::create([
+            'project_id' => $project->id,
+            'user_id' => 22,
+            'title' => $request->input('title'),
+            'description' => $request->input('description'),
+            'image_url' => $request->input('image_url'),
+        ]);
+
+        $message = 'Update added successfully';
+        $type = 'success';
+    }
+
+    return (object)[
+        'type' => $type,
+        'message' => $message,
+        'update' => $type === 'success' ? $update : null,
+    ];
+}
     
    
 
