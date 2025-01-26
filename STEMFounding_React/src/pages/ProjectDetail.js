@@ -1,29 +1,32 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, Modal, TextInput } from 'react-native';
-import { useRoute, useNavigation } from '@react-navigation/native';
-import { getProjectById, getProjectUpdates, addUpdates } from '../services/projectService'; // Importar addUpdates
+import React, { useEffect, useState } from "react";
+import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, Modal, TextInput, Button, Alert } from "react-native";
+import { useRoute, useNavigation } from "@react-navigation/native";
+import { getProjectById, getProjectUpdates, addUpdates } from "../services/projectService"; // Importar la función addUpdates
 
 const ProjectDetail = () => {
     const route = useRoute();
     const navigation = useNavigation();
-    const { id } = route.params;  // El ID del proyecto recibido desde la ruta
+    const { id } = route.params; // Recibe el ID desde los parámetros de la ruta
 
-    const [project, setProject] = useState(null);
-    const [updates, setUpdates] = useState([]);
-    const [modalVisible, setModalVisible] = useState(false); // Estado para el modal
-    const [newUpdate, setNewUpdate] = useState({
+    const [project, setProject] = useState(null); // Almacenamos los detalles del proyecto
+    const [updates, setUpdates] = useState([]); // Almacenamos las actualizaciones del proyecto
+
+    const [modalVisible, setModalVisible] = useState(false); // Estado para manejar la visibilidad del modal
+    const [newUpdate, setNewUpdate] = useState({ // Estado para manejar los valores del formulario de actualización
         title: '',
         description: '',
         image_url: ''
     });
 
-    // Carga de los detalles del proyecto y actualizaciones
+    // Carga de los detalles del proyecto y actualizaciones al montar el componente
     useEffect(() => {
         async function fetchData() {
             try {
+                // Obtener los detalles del proyecto
                 const projectResponse = await getProjectById(id);
                 setProject(projectResponse.data);
 
+                // Obtener las actualizaciones del proyecto
                 const updatesResponse = await getProjectUpdates(id);
                 setUpdates(updatesResponse.data);
             } catch (error) {
@@ -36,64 +39,106 @@ const ProjectDetail = () => {
 
     // Función para calcular el progreso
     const calculateProgress = () => {
-        if (!project || !project.max_investment) return 0;
+        if (!project || !project.max_investment) return 0; // Protege contra errores si los datos no son válidos
         const percentage = (project.current_investment / project.max_investment) * 100;
-        return Math.min(percentage, 100);
+        return Math.min(percentage, 100); // Limita el porcentaje a un máximo de 100
     };
 
-    // Función para manejar el envío del formulario y llamar a la API
     const handleAddUpdate = async () => {
+        console.log("handleAddUpdate called");
+    
+        // Preparar los datos a enviar con valores predeterminados si los campos están vacíos
+        const updateData = {
+            title: newUpdate.title || project.title, // Si title está vacío, usa el valor actual del proyecto
+            description: newUpdate.description || project.description, // Lo mismo para description
+            image_url: newUpdate.image_url || project.image_url, // Lo mismo para image_url
+        };
+    
+        console.log("Sending update data:", updateData); // Verificar los datos que se enviarán
+    
         try {
-            // Preparamos los datos para enviar
-            const updateData = {
-                title: newUpdate.title || project.title, // Si el campo está vacío, se toma el valor del proyecto
-                description: newUpdate.description || project.description,
-                image_url: newUpdate.image_url || project.image_url,
-            };
-
             // Llamamos a la API para agregar la actualización
-            await addUpdates(id, updateData);
-
-            // Actualizamos las actualizaciones en la UI
-            const updatesResponse = await getProjectUpdates(id);
-            setUpdates(updatesResponse.data);
-
-            // Cerramos el modal después de agregar la actualización
-            setModalVisible(false);
+            const response = await addUpdates(id, updateData);
+    
+            // Verificar respuesta de la API
+            console.log("API Response:", response);
+    
+            if (response.status === 200) {
+                // Verificar que la actualización haya sido realizada correctamente
+                // Hacemos una nueva llamada a la API para obtener el proyecto actualizado
+                const updatedProjectResponse = await getProjectById(id);
+                setProject(updatedProjectResponse.data); // Actualizamos el estado del proyecto con los datos más recientes
+    
+                // Actualizar las actualizaciones en la UI
+                const updatesResponse = await getProjectUpdates(id);
+                setUpdates(updatesResponse.data);
+    
+                // Cerramos el modal después de agregar la actualización
+                setModalVisible(false);
+                setNewUpdate({
+                    title: '',
+                    description: '',
+                    image_url: ''
+                }); // Limpiamos el formulario
+            } else {
+                Alert.alert('Error', 'Failed to add the update.');
+            }
         } catch (error) {
             console.error("Error al agregar la actualización:", error);
+            Alert.alert('Error', 'There was an issue adding the update.');
         }
     };
+    
 
     return (
         <ScrollView style={styles.container}>
             {project ? (
                 <View>
+                    {/* Imagen del proyecto */}
                     <Image source={{ uri: project.image_url }} style={styles.image} />
+
                     <View style={styles.textContainer}>
+                        {/* Título del proyecto */}
                         <Text style={styles.title}>{project.title}</Text>
+
+                        {/* Estado del proyecto */}
                         <Text style={styles.status}>Status: {project.state}</Text>
+
+                        {/* Descripción del proyecto */}
                         <Text style={styles.description}>{project.description}</Text>
+
+                        {/* Información de inversión */}
                         <Text style={styles.subtitle}>
                             Money raised: {project.current_investment}€ / {project.max_investment}€
                         </Text>
 
+                        {/* Barra de progreso */}
                         <View style={styles.progressBar}>
-                            <View style={[styles.progressFill, { width: `${calculateProgress()}%` }]} />
+                            <View
+                                style={[
+                                    styles.progressFill,
+                                    { width: `${calculateProgress()}%` }, // Ajusta el ancho de la barra
+                                ]}
+                            />
                         </View>
 
+                        {/* Porcentaje del progreso */}
                         <Text style={styles.progressText}>
                             {calculateProgress().toFixed(2)}% funded
                         </Text>
 
+                        {/* Botones para Editar Proyecto y Ver Inversores si el proyecto es del usuario con ID 22 */}
                         {project.user_id === 22 && (
                             <View style={styles.buttonContainer}>
+                                {/* Botón Editar Proyecto */}
                                 <TouchableOpacity
                                     style={styles.editButton}
                                     onPress={() => navigation.navigate('EditProject', { projectId: project.id })}
                                 >
                                     <Text style={styles.editButtonText}>Edit Project</Text>
                                 </TouchableOpacity>
+
+                                {/* Botón Ver Inversores */}
                                 <TouchableOpacity
                                     style={styles.investorsButton}
                                     onPress={() => navigation.navigate('Investors', { projectId: project.id })}
@@ -104,6 +149,7 @@ const ProjectDetail = () => {
                         )}
                     </View>
 
+                    {/* Sección de actualizaciones */}
                     <View style={styles.updatesContainer}>
                         <Text style={styles.updatesTitle}>Project Updates</Text>
                         {updates.length > 0 ? (
@@ -121,37 +167,39 @@ const ProjectDetail = () => {
                         )}
                     </View>
 
-                    {/* Botón para agregar una nueva actualización */}
-                    <TouchableOpacity
-                        style={styles.addUpdateButton}
-                        onPress={() => setModalVisible(true)}
-                    >
-                        <Text style={styles.addUpdateButtonText}>Add Update</Text>
+                    {/* Botón para abrir el modal */}
+                    <TouchableOpacity style={styles.addButton} onPress={() => setModalVisible(true)}>
+                        <Text style={styles.addButtonText}>Add Update</Text>
                     </TouchableOpacity>
 
-                    {/* Modal para agregar actualización */}
+                    {/* Modal */}
                     <Modal
-                        visible={modalVisible}
                         animationType="slide"
                         transparent={true}
-                        onRequestClose={() => setModalVisible(false)}
+                        visible={modalVisible}
+                        onRequestClose={() => setModalVisible(false)} // Cerrar el modal al presionar el botón de retroceso
                     >
-                        <View style={styles.modalContainer}>
+                        <View style={styles.modalOverlay}>
                             <View style={styles.modalContent}>
-                                <Text style={styles.modalTitle}>Add Project Update</Text>
+                                <Text style={styles.modalTitle}>Add Update</Text>
 
+                                {/* Campo para el título */}
                                 <TextInput
                                     style={styles.input}
                                     placeholder="Title"
                                     value={newUpdate.title}
                                     onChangeText={(text) => setNewUpdate({ ...newUpdate, title: text })}
                                 />
+
+                                {/* Campo para la descripción */}
                                 <TextInput
                                     style={styles.input}
                                     placeholder="Description"
                                     value={newUpdate.description}
                                     onChangeText={(text) => setNewUpdate({ ...newUpdate, description: text })}
                                 />
+
+                                {/* Campo para la URL de la imagen */}
                                 <TextInput
                                     style={styles.input}
                                     placeholder="Image URL"
@@ -159,24 +207,17 @@ const ProjectDetail = () => {
                                     onChangeText={(text) => setNewUpdate({ ...newUpdate, image_url: text })}
                                 />
 
-                                <TouchableOpacity
-                                    style={styles.addUpdateButton}
-                                    onPress={handleAddUpdate} // Llamar a la función para agregar la actualización
-                                >
-                                    <Text style={styles.addUpdateButtonText}>Add Update</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity
-                                    style={styles.addUpdateButton}
-                                    onPress={() => setModalVisible(false)}
-                                >
-                                    <Text style={styles.addUpdateButtonText}>Cancel</Text>
-                                </TouchableOpacity>
+                                <View style={styles.buttonContainer}>
+                                    <Button title="Add Update" onPress={handleAddUpdate} />
+                                    <Button title="Close" onPress={() => setModalVisible(false)} />
+                                </View>
                             </View>
                         </View>
                     </Modal>
                 </View>
             ) : (
                 <View style={styles.loadingContainer}>
+                    {/* Mensaje de carga mientras se obtiene el proyecto */}
                     <Text style={styles.loading}>Loading project details...</Text>
                 </View>
             )}
@@ -237,46 +278,6 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#333',
     },
-    loadingContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginTop: 50,
-    },
-    loading: {
-        fontSize: 18,
-        color: '#888',
-    },
-    buttonContainer: {
-        marginTop: 16,
-        width: '100%',
-        alignItems: 'center',
-    },
-    editButton: {
-        backgroundColor: '#55877e',
-        padding: 12,
-        borderRadius: 8,
-        alignItems: 'center',
-        marginBottom: 8,
-        width: '100%',
-    },
-    editButtonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-    investorsButton: {
-        backgroundColor: '#2a9d8f',
-        padding: 12,
-        borderRadius: 8,
-        alignItems: 'center',
-        width: '100%',
-    },
-    investorsButtonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
     updatesContainer: {
         marginTop: 20,
     },
@@ -317,44 +318,58 @@ const styles = StyleSheet.create({
         color: '#888',
         textAlign: 'center',
     },
-    addUpdateButton: {
+    addButton: {
         backgroundColor: '#55877e',
-        padding: 12,
+        padding: 10,
         borderRadius: 8,
         alignItems: 'center',
-        marginTop: 16,
+        marginTop: 20,
     },
-    addUpdateButtonText: {
+    addButtonText: {
         color: '#fff',
         fontSize: 16,
         fontWeight: 'bold',
     },
-    modalContainer: {
+    loadingContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        marginTop: 50,
+    },
+    loading: {
+        fontSize: 18,
+        color: '#888',
+    },
+    modalOverlay: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fondo oscuro transparente
     },
     modalContent: {
-        backgroundColor: '#fff',
+        backgroundColor: 'white',
         padding: 20,
         borderRadius: 10,
         width: '80%',
+        alignItems: 'center',
     },
     modalTitle: {
         fontSize: 20,
-        fontWeight: 'bold',
         marginBottom: 10,
-        textAlign: 'center',
     },
     input: {
         height: 40,
-        borderColor: '#ddd',
+        width: '100%',
+        borderColor: '#ccc',
         borderWidth: 1,
-        borderRadius: 8,
-        marginBottom: 10,
-        paddingLeft: 10,
-        fontSize: 16,
+        borderRadius: 5,
+        paddingHorizontal: 10,
+        marginBottom: 20,
+    },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
     },
 });
 
