@@ -11,81 +11,75 @@ use Illuminate\Support\Facades\Auth;
 class InvestmentController extends Controller
 {
     public function invest(Request $request)
-{
-    // Validar que la inversión sea mayor o igual a 10
-    $request->validate([
-        'investment_amount' => 'required|numeric|min:10',
-    ]);
-
-    // Inicializar un mensaje de respuesta
-    $message = '';
-
-    // Obtener al usuario autenticado y el proyecto
-    $user = auth()->user();
-    $project = Project::find($request->project_id);
-
-    // Verificar si el proyecto existe
-    if (!$project) {
-        $message = 'Project not found.';
-    } 
-    // Verificar que el monto de la inversión sea mayor o igual a 10 euros
-    else if ($request->investment_amount < 10) {
-        $message = 'The minimum investment amount is 10 euros.';
-    } 
-    else if ($project->state === 'inactive' || $project->state === 'pending'){
-        $message = 'This project is not available';
-    }
-    // Si todo está bien, proceder con la inversión
-    else {
-        // Actualizar el current_investment del proyecto
-        $project->current_investment += $request->investment_amount;
-        $project->save();
-
-        // Descontar el balance del usuario
-        $user->balance -= $request->investment_amount;
-        $user->save();
-
-        // Crear la inversión en la tabla investments
-        Investment::create([
-            'user_id' => $user->id,
-            'project_id' => $request->project_id,
-            'investment_amount' => $request->investment_amount,
+    {
+        $request->validate([
+            'investment_amount' => 'required|numeric|min:10',
         ]);
-
-        // Establecer el mensaje de éxito
-        $message = 'Investment successful!';
+    
+        $status = 'error';
+        $message = '';
+    
+        $user = auth()->user();
+        $project = Project::find($request->project_id);
+    
+        if (!$project) {
+            $message = 'Project not found.';
+        } elseif ($request->investment_amount < 10) {
+            $message = 'The minimum investment amount is 10 euros.';
+        } elseif ($project->state === 'inactive' || $project->state === 'pending') {
+            $message = 'This project is not available.';
+        } else {
+            $project->current_investment += $request->investment_amount;
+            $project->save();
+    
+            $user->balance -= $request->investment_amount;
+            $user->save();
+    
+            Investment::create([
+                'user_id' => $user->id,
+                'project_id' => $request->project_id,
+                'investment_amount' => $request->investment_amount,
+            ]);
+    
+            $status = 'success';
+            $message = 'Investment successful!';
+        }
+    
+        return [
+            'status' => $status,
+            'message' => $message,
+        ];
     }
-
-    // Redirigir al usuario con el mensaje apropiado (ya sea de error o éxito)
-    return redirect()->back()->with($message ? 'success' : 'error', $message);
-}
-
-
+    
+   
     public function projectInvestments()
     {
         $user = Auth::user();
-
+    
         // Obtener los proyectos en los que el usuario ha invertido
-        $projects = Project::whereHas('investments', function($query) use ($user) {
-        $query->where('user_id', $user->id); // Filtra las inversiones que pertenecen al usuario
-        })->paginate(10); // Paginación de proyectos
+        $projects = Project::whereHas('investments', function ($query) use ($user) {
+            $query->where('user_id', $user->id);
+        })->paginate(10); 
         
-        return view('myInvestments', ['projects' => $projects]);
+        return $projects;
     }
+    
 
     public function showInvestments($id)
     {
-        // Obtener el proyecto por ID
+      
         $project = Project::findOrFail($id);
-
-        // Obtener las inversiones del usuario autenticado para ese proyecto
+    
         $investments = Investment::where('project_id', $project->id)
             ->where('user_id', Auth::id())
             ->get();
-
-        // Pasar el proyecto y las inversiones a la vista
-        return view('projectInvestments',['investments' => $investments]);
+    
+        return [
+            'project' => $project,
+            'investments' => $investments
+        ];
     }
+    
 
     public function withdrawInvestment($investmentId)
     {
@@ -131,54 +125,74 @@ class InvestmentController extends Controller
     }
     
 
+    // public function showInvestors($projectId)
+    // {
+    //     // Obtener el proyecto por su ID
+    //     $project = Project::findOrFail($projectId);
+    
+    //     // Obtener todos los inversores que han invertido en este proyecto
+    //     $investors = $project->investments()
+    //                         ->with('user')  // Obtener la información del usuario (inversor)
+    //                         ->get();  // Obtener todas las inversiones
+    
+    //     // Mapear los inversores y sus cantidades invertidas en objetos PHP normales
+    //     $investorsWithAmount = $investors->map(function ($investment) {
+    //         return (object)[
+    //             'user' => $investment->user->name,  // Nombre del inversor
+    //             'investment_amount' => $investment->investment_amount,  // Cantidad invertida
+    //         ];
+    //     });
+    
+    //     // Devolver un objeto PHP normal con los datos (sin vista ni JSON)
+    //     return response()->json([
+    //         'project' => $project,  // Proyecto con sus datos
+    //         'investors' => $investorsWithAmount,  // Inversores y sus inversiones
+    //     ]);
+    // }
+    
     public function showInvestors($projectId)
 {
-    // Obtener el proyecto por su ID
-    $project = Project::findOrFail($projectId);
+    // Inicializamos la variable de respuesta en caso de error
+    $response = (object)[
+        'success' => false,
+        'message' => 'Failed to retrieve project investors.',
+        'error' => null,
+    ];
 
-    // Obtener todos los inversores que han invertido en este proyecto
-    $investors = $project->investments()
-                        ->with('user')  // Obtener la información del usuario (inversor)
-                        ->get();  // Obtener todas las inversiones
-
-    // Mapear los inversores y sus cantidades invertidas
-    $investorsWithAmount = $investors->map(function ($investment) {
-        return [
-            'user' => $investment->user->name,  // Nombre del inversor
-            'investment_amount' => $investment->investment_amount,  // Cantidad invertida
-        ];
-    });
-
-    // Pasar los inversores y sus cantidades a la vista
-    return view('projectInvestors', [
-        'project' => $project,
-        'investorsWithAmount' => $investorsWithAmount,
-    ]);
-}
-
-public function showInvestorsPostman($projectId)
-{
     try {
         // Obtener el proyecto por su ID
         $project = Project::findOrFail($projectId);
 
         // Obtener todos los inversores que han invertido en este proyecto
         $investors = $project->investments()
-                            ->with('user') // Cargar información del usuario (inversor)
+                            ->with('user') // Cargar la información del usuario (inversor)
                             ->get();
 
+        // Crear una colección para almacenar los inversores y sus cantidades invertidas
+        $investorsWithAmount = collect();
 
-        return $investors;
+        // Recorrer las inversiones y agregar los datos al arreglo
+        foreach ($investors as $investment) {
+            $investorsWithAmount->push((object)[
+                'user' => $investment->user->name,  // Nombre del inversor
+                'investment_amount' => $investment->investment_amount,  // Cantidad invertida
+            ]);
+        }
+
+        // Si todo fue exitoso, modificamos la respuesta
+        $response->success = true;
+        $response->project = $project;  // Datos del proyecto
+        $response->investors = $investorsWithAmount;  // Inversores y sus inversiones
     } catch (\Exception $e) {
-        // Manejo de errores
-        return response()->json([
-            'success' => false,
-            'message' => 'Failed to retrieve project investors.',
-            'error' => $e->getMessage(),
-        ], 500);
+        // Si ocurre un error, almacenamos el error en la respuesta
+        $response->error = $e->getMessage();
     }
+
+    // Retornamos la respuesta (ya sea exitosa o con error) en una sola vez
+    return $response;
 }
 
+    
     
     
 }

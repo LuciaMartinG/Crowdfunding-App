@@ -206,17 +206,26 @@ Route::get('/', function () {
     Route::put('/projects/edit/{updateId}', [ProjectController::class, 'editUpdate']) 
     ->name('projects.comments.edit');
 
-
-    //Ruta para invertir//
-    Route::post('/invest', [InvestmentController::class, 'invest'])->middleware('auth');
+    //Ruta para invertir
+    Route::post('/invest', function (Request $request) {
+        $response = app(InvestmentController::class)->invest($request);
+        return redirect()->back()->with($response['status'], $response['message']);
+    })->middleware('auth','role:investor');
     
-    //Ruta para ver los proyectos en los que ha invertido el usuario INVERSOR
-    Route::get('/investments/my-projects', [InvestmentController::class, 'projectInvestments'])
-    ->middleware(['auth', 'role:investor']);
+    //Ruta para ver mis inversiones(investor)
+    Route::get('/investments/my-projects', function () {
+        $projects = app(InvestmentController::class)->projectInvestments();
+        return view('myInvestments', ['projects' => $projects]);
+    })->middleware(['auth', 'role:investor']);
 
    // Ruta para ver las inversiones de un proyecto específico
-    Route::get('/project/investments/{id}', [InvestmentController::class, 'showInvestments'])
-    ->middleware(['auth', 'role:investor'])
+   Route::get('/project/investments/{id}', function ($id) {
+    $response = app(InvestmentController::class)->showInvestments($id);
+    return view('projectInvestments', [
+        'project' => $response['project'],
+        'investments' => $response['investments']
+    ]);
+    })->middleware(['auth', 'role:investor'])
     ->name('investments.show');
 
     // Ruta para borrar las inversiones de un proyecto específico
@@ -224,8 +233,12 @@ Route::get('/', function () {
     ->middleware(['auth', 'role:investor'])
     ->name('investments.withdraw');
 
-    //Ruta para ver los usuarios que han invertido en cada proyecto
-    Route::get('/project/{id}/investors', [InvestmentController::class, 'showInvestors'])
-    ->middleware(['auth', 'role:entrepreneur'])
-    ->name('projects.investors');
-
+    Route::get('/project/{id}/investors', function ($id) {
+        $response = app(InvestmentController::class)->showInvestors($id);
+        return view('projectInvestors', [
+            'project' => $response->project,
+            'investorsWithAmount' => $response->investors,
+        ]);
+    })->middleware(['auth', 'role:entrepreneur'])
+      ->name('projects.investors');
+    

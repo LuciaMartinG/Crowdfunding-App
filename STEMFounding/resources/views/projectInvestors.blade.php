@@ -20,8 +20,8 @@
             <tbody>
                 @foreach($investorsWithAmount as $investment)
                     <tr>
-                        <td>{{ $investment['user'] }}</td>
-                        <td>${{ number_format($investment['investment_amount'], 2) }}</td>
+                    <td>{{ $investment->user }}</td>
+                    <td>${{ number_format($investment->investment_amount, 2) }}</td>
                     </tr>
                 @endforeach
             </tbody>
