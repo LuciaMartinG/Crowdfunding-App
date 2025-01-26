@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
-import { useRoute } from '@react-navigation/native';
+import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native';
+import { useRoute, useNavigation } from '@react-navigation/native';
 import { getProjectById } from '../services/projectService';
-
 
 const ProjectDetail = () => {
     const route = useRoute();
-    const { id } = route.params;  // Recibe el ID desde los parámetros de la ruta
+    const navigation = useNavigation();
+    const { id } = route.params; // Recibe el ID desde los parámetros de la ruta
 
     const [project, setProject] = useState(null); // Almacenamos los detalles del proyecto
 
@@ -26,9 +26,9 @@ const ProjectDetail = () => {
 
     // Función para calcular el progreso
     const calculateProgress = () => {
-        if (!project || !project.max_investment) return 0;  // Protege contra errores si los datos no son válidos
+        if (!project || !project.max_investment) return 0; // Protege contra errores si los datos no son válidos
         const percentage = (project.current_investment / project.max_investment) * 100;
-        return Math.min(percentage, 100);  // Limita el porcentaje a un máximo de 100
+        return Math.min(percentage, 100); // Limita el porcentaje a un máximo de 100
     };
 
     return (
@@ -37,7 +37,7 @@ const ProjectDetail = () => {
                 <View>
                     {/* Imagen del proyecto */}
                     <Image source={{ uri: project.image_url }} style={styles.image} />
-                    
+
                     <View style={styles.textContainer}>
                         {/* Título del proyecto */}
                         <Text style={styles.title}>{project.title}</Text>
@@ -58,7 +58,7 @@ const ProjectDetail = () => {
                             <View
                                 style={[
                                     styles.progressFill,
-                                    { width: `${calculateProgress()}%` },  // Ajusta el ancho de la barra
+                                    { width: `${calculateProgress()}%` }, // Ajusta el ancho de la barra
                                 ]}
                             />
                         </View>
@@ -67,6 +67,27 @@ const ProjectDetail = () => {
                         <Text style={styles.progressText}>
                             {calculateProgress().toFixed(2)}% funded
                         </Text>
+
+                        {/* Botones para Editar Proyecto y Ver Inversores si el proyecto es del usuario con ID 22 */}
+                        {project.user_id === 22 && (
+                            <View style={styles.buttonContainer}>
+                                {/* Botón Editar Proyecto */}
+                                <TouchableOpacity
+                                    style={styles.editButton}
+                                    onPress={() => navigation.navigate('EditProject', { projectId: project.id })}
+                                >
+                                    <Text style={styles.editButtonText}>Edit Project</Text>
+                                </TouchableOpacity>
+
+                                {/* Botón Ver Inversores */}
+                                <TouchableOpacity
+                                    style={styles.investorsButton}
+                                    onPress={() => navigation.navigate('Investors', { projectId: project.id })}
+                                >
+                                    <Text style={styles.investorsButtonText}>View Investors</Text>
+                                </TouchableOpacity>
+                            </View>
+                        )}
                     </View>
                 </View>
             ) : (
@@ -82,7 +103,7 @@ const ProjectDetail = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f9f5e9',  // Fondo crema
+        backgroundColor: '#f9f5e9', // Fondo crema
         padding: 16,
     },
     image: {
@@ -102,7 +123,7 @@ const styles = StyleSheet.create({
     },
     status: {
         fontSize: 16,
-        color: '#55877e',  // Verde para el estado
+        color: '#55877e', // Verde para el estado
         marginBottom: 10,
     },
     description: {
@@ -141,6 +162,36 @@ const styles = StyleSheet.create({
     loading: {
         fontSize: 18,
         color: '#888',
+    },
+    buttonContainer: {
+        marginTop: 16,
+        width: '100%',
+        alignItems: 'center',
+    },
+    editButton: {
+        backgroundColor: '#55877e',
+        padding: 12,
+        borderRadius: 8,
+        alignItems: 'center',
+        marginBottom: 8,
+        width: '100%',
+    },
+    editButtonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    investorsButton: {
+        backgroundColor: '#2a9d8f',
+        padding: 12,
+        borderRadius: 8,
+        alignItems: 'center',
+        width: '100%',
+    },
+    investorsButtonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
     },
 });
 
