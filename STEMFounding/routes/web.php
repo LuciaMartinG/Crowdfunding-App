@@ -189,9 +189,15 @@ Route::get('/', function () {
    
     Route::get('/user/projects', [ProjectController::class, 'showUserProjects'])->middleware('auth')->name('user.projects');
     
-    //Ruta para añadir actualizaciones
-    Route::post('/projects/{projectId}/comments', [ProjectController::class, 'addUpdates'])
+   // Ruta para añadir actualizaciones
+   Route::post('/projects/{projectId}/comments', function (Request $request, $projectId) {
+    $response = app(ProjectController::class)->addUpdates($request, $projectId);
+    return redirect()->route('projects.show', $projectId)
+    ->with($response->type, $response->message);
+    })->middleware('auth','role:entrepreneur')  // Verifica que el usuario esté autenticado
     ->name('projects.comments.add');
+
+
 
     // Ruta para eliminar actualizaciones
     Route::get('/comment/delete/{id}', function ($id) {
