@@ -10,11 +10,15 @@ use App\Models\Project;
 use App\Models\User;
 use App\Models\Investment;
 use App\Models\ProjectUpdate;
-
+use App\Http\Controllers\Api\AuthController;
 
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
 // })->middleware('auth:sanctum');
+
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
+Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']); // Ruta para logout (solo accesible si el usuario está autenticado)
 
 Route::get('/project', function () {
     return Project::all();
@@ -47,7 +51,7 @@ Route::delete('/user/{id}', function ($id) {
     return User::destroy($id);
 });
 
-Route::post('/user', [RegisterController::class, 'createUser']);
+// Route::post('/user', [RegisterController::class, 'createUser']);
 
 Route::put('/user', [UserController::class, 'updateUser']);
 
