@@ -10,26 +10,18 @@ use App\Http\Controllers\InvestmentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+Auth::routes();
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 Route::get('/', function () {
     return view('projectList', ['projectList' => Project::whereIn('state', ['active', 'inactive'])->paginate(10)]);
 });
 
-    Auth::routes();
-
-    Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-
+  
 
     // ============================== Rutas públicas (usuarios autenticados) ==============================
 
-    /*
-        Ruta para mostrar la lista de proyectos, solo accesible para usuarios autenticados.
-        Paginación de 10 proyectos por página.
-    */
-    // Route::get('/project', function () {
-    //     return view('projectList', ['projectList' => Project::paginate(10)]);
-    // })->middleware('auth');
-    
     /*
         Ruta para mostrar la lista de proyectos activos e inactivos,accesible para todos los usuarios.
         Paginación de 10 proyectos por página.
@@ -57,7 +49,7 @@ Route::get('/', function () {
     Route::get('/project/delete/{id}', function ($id) {
         Project::destroy($id);
         return redirect('/project');
-    });
+    })->middleware(['auth', 'role:admin']);
 
     /*
         Ruta para mostrar el formulario de creación de un nuevo proyecto.
@@ -83,7 +75,7 @@ Route::get('/', function () {
     Route::post('/project/update', function (Request $request) {
         $project = app(ProjectController::class)->updateProject($request);
         return redirect('/project/detail/1');
-    })->middleware('auth');
+    })->middleware('auth','role:entrepreneur');
 
     
 
@@ -112,19 +104,12 @@ Route::get('/', function () {
     ->middleware(['auth', 'role:admin']);  // Asegura que el usuario esté autenticado y sea admin
 
  
-
-    Auth::routes();
-
-    Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-        
-
-
     /*
-        Ruta para mostrar la lista de usuarios, solo accesible para usuarios autenticados.
+        Ruta para mostrar la lista de usuarios, solo accesible para el admin.
         Paginación de 10 proyectos por página.
     */
     Route::get('/user', [UserController::class, 'listUsers'])
-    ->middleware('auth')
+    ->middleware('auth','role:admin')
     ->name('users.list');
 
         /*
@@ -139,7 +124,7 @@ Route::get('/', function () {
             'user' => $user,
             'userProjects' => $userProjects,
         ]);
-    })->middleware('auth');
+    });
     /*
         Ruta para actualizar un rol.
     */
@@ -149,9 +134,6 @@ Route::get('/', function () {
         return redirect('/user/detail/' . $user->id);
     })->middleware(['auth', 'role:admin']);
     
-     /*
-        Ruta para procesar la solicitud de actualización del usuario 
-    */
 
     /*
         Ruta para mostrar el formulario de edición del perfil.
@@ -184,7 +166,7 @@ Route::get('/', function () {
     Route::post('/user/ban', function (Request $request) {
         $user = app(UserController::class)->toggleBan($request);
         return redirect('/user/detail/' . $user->id)->with('success', 'Banned successfully!');
-    })->middleware('auth');
+    })->middleware('auth','role:admin');
 
    
     Route::get('/user/projects', [ProjectController::class, 'showUserProjects'])->middleware('auth')->name('user.projects');
@@ -205,11 +187,12 @@ Route::get('/', function () {
     ProjectUpdate::destroy($id);
     $projectId = $update->project_id;
     return redirect()->route('projects.show', ['id' => $projectId])->with('success', 'Update deleted successfully.');
-    })->name('projects.comments.delete');
+    })->middleware('auth','role:entrepreneur')
+    ->name('projects.comments.delete');
         
 
     // Ruta para actualizar actualizaciones (usando PUT)
-Route::put('/projects/edit/{updateId}', function (Request $request, $updateId) {
+    Route::put('/projects/edit/{updateId}', function (Request $request, $updateId) {
     $response = app(ProjectController::class)->editUpdate($request, $updateId);
     return redirect()
         ->route('projects.show', ['id' => $response->update ? $response->update->project_id : null])  // Redirige al proyecto
