@@ -68,3 +68,5 @@ Route::post('/addUpdate/{projectId}', [ProjectController::class, 'addUpdatesPost
 Route::delete('/update/{id}', function ($id) {
     return ProjectUpdate::destroy($id);
 });
+
+Route::put('/update/{id}', [ProjectController::class, 'editUpdatePostman']); // RUTA PARA EDITAR UNA ACTUALIZACIÓN

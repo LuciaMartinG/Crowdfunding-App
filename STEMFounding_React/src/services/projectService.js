@@ -43,3 +43,8 @@ export const activateOrReject = (projectId, state) => {
 export const deleteUpdate = (id) => {
     return API.delete(`/update/${id}`);
 };
+
+// Edita una actualización existente
+export const editUpdate = (updateId, updateData) => {
+    return API.put(`/update/${updateId}`, updateData); // Se envían los datos de la actualización
+};

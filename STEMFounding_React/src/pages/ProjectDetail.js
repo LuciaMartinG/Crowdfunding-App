@@ -1,32 +1,30 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, Modal, TextInput, Button, Alert } from "react-native";
 import { useRoute, useNavigation } from "@react-navigation/native";
-import { getProjectById, getProjectUpdates, addUpdates, deleteUpdate } from "../services/projectService"; // Importar la función addUpdates
+import { getProjectById, getProjectUpdates, addUpdates, deleteUpdate, editUpdate } from "../services/projectService"; // Importar la función updateUpdate
 
 const ProjectDetail = () => {
     const route = useRoute();
     const navigation = useNavigation();
-    const { id } = route.params; // Recibe el ID desde los parámetros de la ruta
+    const { id } = route.params;
 
-    const [project, setProject] = useState(null); // Almacenamos los detalles del proyecto
-    const [updates, setUpdates] = useState([]); // Almacenamos las actualizaciones del proyecto
-
-    const [modalVisible, setModalVisible] = useState(false); // Estado para manejar la visibilidad del modal
-    const [newUpdate, setNewUpdate] = useState({ // Estado para manejar los valores del formulario de actualización
+    const [project, setProject] = useState(null);
+    const [updates, setUpdates] = useState([]);
+    const [modalVisible, setModalVisible] = useState(false);
+    const [newUpdate, setNewUpdate] = useState({
         title: '',
         description: '',
         image_url: ''
     });
 
-    // Carga de los detalles del proyecto y actualizaciones al montar el componente
+    const [updateToEdit, setUpdateToEdit] = useState(null); // Estado para manejar la actualización seleccionada para editar
+
     useEffect(() => {
         async function fetchData() {
             try {
-                // Obtener los detalles del proyecto
                 const projectResponse = await getProjectById(id);
                 setProject(projectResponse.data);
 
-                // Obtener las actualizaciones del proyecto
                 const updatesResponse = await getProjectUpdates(id);
                 setUpdates(updatesResponse.data);
             } catch (error) {
@@ -37,62 +35,58 @@ const ProjectDetail = () => {
         fetchData();
     }, [id]);
 
-    // Función para calcular el progreso
     const calculateProgress = () => {
-        if (!project || !project.max_investment) return 0; // Protege contra errores si los datos no son válidos
+        if (!project || !project.max_investment) return 0;
         const percentage = (project.current_investment / project.max_investment) * 100;
-        return Math.min(percentage, 100); // Limita el porcentaje a un máximo de 100
+        return Math.min(percentage, 100);
     };
 
     const handleAddUpdate = async () => {
-        // Verificar que al menos title y description estén presentes
         if (!newUpdate.title || !newUpdate.description) {
             Alert.alert('Error', 'Title and description are required.');
             return;
         }
-    
-        // Preparar los datos a enviar solo con title y description
+
         const updateData = {
             title: newUpdate.title,
             description: newUpdate.description,
         };
-    
-        // Solo añadir image_url si tiene valor
+
         if (newUpdate.image_url) {
             updateData.image_url = newUpdate.image_url;
         }
-    
+
         try {
-            // Llamar a la API para agregar la actualización
-            const response = await addUpdates(id, updateData);
-    
+            let response;
+            if (updateToEdit) {
+                response = await editUpdate(updateToEdit.id, updateData); // Actualizar la actualización
+            } else {
+                response = await addUpdates(id, updateData); // Agregar nueva actualización
+            }
+
             if (response.status === 200) {
-                // Si la actualización es exitosa, obtener el proyecto actualizado y las nuevas actualizaciones
                 const updatedProjectResponse = await getProjectById(id);
-                setProject(updatedProjectResponse.data); // Actualizar el proyecto
-    
+                setProject(updatedProjectResponse.data);
+
                 const updatesResponse = await getProjectUpdates(id);
-                setUpdates(updatesResponse.data); // Actualizar las actualizaciones
-    
-                // Cerrar el modal y limpiar los campos
+                setUpdates(updatesResponse.data);
+
                 setModalVisible(false);
                 setNewUpdate({ title: '', description: '', image_url: '' });
+                setUpdateToEdit(null); // Resetear el estado de la actualización que estamos editando
             } else {
-                throw new Error('Failed to add update.');
+                throw new Error('Failed to add or update update.');
             }
         } catch (error) {
             console.error("Error during API call:", error);
-            Alert.alert('Error', 'There was an issue adding the update: ' + error.message);
+            Alert.alert('Error', 'There was an issue adding or updating the update: ' + error.message);
         }
     };
-    
+
     const handleDeleteUpdate = async (updateId) => {
         try {
-            // Llamada al método para eliminar la actualización
             const response = await deleteUpdate(updateId);
             if (response.status === 200) {
-                console.log('Update deleted successfully');
-                // Actualizar la lista de actualizaciones
                 const updatedUpdates = updates.filter(update => update.id !== updateId);
                 setUpdates(updatedUpdates);
             }
@@ -102,47 +96,43 @@ const ProjectDetail = () => {
         }
     };
 
+    const handleEditUpdate = (updateId) => {
+        const selectedUpdate = updates.find((update) => update.id === updateId);
+        if (selectedUpdate) {
+            setUpdateToEdit(selectedUpdate);
+            setNewUpdate({ title: selectedUpdate.title, description: selectedUpdate.description, image_url: selectedUpdate.image_url });
+            setModalVisible(true); // Abrir el modal para editar
+        }
+    };
+
     return (
         <ScrollView style={styles.container}>
             {project ? (
                 <View>
-                    {/* Imagen del proyecto */}
                     <Image source={{ uri: project.image_url }} style={styles.image} />
-
                     <View style={styles.textContainer}>
-                        {/* Título del proyecto */}
                         <Text style={styles.title}>{project.title}</Text>
-
-                        {/* Estado del proyecto */}
                         <Text style={styles.status}>Status: {project.state}</Text>
-
-                        {/* Descripción del proyecto */}
                         <Text style={styles.description}>{project.description}</Text>
-
-                        {/* Información de inversión */}
                         <Text style={styles.subtitle}>
                             Money raised: {project.current_investment}€ / {project.max_investment}€
                         </Text>
 
-                        {/* Barra de progreso */}
                         <View style={styles.progressBar}>
                             <View
                                 style={[
                                     styles.progressFill,
-                                    { width: `${calculateProgress()}%` }, // Ajusta el ancho de la barra
+                                    { width: `${calculateProgress()}%` },
                                 ]}
                             />
                         </View>
 
-                        {/* Porcentaje del progreso */}
                         <Text style={styles.progressText}>
                             {calculateProgress().toFixed(2)}% funded
                         </Text>
 
-                        {/* Botones para Editar Proyecto y Ver Inversores si el proyecto es del usuario con ID 22 */}
                         {project.user_id === 22 && (
                             <View style={styles.buttonContainer}>
-                                {/* Botón Editar Proyecto */}
                                 <TouchableOpacity
                                     style={styles.editButton}
                                     onPress={() => navigation.navigate('EditProject', { projectId: project.id })}
@@ -150,7 +140,6 @@ const ProjectDetail = () => {
                                     <Text style={styles.editButtonText}>Edit Project</Text>
                                 </TouchableOpacity>
 
-                                {/* Botón Ver Inversores */}
                                 <TouchableOpacity
                                     style={styles.investorsButton}
                                     onPress={() => navigation.navigate('Investors', { projectId: project.id })}
@@ -161,7 +150,6 @@ const ProjectDetail = () => {
                         )}
                     </View>
 
-                    {/* Sección de actualizaciones */}
                     <View style={styles.updatesContainer}>
                         <Text style={styles.updatesTitle}>Project Updates</Text>
                         {updates.length > 0 ? (
@@ -173,7 +161,15 @@ const ProjectDetail = () => {
                                         Updated on: {new Date(update.updated_at).toLocaleDateString()}
                                     </Text>
 
-                                    {/* Botón de borrar actualización */}
+                                    {project.user_id === 22 && (
+                                        <TouchableOpacity
+                                            style={styles.editButton}
+                                            onPress={() => handleEditUpdate(update.id)}
+                                        >
+                                            <Text style={styles.deleteButtonText}>Edit Update</Text>
+                                        </TouchableOpacity>
+                                    )}
+
                                     {project.user_id === 22 && (
                                         <TouchableOpacity
                                             style={styles.deleteButton}
@@ -189,23 +185,20 @@ const ProjectDetail = () => {
                         )}
                     </View>
 
-                    {/* Botón para abrir el modal */}
                     <TouchableOpacity style={styles.addButton} onPress={() => setModalVisible(true)}>
                         <Text style={styles.addButtonText}>Add Update</Text>
                     </TouchableOpacity>
 
-                    {/* Modal */}
                     <Modal
                         animationType="slide"
                         transparent={true}
                         visible={modalVisible}
-                        onRequestClose={() => setModalVisible(false)} // Cerrar el modal al presionar el botón de retroceso
+                        onRequestClose={() => setModalVisible(false)}
                     >
                         <View style={styles.modalOverlay}>
                             <View style={styles.modalContent}>
-                                <Text style={styles.modalTitle}>Add Update</Text>
+                                <Text style={styles.modalTitle}>{updateToEdit ? 'Edit Update' : 'Add Update'}</Text>
 
-                                {/* Campo para el título */}
                                 <TextInput
                                     style={styles.input}
                                     placeholder="Title (required)"
@@ -213,7 +206,6 @@ const ProjectDetail = () => {
                                     onChangeText={(text) => setNewUpdate({ ...newUpdate, title: text })}
                                 />
 
-                                {/* Campo para la descripción */}
                                 <TextInput
                                     style={styles.input}
                                     placeholder="Description (required)"
@@ -221,7 +213,6 @@ const ProjectDetail = () => {
                                     onChangeText={(text) => setNewUpdate({ ...newUpdate, description: text })}
                                 />
 
-                                {/* Campo para la URL de la imagen */}
                                 <TextInput
                                     style={styles.input}
                                     placeholder="Image URL (optional)"
@@ -230,7 +221,7 @@ const ProjectDetail = () => {
                                 />
 
                                 <View style={styles.buttonContainer}>
-                                    <Button title="Add Update" onPress={handleAddUpdate} />
+                                    <Button title={updateToEdit ? 'Update Update' : 'Add Update'} onPress={handleAddUpdate} />
                                     <Button title="Close" onPress={() => setModalVisible(false)} />
                                 </View>
                             </View>
@@ -239,7 +230,6 @@ const ProjectDetail = () => {
                 </View>
             ) : (
                 <View style={styles.loadingContainer}>
-                    {/* Mensaje de carga mientras se obtiene el proyecto */}
                     <Text style={styles.loading}>Loading project details...</Text>
                 </View>
             )}
@@ -250,7 +240,7 @@ const ProjectDetail = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#f9f5e9', // Fondo crema
+        backgroundColor: '#f9f5e9',
         padding: 16,
     },
     image: {
@@ -270,7 +260,7 @@ const styles = StyleSheet.create({
     },
     status: {
         fontSize: 16,
-        color: '#55877e', // Verde para el estado
+        color: '#55877e',
         marginBottom: 10,
     },
     description: {
@@ -294,11 +284,36 @@ const styles = StyleSheet.create({
     },
     progressFill: {
         height: '100%',
-        backgroundColor: '#55877e',
+        backgroundColor: '#77c4d3',
     },
     progressText: {
-        fontSize: 14,
+        textAlign: 'center',
+        fontSize: 16,
         color: '#333',
+    },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginTop: 10,
+    },
+    editButton: {
+        backgroundColor: '#578E7E',
+        padding: 10,
+        marginRight: 10,
+        borderRadius: 5,
+    },
+    deleteButton: {
+        backgroundColor: '#f44336',
+        padding: 10,
+        borderRadius: 5,
+    },
+    editButtonText: {
+        color: '#fff',
+        fontSize: 16,
+    },
+    deleteButtonText: {
+        color: '#fff',
+        fontSize: 16,
     },
     updatesContainer: {
         marginTop: 20,
@@ -307,137 +322,88 @@ const styles = StyleSheet.create({
         fontSize: 20,
         fontWeight: 'bold',
         marginBottom: 10,
-        color: '#333',
     },
     updateCard: {
-        padding: 15,
-        borderRadius: 10,
         backgroundColor: '#fff',
+        padding: 15,
         marginBottom: 10,
+        borderRadius: 8,
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
-        shadowRadius: 4,
+        shadowRadius: 5,
         elevation: 3,
     },
     updateTitle: {
         fontSize: 16,
         fontWeight: 'bold',
-        marginBottom: 5,
-        color: '#333',
     },
     updateDescription: {
         fontSize: 14,
-        marginBottom: 5,
-        color: '#555',
+        marginVertical: 5,
     },
     updateDate: {
         fontSize: 12,
-        color: '#888',
+        color: '#777',
     },
     noUpdatesText: {
-        fontSize: 14,
-        color: '#888',
+        fontSize: 16,
+        color: '#555',
         textAlign: 'center',
     },
     addButton: {
-        backgroundColor: '#55877e',
+        backgroundColor: '#008CBA',
         padding: 10,
-        borderRadius: 8,
-        alignItems: 'center',
+        borderRadius: 5,
         marginTop: 20,
+        alignItems: 'center',
     },
     addButtonText: {
         color: '#fff',
         fontSize: 16,
-        fontWeight: 'bold',
-    },
-    loadingContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginTop: 50,
-    },
-    loading: {
-        fontSize: 18,
-        color: '#888',
     },
     modalOverlay: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Fondo oscuro transparente
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
     modalContent: {
-        backgroundColor: 'white',
+        backgroundColor: '#fff',
+        width: '80%',
         padding: 20,
         borderRadius: 10,
-        width: '80%',
-        alignItems: 'center',
     },
     modalTitle: {
         fontSize: 20,
+        fontWeight: 'bold',
         marginBottom: 10,
     },
     input: {
-        height: 40,
         width: '100%',
-        borderColor: '#ccc',
+        padding: 10,
         borderWidth: 1,
         borderRadius: 5,
-        paddingHorizontal: 10,
-        marginBottom: 20,
+        marginBottom: 10,
+        borderColor: '#ccc',
     },
-    buttonContainer: {
-        flexDirection: 'column', // Cambiado a 'column' para que los botones estén apilados verticalmente
-        alignItems: 'center',    // Centrar los botones horizontalmente
-        width: '100%',           // Para que ocupe todo el ancho disponible
-        marginTop: 20,           // Agregar un poco de margen superior para separarlo de otros elementos
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
-
-    editButton: {
-        backgroundColor: '#55877e', // Fondo verde
-        paddingVertical: 12, // Añadir relleno para hacerlo más grande
-        paddingHorizontal: 20, // Añadir relleno para equilibrar el tamaño
-        borderRadius: 8, // Bordes redondeados
-        alignItems: 'center', // Centrar el texto
-        marginBottom: 10, // Espaciado entre los botones
-        width: '80%', // Ancho del 80% para que sea más destacado
-        alignSelf: 'center', // Centrar el botón horizontalmente
+    loading: {
+        fontSize: 18,
+        color: '#555',
     },
-
     investorsButton: {
-        backgroundColor: '#55877e', // Fondo verde, el mismo color para consistencia
-        paddingVertical: 12, // Tamaño adecuado para hacerlo visualmente atractivo
-        paddingHorizontal: 20, // Espaciado en los lados
-        borderRadius: 8, // Bordes redondeados
-        alignItems: 'center', // Centrar el texto
-        marginBottom: 10, // Espaciado entre los botones
-        width: '80%', // Ancho del 80% para que sea prominente
-        alignSelf: 'center', // Centrar el botón horizontalmente
-    },
-    editButtonText: {
-        color: '#fff', // Color blanco para el texto
-        fontSize: 16, // Tamaño de fuente adecuado
-        fontWeight: 'bold', // Hacer el texto en negrita
+        backgroundColor: '#578E7E',
+        padding: 10,
+        marginRight: 10,
+        borderRadius: 5,
     },
     investorsButtonText: {
-        color: '#fff', // Texto blanco
-        fontSize: 16, // Tamaño adecuado
-        fontWeight: 'bold', // Hacer el texto en negrita
-    },
-    deleteButton: {
-        backgroundColor: '#d9534f', // Rojo
-        paddingVertical: 8,
-        paddingHorizontal: 15,
-        borderRadius: 5,
-        alignItems: 'center',
-        marginTop: 10,
-    },
-    deleteButtonText: {
         color: '#fff',
-        fontSize: 14,
-        fontWeight: 'bold',
+        fontSize: 16,
     },
 });
 
