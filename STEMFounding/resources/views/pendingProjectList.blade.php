@@ -5,6 +5,17 @@
 @section('content')
 
 <div class="container">
+@if(session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="alert alert-danger">
+                {{ session('error') }}
+            </div>
+        @endif
     <h1 class="mb-4">Pending Projects</h1>
 
     <!-- Verificar si hay proyectos pendientes -->

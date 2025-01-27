@@ -3,57 +3,60 @@
 use Illuminate\Support\Facades\Route;
 use App\Models\Project;
 use App\Models\User;
+use App\Models\ProjectUpdate;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\InvestmentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-    Route::get('/', function () {
-        return view('home');
-    });
+Auth::routes();
 
-    Auth::routes();
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
-    Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/', function () {
+    return view('projectList', ['projectList' => Project::whereIn('state', ['active', 'inactive'])->paginate(10)]);
+});
 
-    Auth::routes();
-
-    Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+  
 
     // ============================== Rutas públicas (usuarios autenticados) ==============================
 
     /*
-        Ruta para mostrar la lista de proyectos, solo accesible para usuarios autenticados.
-        Paginación de 10 proyectos por página.
-    */
-    // Route::get('/project', function () {
-    //     return view('projectList', ['projectList' => Project::paginate(10)]);
-    // })->middleware('auth');
-    
-    /*
         Ruta para mostrar la lista de proyectos activos e inactivos,accesible para todos los usuarios.
         Paginación de 10 proyectos por página.
     */
-    Route::get('/project', [ProjectController::class, 'showActiveAndInactiveProjects'])->middleware('auth');
+    Route::get('/project', [ProjectController::class, 'showActiveAndInactiveProjects']);
     Route::get('/projects/pending', [ProjectController::class, 'showPendingProjects'])->middleware('auth','role:admin');
 
-    Route::get('/', function () {
-        return redirect('/project');
-    });
+    // Route::get('/', function () {
+    //     return redirect('/project');
+    // });
 
     /*
         Ruta para mostrar el detalle de proyecto específico.
         La ruta recibe el ID del proyecto y muestra su información.
     */
-    Route::get('/project/detail/{id}', function ($id) {
-        return view('projectDetail', ['project' => Project::find($id)]);
-    })->middleware('auth');
+    // Route::get('/project/detail/{id}', function ($id) {
+    //     return view('projectDetail', ['project' => Project::find($id)]);
+    // });
+
+    Route::get('/project/detail/{id}', [ProjectController::class, 'showProjectDetails'])
+    ->name('projects.show');
+    
+    Route::get('/projects', [ProjectController::class, 'showProjects'])->name('projects.list'); 
 
     Route::get('/project/delete/{id}', function ($id) {
-        Project::destroy($id);
-        return redirect('/project');
-    });
-
+        $status = 'error';
+        $message = 'An error occurred while deleting the project.';
+    
+        if (Project::destroy($id)) {
+            $status = 'success';
+            $message = 'Project deleted successfully!';
+        }
+    
+        return redirect('/project')->with($status, $message);
+    })->middleware(['auth', 'role:admin']);
     /*
         Ruta para mostrar el formulario de creación de un nuevo proyecto.
         Solo accesible para usuarios con rol de entrepreneur.
@@ -78,7 +81,7 @@ use Illuminate\Support\Facades\DB;
     Route::post('/project/update', function (Request $request) {
         $project = app(ProjectController::class)->updateProject($request);
         return redirect('/project/detail/1');
-    })->middleware('auth');
+    })->middleware('auth','role:entrepreneur');
 
     
 
@@ -107,21 +110,13 @@ use Illuminate\Support\Facades\DB;
     ->middleware(['auth', 'role:admin']);  // Asegura que el usuario esté autenticado y sea admin
 
  
-
-    Auth::routes();
-
-    Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-        
-
-
     /*
-        Ruta para mostrar la lista de usuarios, solo accesible para usuarios autenticados.
+        Ruta para mostrar la lista de usuarios, solo accesible para el admin.
         Paginación de 10 proyectos por página.
     */
-    Route::get('/user', function () {
-        return view('userList', ['userList' => User::paginate(10)]);
-    })->middleware('auth');
-
+    Route::get('/user', [UserController::class, 'listUsers'])
+    ->middleware('auth','role:admin')
+    ->name('users.list');
 
         /*
         Ruta para mostrar el detalle de usuario específico.
@@ -135,7 +130,7 @@ use Illuminate\Support\Facades\DB;
             'user' => $user,
             'userProjects' => $userProjects,
         ]);
-    })->middleware('auth');
+    });
     /*
         Ruta para actualizar un rol.
     */
@@ -145,9 +140,6 @@ use Illuminate\Support\Facades\DB;
         return redirect('/user/detail/' . $user->id);
     })->middleware(['auth', 'role:admin']);
     
-     /*
-        Ruta para procesar la solicitud de actualización del usuario 
-    */
 
     /*
         Ruta para mostrar el formulario de edición del perfil.
@@ -180,8 +172,73 @@ use Illuminate\Support\Facades\DB;
     Route::post('/user/ban', function (Request $request) {
         $user = app(UserController::class)->toggleBan($request);
         return redirect('/user/detail/' . $user->id)->with('success', 'Banned successfully!');
-    })->middleware('auth');
+    })->middleware('auth','role:admin');
 
    
     Route::get('/user/projects', [ProjectController::class, 'showUserProjects'])->middleware('auth')->name('user.projects');
+    
+   // Ruta para añadir actualizaciones
+   Route::post('/projects/{projectId}/comments', function (Request $request, $projectId) {
+    $response = app(ProjectController::class)->addUpdates($request, $projectId);
+    return redirect()->route('projects.show', $projectId)
+    ->with($response->type, $response->message);
+    })->middleware('auth','role:entrepreneur')  // Verifica que el usuario esté autenticado
+    ->name('projects.comments.add');
 
+
+
+    // Ruta para eliminar actualizaciones
+    Route::get('/comment/delete/{id}', function ($id) {
+    $update = ProjectUpdate::find($id);
+    ProjectUpdate::destroy($id);
+    $projectId = $update->project_id;
+    return redirect()->route('projects.show', ['id' => $projectId])->with('success', 'Update deleted successfully.');
+    })->middleware('auth','role:entrepreneur')
+    ->name('projects.comments.delete');
+        
+
+    // Ruta para actualizar actualizaciones (usando PUT)
+    Route::put('/projects/edit/{updateId}', function (Request $request, $updateId) {
+    $response = app(ProjectController::class)->editUpdate($request, $updateId);
+    return redirect()
+        ->route('projects.show', ['id' => $response->update ? $response->update->project_id : null])  // Redirige al proyecto
+        ->with($response->type, $response->message);  // Con el mensaje de éxito o error
+    })->middleware('auth', 'role:entrepreneur') // Verifica que el usuario esté autenticado y sea emprendedor
+     ->name('projects.comments.edit');
+
+    //Ruta para invertir
+    Route::post('/invest', function (Request $request) {
+        $response = app(InvestmentController::class)->invest($request);
+        return redirect()->back()->with($response['status'], $response['message']);
+    })->middleware('auth','role:investor');
+    
+    //Ruta para ver mis inversiones(investor)
+    Route::get('/investments/my-projects', function () {
+        $projects = app(InvestmentController::class)->projectInvestments();
+        return view('myInvestments', ['projects' => $projects]);
+    })->middleware(['auth', 'role:investor']);
+
+   // Ruta para ver las inversiones de un proyecto específico
+   Route::get('/project/investments/{id}', function ($id) {
+    $response = app(InvestmentController::class)->showInvestments($id);
+    return view('projectInvestments', [
+        'project' => $response['project'],
+        'investments' => $response['investments']
+    ]);
+    })->middleware(['auth', 'role:investor'])
+    ->name('investments.show');
+
+    // Ruta para borrar las inversiones de un proyecto específico
+    Route::delete('/investments/withdraw/{investment}', [InvestmentController::class, 'withdrawInvestment'])
+    ->middleware(['auth', 'role:investor'])
+    ->name('investments.withdraw');
+
+    Route::get('/project/{id}/investors', function ($id) {
+        $response = app(InvestmentController::class)->showInvestors($id);
+        return view('projectInvestors', [
+            'project' => $response->project,
+            'investorsWithAmount' => $response->investors,
+        ]);
+    })->middleware(['auth', 'role:entrepreneur'])
+      ->name('projects.investors');
+    
