@@ -39,3 +39,7 @@ export const getProjectInvestors = (projectId) => {
 export const activateOrReject = (projectId, state) => {
     return API.put(`/activateOrRejectProject/${projectId}`, { state });
 };
+
+export const deleteUpdate = (id) => {
+    return API.delete(`/update/${id}`);
+};

@@ -9,6 +9,7 @@ use App\Http\Controllers\InvestmentController;
 use App\Models\Project;
 use App\Models\User;
 use App\Models\Investment;
+use App\Models\ProjectUpdate;
 
 
 // Route::get('/user', function (Request $request) {
@@ -63,3 +64,7 @@ Route::put('/activateOrRejectProject/{id}', [ProjectController::class, 'activate
 Route::get('/showUpdates/{id}', [ProjectController::class, 'showUpdates']);
 
 Route::post('/addUpdate/{projectId}', [ProjectController::class, 'addUpdatesPostman']);
+
+Route::delete('/update/{id}', function ($id) {
+    return ProjectUpdate::destroy($id);
+});

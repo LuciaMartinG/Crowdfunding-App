@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, Modal, TextInput, Button, Alert } from "react-native";
 import { useRoute, useNavigation } from "@react-navigation/native";
-import { getProjectById, getProjectUpdates, addUpdates } from "../services/projectService"; // Importar la función addUpdates
+import { getProjectById, getProjectUpdates, addUpdates, deleteUpdate } from "../services/projectService"; // Importar la función addUpdates
 
 const ProjectDetail = () => {
     const route = useRoute();
@@ -45,50 +45,62 @@ const ProjectDetail = () => {
     };
 
     const handleAddUpdate = async () => {
-        console.log("handleAddUpdate called");
+        // Verificar que al menos title y description estén presentes
+        if (!newUpdate.title || !newUpdate.description) {
+            Alert.alert('Error', 'Title and description are required.');
+            return;
+        }
     
-        // Preparar los datos a enviar con valores predeterminados si los campos están vacíos
+        // Preparar los datos a enviar solo con title y description
         const updateData = {
-            title: newUpdate.title || project.title, // Si title está vacío, usa el valor actual del proyecto
-            description: newUpdate.description || project.description, // Lo mismo para description
-            image_url: newUpdate.image_url || project.image_url, // Lo mismo para image_url
+            title: newUpdate.title,
+            description: newUpdate.description,
         };
     
-        console.log("Sending update data:", updateData); // Verificar los datos que se enviarán
+        // Solo añadir image_url si tiene valor
+        if (newUpdate.image_url) {
+            updateData.image_url = newUpdate.image_url;
+        }
     
         try {
-            // Llamamos a la API para agregar la actualización
+            // Llamar a la API para agregar la actualización
             const response = await addUpdates(id, updateData);
     
-            // Verificar respuesta de la API
-            console.log("API Response:", response);
-    
             if (response.status === 200) {
-                // Verificar que la actualización haya sido realizada correctamente
-                // Hacemos una nueva llamada a la API para obtener el proyecto actualizado
+                // Si la actualización es exitosa, obtener el proyecto actualizado y las nuevas actualizaciones
                 const updatedProjectResponse = await getProjectById(id);
-                setProject(updatedProjectResponse.data); // Actualizamos el estado del proyecto con los datos más recientes
+                setProject(updatedProjectResponse.data); // Actualizar el proyecto
     
-                // Actualizar las actualizaciones en la UI
                 const updatesResponse = await getProjectUpdates(id);
-                setUpdates(updatesResponse.data);
+                setUpdates(updatesResponse.data); // Actualizar las actualizaciones
     
-                // Cerramos el modal después de agregar la actualización
+                // Cerrar el modal y limpiar los campos
                 setModalVisible(false);
-                setNewUpdate({
-                    title: '',
-                    description: '',
-                    image_url: ''
-                }); // Limpiamos el formulario
+                setNewUpdate({ title: '', description: '', image_url: '' });
             } else {
-                Alert.alert('Error', 'Failed to add the update.');
+                throw new Error('Failed to add update.');
             }
         } catch (error) {
-            console.error("Error al agregar la actualización:", error);
-            Alert.alert('Error', 'There was an issue adding the update.');
+            console.error("Error during API call:", error);
+            Alert.alert('Error', 'There was an issue adding the update: ' + error.message);
         }
     };
     
+    const handleDeleteUpdate = async (updateId) => {
+        try {
+            // Llamada al método para eliminar la actualización
+            const response = await deleteUpdate(updateId);
+            if (response.status === 200) {
+                console.log('Update deleted successfully');
+                // Actualizar la lista de actualizaciones
+                const updatedUpdates = updates.filter(update => update.id !== updateId);
+                setUpdates(updatedUpdates);
+            }
+        } catch (error) {
+            console.error('Error deleting update:', error);
+            Alert.alert('Error', 'There was an issue deleting the update.');
+        }
+    };
 
     return (
         <ScrollView style={styles.container}>
@@ -160,6 +172,16 @@ const ProjectDetail = () => {
                                     <Text style={styles.updateDate}>
                                         Updated on: {new Date(update.updated_at).toLocaleDateString()}
                                     </Text>
+
+                                    {/* Botón de borrar actualización */}
+                                    {project.user_id === 22 && (
+                                        <TouchableOpacity
+                                            style={styles.deleteButton}
+                                            onPress={() => handleDeleteUpdate(update.id)}
+                                        >
+                                            <Text style={styles.deleteButtonText}>Delete Update</Text>
+                                        </TouchableOpacity>
+                                    )}
                                 </View>
                             ))
                         ) : (
@@ -186,7 +208,7 @@ const ProjectDetail = () => {
                                 {/* Campo para el título */}
                                 <TextInput
                                     style={styles.input}
-                                    placeholder="Title"
+                                    placeholder="Title (required)"
                                     value={newUpdate.title}
                                     onChangeText={(text) => setNewUpdate({ ...newUpdate, title: text })}
                                 />
@@ -194,7 +216,7 @@ const ProjectDetail = () => {
                                 {/* Campo para la descripción */}
                                 <TextInput
                                     style={styles.input}
-                                    placeholder="Description"
+                                    placeholder="Description (required)"
                                     value={newUpdate.description}
                                     onChangeText={(text) => setNewUpdate({ ...newUpdate, description: text })}
                                 />
@@ -202,7 +224,7 @@ const ProjectDetail = () => {
                                 {/* Campo para la URL de la imagen */}
                                 <TextInput
                                     style={styles.input}
-                                    placeholder="Image URL"
+                                    placeholder="Image URL (optional)"
                                     value={newUpdate.image_url}
                                     onChangeText={(text) => setNewUpdate({ ...newUpdate, image_url: text })}
                                 />
@@ -367,9 +389,55 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     buttonContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        width: '100%',
+        flexDirection: 'column', // Cambiado a 'column' para que los botones estén apilados verticalmente
+        alignItems: 'center',    // Centrar los botones horizontalmente
+        width: '100%',           // Para que ocupe todo el ancho disponible
+        marginTop: 20,           // Agregar un poco de margen superior para separarlo de otros elementos
+    },
+
+    editButton: {
+        backgroundColor: '#55877e', // Fondo verde
+        paddingVertical: 12, // Añadir relleno para hacerlo más grande
+        paddingHorizontal: 20, // Añadir relleno para equilibrar el tamaño
+        borderRadius: 8, // Bordes redondeados
+        alignItems: 'center', // Centrar el texto
+        marginBottom: 10, // Espaciado entre los botones
+        width: '80%', // Ancho del 80% para que sea más destacado
+        alignSelf: 'center', // Centrar el botón horizontalmente
+    },
+
+    investorsButton: {
+        backgroundColor: '#55877e', // Fondo verde, el mismo color para consistencia
+        paddingVertical: 12, // Tamaño adecuado para hacerlo visualmente atractivo
+        paddingHorizontal: 20, // Espaciado en los lados
+        borderRadius: 8, // Bordes redondeados
+        alignItems: 'center', // Centrar el texto
+        marginBottom: 10, // Espaciado entre los botones
+        width: '80%', // Ancho del 80% para que sea prominente
+        alignSelf: 'center', // Centrar el botón horizontalmente
+    },
+    editButtonText: {
+        color: '#fff', // Color blanco para el texto
+        fontSize: 16, // Tamaño de fuente adecuado
+        fontWeight: 'bold', // Hacer el texto en negrita
+    },
+    investorsButtonText: {
+        color: '#fff', // Texto blanco
+        fontSize: 16, // Tamaño adecuado
+        fontWeight: 'bold', // Hacer el texto en negrita
+    },
+    deleteButton: {
+        backgroundColor: '#d9534f', // Rojo
+        paddingVertical: 8,
+        paddingHorizontal: 15,
+        borderRadius: 5,
+        alignItems: 'center',
+        marginTop: 10,
+    },
+    deleteButtonText: {
+        color: '#fff',
+        fontSize: 14,
+        fontWeight: 'bold',
     },
 });
 
