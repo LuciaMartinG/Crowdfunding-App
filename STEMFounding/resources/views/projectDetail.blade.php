@@ -33,6 +33,7 @@
                             <h4 class="user">User: {{ $project->user->name }}</h4>
                             <p class="card-text">{{ $project->description }}</p>
                             <h5 class="card-subtitle mb-2">Deadline: {{ $project->limit_date }}</h5>
+                            <h5 class="card-subtitle mb-2">State: {{ $project->state }}</h5>
                             <h5 class="card-subtitle mb-2 ">Money raised: {{ $project->current_investment }} / {{ $project->max_investment }}</h5>
                             
                             <!-- Barra de Progreso -->
@@ -101,7 +102,7 @@
                         @endif
 
                         <!-- Botón "Edit Project" y Modal visible solo si el proyecto pertenece al usuario autenticado -->
-                        @if ($project->user_id == Auth::id())
+                        @if ($project->user_id == Auth::id() && $project->state == 'active')
                         <button 
                                         class="btn btn-warning btn-sm mt-3" 
                                         data-bs-toggle="modal" 

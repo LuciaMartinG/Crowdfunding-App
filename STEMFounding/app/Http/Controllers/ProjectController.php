@@ -544,12 +544,6 @@ public function editUpdate(Request $request, $updateId)
             abort(404, 'Project not found');
         }
 
-        // Verificar si el estado del proyecto es 'pending' y si el usuario no es admin
-        if ($project->state === 'pending' && Auth::user()?->role !== 'admin') {
-            abort(403, 'You are not authorized to view this project.');
-        }
-
-        // Si todo está bien, retornar la vista con los detalles del proyecto
         return view('projectDetail', ['project' => $project]);
     }
 
