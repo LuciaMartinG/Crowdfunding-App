@@ -48,3 +48,37 @@ export const deleteUpdate = (id) => {
 export const editUpdate = (updateId, updateData) => {
     return API.put(`/update/${updateId}`, updateData); // Se envían los datos de la actualización
 };
+
+
+// Login: Enviar las credenciales del usuario
+export const login = (data) => {
+    return API.post('/login', data)  // Enviar los datos del usuario a la API Laravel
+        .then(response => response.data)  // Retorna la respuesta que incluye el token
+        .catch(error => {
+            console.error('Error en el login:', error.response);
+            throw error;  // Lanza el error para manejarlo en el componente
+        });
+};
+
+// Register: Enviar los datos del nuevo usuario
+export const register = (data) => {
+    return API.post('/register', data)  // Enviar los datos de registro a la API Laravel
+        .then(response => response.data)  // Retorna la respuesta, que incluye el token
+        .catch(error => {
+            console.error('Error en el registro:', error.response);
+            throw error;  // Lanza el error para manejarlo en el componente
+        });
+};
+
+// Logout: Revocar el token del usuario actual
+export const logout = (token) => {
+    return API.post('/logout', {}, {
+        headers: {
+            Authorization: `Bearer ${token}`,  // Enviar el token de autorización en el header
+        }
+    }).then(response => response.data)  // Retorna la respuesta de logout
+      .catch(error => {
+          console.error('Error en el logout:', error.response);
+          throw error;  // Lanza el error para manejarlo en el componente
+      });
+};
