@@ -78,6 +78,8 @@
                                         </button>
                                     @endif
                                 @endif
+                                <a href="{{ route('projects.show', $project->id) }}" class="btn btn-secondary btn-sm mt-3 mb-3 me-2">View Details
+    </a>
                                 </div>
                             </div>
                         </div>

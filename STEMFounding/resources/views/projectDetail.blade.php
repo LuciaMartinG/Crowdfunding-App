@@ -57,9 +57,10 @@
                                 <h5 class="update-title">{{ $update->title }}</h5>
                                 <p class="update-description">{{ $update->description }}</p>
                                 <p><strong>Updated by:</strong> {{ $update->user->name }} | <strong>On:</strong> {{ $update->updated_at->format('d-m-Y H:i') }}</p>
-                                <!-- Botón para eliminar -->
+                                @if (Auth::check() && (Auth::id() === $update->user_id || Auth::id() === $project->user_id))
                                 <a href="{{ route('projects.comments.delete', $update->id) }}" class="btn btn-danger btn-sm mb-3 w-auto" onclick="return confirm('¿Are you sure?');">Delete Update</a>
                                 <a href="#" data-bs-toggle="modal" data-bs-target="#editUpdateModal" class="btn btn-warning btn-sm mb-3 w-auto">Edit Update</a>
+                                @endif
                                 @include('editUpdatesModal')
                             </div>
 
