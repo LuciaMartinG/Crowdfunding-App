@@ -6,59 +6,71 @@
     <title>@yield('title')</title>
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
 </head>
 <body class="d-flex flex-column min-vh-100">
     <!-- Header -->
     <header class="bg-secondary text-white py-3">
-        <nav class="container d-flex justify-content-between align-items-center">
-            <ul class="nav">
-               
-                    <a href="/project" class="btn btn-secondary text-white ms-3">
-                        Projects
-                    </a>
-                    
-                @if(Auth::check() && Auth::user()->role == 'entrepreneur')
-                    <li class="nav-item">
-                        <a href="/project/create" class="btn btn-secondary text-white ms-3">Create Project</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="/user/projects" class="btn btn-secondary text-white ms-3">My Projects</a>
-                    </li>
-                @endif
-                
-                @if(Auth::check() && Auth::user()->role == 'admin')
-                    <li class="nav-item">
-                        <a href="/user" class="btn btn-secondary text-white ms-3">Users</a>
-                    </li>
-                @endif
+        <nav class="navbar navbar-expand-lg bg-secondary container">
+            <!-- Brand -->
+            <a class="navbar-brand text-white" href="/">STEMFounding</a>
 
-                @if(Auth::check() && Auth::user()->role == 'investor')
+            <!-- Toggler -->
+            <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Collapsible Content -->
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a href="/investments/my-projects" class="btn btn-secondary text-white ms-3">My investments</a>
+                        <a href="/project" class="btn btn-secondary text-white ms-3">Projects</a>
                     </li>
-                @endif
-            </ul>
-            <ul class="nav">
-                @if(Auth::check()) <!-- Verifica si el usuario está autenticado -->
-                    <li class="nav-item">
-                        <a href="/user/detail/{{ Auth::user()->id }}" class="nav-link text-white">{{ Auth::user()->name }}</a>
-                    </li>
-                    <li class="nav-item">
-                        <form action="/logout" method="POST" class="d-inline">
-                            @csrf
-                            <button type="submit" class="btn btn-outline-light">Logout</button>
-                        </form>
-                    </li>
-                @else
-                    <!-- Mostrar opciones para usuarios no autenticados -->
-                    <li class="nav-item">
-                        <a href="/login" class="btn btn-outline-light me-2">Login</a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="/register" class="btn btn-light">Register</a>
-                    </li>
-                @endif
-            </ul>
+                    
+                    @if(Auth::check() && Auth::user()->role == 'entrepreneur')
+                        <li class="nav-item">
+                            <a href="/project/create" class="btn btn-secondary text-white ms-3">Create Project</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/user/projects" class="btn btn-secondary text-white ms-3">My Projects</a>
+                        </li>
+                    @endif
+
+                    @if(Auth::check() && Auth::user()->role == 'admin')
+                        <li class="nav-item">
+                            <a href="/user" class="btn btn-secondary text-white ms-3">Users</a>
+                        </li>
+                    @endif
+
+                    @if(Auth::check() && Auth::user()->role == 'investor')
+                        <li class="nav-item">
+                            <a href="/investments/my-projects" class="btn btn-secondary text-white ms-3">My investments</a>
+                        </li>
+                    @endif
+                </ul>
+
+                <ul class="navbar-nav">
+                    @if(Auth::check()) <!-- Verifica si el usuario está autenticado -->
+                        <li class="nav-item">
+                            <a href="/user/detail/{{ Auth::user()->id }}" class="nav-link text-white">{{ Auth::user()->name }}</a>
+                        </li>
+                        <li class="nav-item">
+                            <form action="/logout" method="POST" class="d-inline">
+                                @csrf
+                                <button type="submit" class="btn btn-outline-light">Logout</button>
+                            </form>
+                        </li>
+                    @else
+                        <!-- Mostrar opciones para usuarios no autenticados -->
+                        <li class="nav-item">
+                            <a href="/login" class="btn btn-outline-light me-2">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/register" class="btn btn-light">Register</a>
+                        </li>
+                    @endif
+                </ul>
+            </div>
         </nav>
     </header>
 
@@ -73,6 +85,5 @@
         <p class="mb-0">© 2024 STEMFounding | All Rights Reserved</p>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
