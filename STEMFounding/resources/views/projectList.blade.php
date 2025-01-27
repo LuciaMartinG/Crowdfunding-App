@@ -5,6 +5,17 @@
 @section('content')
 
 <div class="container">
+@if(session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="alert alert-danger">
+            {{ session('error') }}
+        </div>
+    @endif
 
     @if (Auth::check() && Auth::user()->role == 'admin') <!-- Solo muestra esto si el usuario está autenticado y es admin -->
         <div class="mb-4">

@@ -47,10 +47,16 @@ Route::get('/', function () {
     Route::get('/projects', [ProjectController::class, 'showProjects'])->name('projects.list'); 
 
     Route::get('/project/delete/{id}', function ($id) {
-        Project::destroy($id);
-        return redirect('/project');
+        $status = 'error';
+        $message = 'An error occurred while deleting the project.';
+    
+        if (Project::destroy($id)) {
+            $status = 'success';
+            $message = 'Project deleted successfully!';
+        }
+    
+        return redirect('/project')->with($status, $message);
     })->middleware(['auth', 'role:admin']);
-
     /*
         Ruta para mostrar el formulario de creación de un nuevo proyecto.
         Solo accesible para usuarios con rol de entrepreneur.
