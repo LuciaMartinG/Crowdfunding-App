@@ -35,31 +35,35 @@ const MyProfile = ({ navigation }) => {
   }
 
   const handleWithdraw = async () => {
-    // Validación de la cantidad ingresada
-    if (amount <= 0 || amount > user.balance) {
+    const numericAmount = parseFloat(amount); // Convertir la cantidad ingresada a número
+  
+    // Validar que el monto sea positivo, no mayor al saldo disponible, y no NaN
+    if (isNaN(numericAmount) || numericAmount <= 0 || numericAmount > user.balance) {
       Alert.alert("Error", "Invalid amount.");
       return;
     }
-
+  
+    // Objeto que se enviará a la API
     const balanceData = {
-      id: user.id, // Usamos el id del usuario
-      amount: amount.toString(), // Convertimos el amount a string para coincidir con el tipo en la API
-      transaction_type: "withdrawal", // Transaction type siempre será "withdrawal"
+      id: user.id.toString(), // Convertir el ID a string
+      amount: numericAmount.toString(), // Convertir el monto a string
+      transaction_type: "withdrawal", // Tipo de transacción fijo
     };
-
+  
     try {
-      const response = await updateUserBalance(balanceData);
-      console.log("Balance updated successfully:", response);
-      Alert.alert("Success", `You have withdrawn €${amount}`);
-      setModalVisible(false); // Cerrar el modal después de la acción
-      setAmount(""); // Limpiar el campo de cantidad
-      // Podrías también actualizar el saldo en el estado del usuario si es necesario
-      setUser({ ...user, balance: user.balance - amount }); // Actualiza el balance local
+      const response = await updateUserBalance(balanceData); // Llamada a la API
+      Alert.alert("Success", `You have withdrawn €${numericAmount}`);
+      setModalVisible(false);
+      setAmount("");
+  
+      // Actualizar el balance local
+      const updatedBalance = user.balance - numericAmount;
+      setUser({ ...user, balance: updatedBalance });
     } catch (error) {
-      console.error("Error updating balance:", error);
       Alert.alert("Error", "There was an issue processing your withdrawal.");
     }
   };
+  
 
   return (
     <View style={styles.container}>
@@ -86,9 +90,11 @@ const MyProfile = ({ navigation }) => {
 
       {/* Botón para navegar a EditUser y pasar los datos del usuario */}
       <Button
-        title="Edit Profile"
-        onPress={() => navigation.navigate('EditUser', { user: user })}
-      />
+    title="Edit Profile"
+    onPress={() => navigation.dispatch({
+        ...navigation.navigate('EditUser', { user: user }),
+    })}
+/>
 
       {/* Modal */}
       <Modal
