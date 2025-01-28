@@ -66,6 +66,7 @@ export default function App() {
             <Stack.Screen name="EditProject" component={EditProject} />
             <Stack.Screen name="Investors" component={Investors} />
             <Stack.Screen name="MyProfile" component={MyProfile} />
+            <Stack.Screen name="EditUser" component={EditUser} />
         </Stack.Navigator>
     );
 
@@ -79,6 +80,20 @@ export default function App() {
         >
             <Stack.Screen name="MyProjects" component={MyProjects} />
             <Stack.Screen name="EditProject" component={EditProject} />
+            <Stack.Screen name="Investors" component={Investors} />
+        </Stack.Navigator>
+    );
+
+    const ProfileStack = () => (
+        <Stack.Navigator
+            screenOptions={{
+                headerStyle: styles.header,
+                headerTintColor: '#ffffff',
+            }}
+        >
+            {/* Pantallas del perfil */}
+            <Stack.Screen name="MyProfile" component={MyProfile} />
+            <Stack.Screen name="EditUser" component={EditUser} />
         </Stack.Navigator>
     );
 
@@ -97,9 +112,7 @@ export default function App() {
             <Drawer.Screen name="Projects" component={ProjectStack} />
             <Drawer.Screen name="My Projects" component={MyProjectsStack} />
             <Drawer.Screen name="Create Project" component={CreateProject} />
-            <Drawer.Screen name="MyProfile" component={MyProfile} />
-            <Drawer.Screen name="Investors" component={Investors} />
-            <Drawer.Screen name="Edit User" component={EditUser} />
+            <Drawer.Screen name="Profile" component={ProfileStack} />
             <Drawer.Screen
                 name="Logout"
                 component={({ navigation }) => (
