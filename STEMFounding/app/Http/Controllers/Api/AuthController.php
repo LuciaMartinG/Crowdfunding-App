@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Laravel\Sanctum\HasApiTokens;
 
-
 class AuthController extends Controller
 {
     use HasApiTokens;
@@ -20,6 +19,8 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
+        $response = null;
+
         // Validar los datos enviados
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
@@ -30,28 +31,32 @@ class AuthController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['error' => $validator->errors()], 422);
+            $response = response()->json(['error' => $validator->errors()], 422);
+        } elseif ($request->role !== 'entrepreneur') {
+            // Restringir el registro solo a usuarios con el rol "entrepreneur"
+            $response = response()->json(['error' => 'Solo los usuarios con el rol entrepreneur pueden registrarse.'], 403);
+        } else {
+            // Crear el usuario
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'role' => $request->role,
+                'photo' => $request->photo ?? null,
+                'balance' => 0, // Balance inicial
+            ]);
+
+            // Crear un token de acceso
+            $token = $user->createToken('auth_token')->plainTextToken;
+
+            $response = response()->json([
+                'user' => $user,
+                'access_token' => $token,
+                'token_type' => 'Bearer',
+            ], 201);
         }
 
-        // Crear el usuario
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => $request->role,
-            'photo' => $request->photo ?? null,
-            'balance' => 0, // Balance inicial
-        ]);
-
-        // Crear un token de acceso
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        // Retornar la respuesta con el usuario y el token
-        return response()->json([
-            'user' => $user,
-            'access_token' => $token,
-            'token_type' => 'Bearer',
-        ], 201);
+        return $response;
     }
 
     /**
@@ -59,21 +64,31 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
+        $response = null;
+
         $credentials = $request->only('email', 'password');
 
         // Verificar las credenciales
-        if (Auth::attempt($credentials)) {
+        if (!Auth::attempt($credentials)) {
+            $response = response()->json(['error' => 'Unauthorized'], 401);
+        } else {
             $user = Auth::user();
-            $token = $user->createToken('auth_token')->plainTextToken;
 
-            return response()->json([
-                'user' => $user,
-                'access_token' => $token,
-                'token_type' => 'Bearer',
-            ]);
+            // Verificar si el usuario tiene el rol "entrepreneur"
+            if ($user->role !== 'entrepreneur') {
+                $response = response()->json(['error' => 'Solo los usuarios con el rol entrepreneur pueden iniciar sesión.'], 403);
+            } else {
+                $token = $user->createToken('auth_token')->plainTextToken;
+
+                $response = response()->json([
+                    'user' => $user,
+                    'access_token' => $token,
+                    'token_type' => 'Bearer',
+                ]);
+            }
         }
 
-        return response()->json(['error' => 'Unauthorized'], 401);
+        return $response;
     }
 
     /**
@@ -81,11 +96,16 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
-        $request->user()->tokens->each(function ($token) {
-            $token->delete();
-        });
+        $response = null;
 
-        return response()->json(['message' => 'Logged out successfully']);
+        if ($request->user()) {
+            $request->user()->tokens->each(function ($token) {
+                $token->delete();
+            });
+
+            $response = response()->json(['message' => 'Logged out successfully']);
+        }
+
+        return $response;
     }
 }
-

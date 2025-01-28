@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createStackNavigator } from '@react-navigation/stack';
-import { StyleSheet, View, Text, Button } from 'react-native';
+import { StyleSheet, Button } from 'react-native';
 import Project from './src/pages/Project';
 import ProjectDetail from './src/pages/ProjectDetail';
 import CreateProject from './src/pages/CreateProject';
@@ -13,8 +13,8 @@ import MyProfile from './src/pages/MyProfile';
 import EditUser from './src/pages/EditUser';
 import Login from './src/pages/Login';
 import Register from './src/pages/Register';
-import AsyncStorage from '@react-native-async-storage/async-storage'; // Usado para almacenar el token
-import { logout } from './src/services/projectService'; // Importa la función de logout
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { logout } from './src/services/projectService'; // Función de logout
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -25,32 +25,27 @@ export default function App() {
     // Función para verificar el estado de login
     const checkLoginStatus = async () => {
         try {
-            const token = await AsyncStorage.getItem('authToken'); // O la clave que usas para almacenar el token
+            const token = await AsyncStorage.getItem('authToken'); // Recupera el token
             setUserLoggedIn(!!token); // Si hay un token, el usuario está logueado
         } catch (error) {
             console.error(error);
         }
     };
 
-    // Revisa el estado de login cuando la app se monta
+    // Verifica el estado de login al montar la aplicación
     useEffect(() => {
         checkLoginStatus();
     }, []);
 
     // Función para cerrar sesión (Logout)
-    const handleLogout = async () => {
+    const handleLogout = async (navigation) => {
         try {
-            // Obtener el token almacenado en AsyncStorage
-            const token = await AsyncStorage.getItem('authToken');
-
+            const token = await AsyncStorage.getItem('authToken'); // Obtén el token
             if (token) {
-                // Llamar a la función de logout desde el servicio
-                await logout(token);
-
-                // Eliminar el token de AsyncStorage
-                await AsyncStorage.removeItem('authToken');
-                setUserLoggedIn(false); // Actualiza el estado de login
-                navigation.navigate('Login'); // Navega a la pantalla de login
+                await logout(token); // Llama a la función de logout
+                await AsyncStorage.removeItem('authToken'); // Borra el token
+                setUserLoggedIn(false); // Cambia el estado a "no logueado"
+                navigation.navigate('Login'); // Redirige al login
             }
         } catch (error) {
             console.error('Error en el logout:', error);
@@ -58,12 +53,12 @@ export default function App() {
         }
     };
 
-    // Navegación de los proyectos
+    // Navegación del Stack de proyectos
     const ProjectStack = () => (
         <Stack.Navigator
             screenOptions={{
-                headerStyle: styles.header, // Fondo verde para la barra de navegación
-                headerTintColor: '#ffffff', // Letras blancas en la barra de navegación
+                headerStyle: styles.header,
+                headerTintColor: '#ffffff',
             }}
         >
             <Stack.Screen name="Projects" component={Project} />
@@ -74,12 +69,12 @@ export default function App() {
         </Stack.Navigator>
     );
 
-    // Navegación de los proyectos de usuario
+    // Navegación del Stack de proyectos del usuario
     const MyProjectsStack = () => (
         <Stack.Navigator
             screenOptions={{
-                headerStyle: styles.header, // Fondo verde para la barra de navegación
-                headerTintColor: '#ffffff', // Letras blancas en la barra de navegación
+                headerStyle: styles.header,
+                headerTintColor: '#ffffff',
             }}
         >
             <Stack.Screen name="MyProjects" component={MyProjects} />
@@ -91,47 +86,48 @@ export default function App() {
     const AppDrawer = () => (
         <Drawer.Navigator
             screenOptions={{
-                drawerActiveBackgroundColor: '#578E7E', // Fondo verde para las opciones activas del menú
-                drawerActiveTintColor: '#ffffff', // Letras blancas en las opciones activas
-                drawerInactiveTintColor: '#000000', // Letras negras en las opciones inactivas
-                headerStyle: styles.header, // Fondo verde en la cabecera
-                headerTintColor: '#ffffff', // Letras blancas en la cabecera
+                drawerActiveBackgroundColor: '#578E7E',
+                drawerActiveTintColor: '#ffffff',
+                drawerInactiveTintColor: '#000000',
+                headerStyle: styles.header,
+                headerTintColor: '#ffffff',
             }}
         >
-            {/* Pantallas siempre visibles */}
+            {/* Pantallas visibles para usuarios autenticados */}
             <Drawer.Screen name="Projects" component={ProjectStack} />
-            
-            {/* Pantallas solo visibles si el usuario está logueado */}
-            {userLoggedIn && (
-                <>
-                    <Drawer.Screen name="My Projects" component={MyProjectsStack} />
-                    <Drawer.Screen name="Create Project" component={CreateProject} />
-                    <Drawer.Screen name="MyProfile" component={MyProfile} />
-                    <Drawer.Screen name="Investors" component={Investors} />
-                    <Drawer.Screen name="Edit User" component={EditUser} />
-                    <Drawer.Screen name="Edit Project" component={EditProject} />
-                    
-                    {/* Opción de logout */}
-                    <Drawer.Screen
-                        name="Logout"
-                        component={() => (
-                            <Button title="Logout" onPress={handleLogout} />
-                        )}
-                    />
-                </>
-            )}
-
-            {/* Pantallas siempre visibles */}
-            <Drawer.Screen name="Login">
-                {props => <Login {...props} setUserLoggedIn={setUserLoggedIn} />}
-            </Drawer.Screen>
-            <Drawer.Screen name="Register" component={Register} />
+            <Drawer.Screen name="My Projects" component={MyProjectsStack} />
+            <Drawer.Screen name="Create Project" component={CreateProject} />
+            <Drawer.Screen name="MyProfile" component={MyProfile} />
+            <Drawer.Screen name="Investors" component={Investors} />
+            <Drawer.Screen name="Edit User" component={EditUser} />
+            <Drawer.Screen
+                name="Logout"
+                component={({ navigation }) => (
+                    <Button title="Logout" onPress={() => handleLogout(navigation)} />
+                )}
+            />
         </Drawer.Navigator>
     );
 
     return (
         <NavigationContainer>
-            <AppDrawer />
+            {userLoggedIn ? (
+                // Drawer para usuarios autenticados
+                <AppDrawer />
+            ) : (
+                // Stack para usuarios no autenticados
+                <Stack.Navigator
+                    screenOptions={{
+                        headerStyle: styles.header,
+                        headerTintColor: '#ffffff',
+                    }}
+                >
+                    <Stack.Screen name="Login">
+                        {props => <Login {...props} setUserLoggedIn={setUserLoggedIn} />}
+                    </Stack.Screen>
+                    <Stack.Screen name="Register" component={Register} />
+                </Stack.Navigator>
+            )}
         </NavigationContainer>
     );
 }
