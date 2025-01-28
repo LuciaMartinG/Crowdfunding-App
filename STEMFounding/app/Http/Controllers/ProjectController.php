@@ -277,29 +277,32 @@ public function activateOrRejectProjectPostman(Request $request, $id)
     // Redirigir con el mensaje adecuado
     return $project;
 }
+
+
+
     
     
  
 public function showActiveAndInactiveProjects()
 {
-    $projectList = Project::whereIn('state', ['active', 'inactive'])->paginate(10); // 10 proyectos por página
     $now = Carbon::now();
 
-    // foreach ($projectList as $project) {
-    //     // Desactivar proyectos que alcanzaron la financiación máxima
-    //     if ($project->current_investment >= $project->max_investment) {
-    //         $project->state = 'inactive';
-    //         $project->save();
-    //     }
+    // Condición 1: Desactivar proyectos con financiación máxima alcanzada
+    Project::whereColumn('current_investment', '>=', 'max_investment')
+        ->where('state', 'active') // Solo si están activos
+        ->update(['state' => 'inactive']);
 
-    //     // Desactivar proyectos cuya fecha límite expiró sin alcanzar la financiación mínima
-    //     if ($project->deadline < $now && $project->current_investment < $project->min_investment) {
-    //         $project->state = 'inactive';
-    //         $project->save();
-    //     }
-    // }
+    // Condición 2: Desactivar proyectos cuya fecha límite expiró sin alcanzar el mínimo de financiación
+    Project::where('limit_date', '<', $now)
+        ->whereColumn('current_investment', '<', 'min_investment')
+        ->where('state', 'active') // Solo si están activos
+        ->update(['state' => 'inactive']);
 
-    return view('projectList', ['projectList' => $projectList]);
+    // Cargar los proyectos actualizados con paginación
+    $paginatedProjects = Project::whereIn('state', ['active', 'inactive'])->paginate(10);
+
+    // Retornar la vista con los proyectos actualizados
+    return view('projectList', ['projectList' => $paginatedProjects]);
 }
 
 
