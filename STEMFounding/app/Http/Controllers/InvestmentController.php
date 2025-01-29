@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Project;
 use App\Models\Investment;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 
 class InvestmentController extends Controller
@@ -177,6 +179,33 @@ class InvestmentController extends Controller
             'investors' => $investorsWithAmount,  // Inversores y sus inversiones
         ];
     }
+
+    public function processRefunds()
+{
+   
+    $projects = Project::where('limit_date', '<', now())
+                       ->whereColumn('current_investment', '<', 'min_investment')
+                       ->get();
+
+    foreach ($projects as $project) {
+        DB::transaction(function () use ($project) {
+            $investments = Investment::where('project_id', $project->id)->get();
+
+            foreach ($investments as $investment) {
+                $user = User::find($investment->user_id);
+                $user->balance += $investment->investment_amount;
+                $user->save();
+
+                $investment->delete();
+            }
+        
+            $project->current_investment = 0;
+            $project->save();
+        });
+    }
+
+    return response()->json(['message' => 'Reembolsos procesados correctamente.']);
+}
     
     
     

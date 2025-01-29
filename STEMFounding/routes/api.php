@@ -74,3 +74,5 @@ Route::delete('/update/{id}', function ($id) {
 });
 
 Route::put('/update/{id}', [ProjectController::class, 'editUpdatePostman']); // RUTA PARA EDITAR UNA ACTUALIZACIÓN
+
+Route::post('/process-refunds', [InvestmentController::class, 'processRefunds']); //Ruta para procesar reembolsos
