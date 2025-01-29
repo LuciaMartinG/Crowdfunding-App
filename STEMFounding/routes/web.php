@@ -242,3 +242,13 @@ Route::get('/', function () {
     })->middleware(['auth', 'role:entrepreneur'])
       ->name('projects.investors');
     
+
+    // Ruta para retirar fondos del proyecto, solo accesible si el usuario está autenticado
+      Route::middleware('auth','role:entrepreneur')->post('/projects/{projectId}/withdraw', [ProjectController::class, 'withdrawFunds'])->name('projects.withdraw');
+
+    //Ruta para retirar fondos
+      Route::post('/projects/{projectId}/withdraw-funds', function ($projectId) {
+        $response = app(ProjectController::class)->withdrawFunds($projectId);
+        return $response;
+    })->middleware('auth', 'role:entrepreneur')
+    ->name('projects.withdrawFunds');

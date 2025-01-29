@@ -198,7 +198,7 @@ class InvestmentController extends Controller
 
                 $investment->delete();
             }
-        
+            $project->state = 'inactive';
             $project->current_investment = 0;
             $project->save();
         });

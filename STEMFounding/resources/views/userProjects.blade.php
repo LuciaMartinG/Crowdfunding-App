@@ -5,6 +5,11 @@
 @section('content')
 
 <div class="container my-5">
+    @if(session('message'))
+        <div class="alert alert-info">
+            {{ session('message') }}
+        </div>
+    @endif
     <h1 class="mb-4 text-center">My Projects</h1>
 
     @if($projects->isEmpty())
@@ -67,7 +72,11 @@
                                     @if(Auth::check() && Auth::user()->role == 'entrepreneur')
                                         <a href="{{ route('projects.investors', ['id' => $project->id]) }}" class="btn btn-info btn-sm">View investors</a>
                                     @endif
-
+                                    @if($project->user_id === auth()->id() && $project->limit_date <= now() && $project->current_investment >= $project->min_investment && $project->state === 'active')
+                                        <form action="{{ route('projects.withdrawFunds', $project->id) }}" method="POST">
+                                            @csrf
+                                            <button type="submit" class="btn btn-danger">Withdraw Funds</button>
+                                    @endif
                                     <!-- Botón para abrir el modal: solo visible si el proyecto está activo -->
                                     @if ($project->state == 'active')
                                         <button 
