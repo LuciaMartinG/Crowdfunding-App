@@ -75,7 +75,7 @@
     </header>
 
     <!-- Main Content -->
-    <main>
+    <main class="mt-5"> <!-- Aquí agregamos un margen superior -->
         @yield('content')
     </main>
 

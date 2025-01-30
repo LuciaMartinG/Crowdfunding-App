@@ -5,8 +5,7 @@
 @section('content')
 
 <div class="container mt-5">
-    <!-- Información del usuario en una tarjeta con sombra -->
-    <div class="card shadow-lg mb-4">
+    <div class="card shadow-lg mb-4 fade-in">
         <div class="row g-0">
             <!-- Fotografía del usuario a la izquierda -->
             <div class="col-md-4">

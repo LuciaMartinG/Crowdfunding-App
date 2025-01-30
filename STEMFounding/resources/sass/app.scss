@@ -6,3 +6,20 @@
 
 // Bootstrap
 @import 'bootstrap/scss/bootstrap';
+
+
+// Define the fade-in animation
+@keyframes fadeIn {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  
+  // Aplica la animación a las tarjetas
+  .card.fade-in {
+    animation: fadeIn 1s ease-out;
+  }
+  
