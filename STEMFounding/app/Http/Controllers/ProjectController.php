@@ -555,48 +555,35 @@ public function editUpdate(Request $request, $updateId)
 
     public function withdrawFunds($projectId)
     {
-        // Buscar el proyecto
-        $project = Project::findOrFail($projectId);
-        $message = '';
+        $status = 'error';
+        $message = 'The project does not meet the conditions for fund withdrawal.';
     
-        // Verificar si el usuario autenticado es el dueño del proyecto
+        $project = Project::findOrFail($projectId);
+    
         if ($project->user_id !== auth()->id()) {
             $message = 'No tienes permiso para retirar los fondos de este proyecto.';
-            return response()->json(['message' => $message], 403); // Return response if the user is not authorized
-        }
-    
-        // Verificar si el proyecto ha alcanzado la fecha límite y la inversión mínima
-        if ($project->limit_date <= now() && $project->current_investment >= $project->min_investment) {
-            DB::transaction(function () use ($project, &$message) {
-                // Obtener todas las inversiones asociadas al proyecto
+        } elseif ($project->limit_date <= now() && $project->current_investment >= $project->min_investment) {
+            DB::transaction(function () use ($project, &$message, &$status) {
                 $investments = Investment::where('project_id', $project->id)->get();
+                $entrepreneur = User::find($project->user_id);
     
-                // Procesar el retiro de fondos al emprendedor (dueño del proyecto)
-                $entrepreneur = User::find($project->user_id); // El dueño del proyecto
-    
-                // Transferir el total de las inversiones al saldo del emprendedor
                 foreach ($investments as $investment) {
-                    $entrepreneur->balance += $investment->investment_amount; // Aumentamos el saldo del emprendedor
+                    $entrepreneur->balance += $investment->investment_amount;
                     $entrepreneur->save();
-    
-                    // Eliminar la inversión después de procesar el retiro
                     $investment->delete();
                 }
     
-                // Desactivar el proyecto (marcarlo como "completado")
-                $project->current_investment = 'inactive';
-                $project->state = 'inactive';  // Cambiar el estado del proyecto a "inactivo"
+                $project->state = 'inactive';
                 $project->save();
-                
-                // Set the success message
-                $message = "Funds successfully withdrawn by the entrepreneur and project deactivated.";
-            });
     
-            return response()->json(['message' => $message]);
-       
+                $message = "Funds successfully withdrawn by the entrepreneur and project deactivated.";
+                $status = 'success';
+            });
+        }
+    
+        return response()->json(['status' => $status, 'message' => $message]);
     }
     
-}
 
 }
 

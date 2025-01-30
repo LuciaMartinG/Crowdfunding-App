@@ -105,9 +105,9 @@ Route::get('/', function () {
         return redirect('/user/projects');
     });
 
-    // Ruta para actualizar el estado del proyecto, solo accesible para administradores
+    // Ruta para activar o RECHAZAR un proyecto, solo accesible para administradores
     Route::post('/projects/{id}/updateState', [ProjectController::class, 'activateOrRejectProject'])
-    ->middleware(['auth', 'role:admin']);  // Asegura que el usuario esté autenticado y sea admin
+    ->middleware(['auth', 'role:admin']);  // Asegura que el usuario esté autenticado y sea admin  ->>>>>>> comprobar en REACT
 
  
     /*
@@ -246,9 +246,9 @@ Route::get('/', function () {
     // Ruta para retirar fondos del proyecto, solo accesible si el usuario está autenticado
       Route::middleware('auth','role:entrepreneur')->post('/projects/{projectId}/withdraw', [ProjectController::class, 'withdrawFunds'])->name('projects.withdraw');
 
-    //Ruta para retirar fondos
       Route::post('/projects/{projectId}/withdraw-funds', function ($projectId) {
         $response = app(ProjectController::class)->withdrawFunds($projectId);
-        return $response;
-    })->middleware('auth', 'role:entrepreneur')
-    ->name('projects.withdrawFunds');
+    
+        return redirect()->route('projects.myProjects')->with($response['status'], $response['message']);
+    })->middleware('auth', 'role:entrepreneur')->name('projects.withdrawFunds');
+    
