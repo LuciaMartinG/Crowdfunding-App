@@ -266,8 +266,8 @@ public function activateOrRejectProjectPostman(Request $request, $id)
             }
         }
         // Si se va a rechazar el proyecto
-        else if ($state === 'rejected') {
-            $project->state = 'rejected';
+        else if ($state === 'inactive') {
+            $project->state = 'inactive';
             $message = 'Proyecto actualizado con éxito.';
             $type = 'success'; // Cambiar tipo de mensaje a éxito
         }

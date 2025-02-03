@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, Button, Modal, TextInput, Alert } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getUserData, updateUserBalance } from "../services/projectService"; 
 
 const MyProfile = ({ navigation }) => {

@@ -25,13 +25,14 @@ const MyProjects = () => {
     const handleToggleProjectState = async (projectId, currentState) => {
         const newState = currentState === 'active' ? 'inactive' : 'active';
         try {
-            await activateOrReject(projectId, {state:newState}); // Llamar al servicio con el nuevo estado
+            const response = await activateOrReject(projectId, newState); 
             Alert.alert('Success', `Project has been ${newState === 'active' ? 'activated' : 'deactivated'} successfully.`);
-            fetchProjects(); // Recargar los proyectos para reflejar los cambios
+            fetchProjects();
         } catch (error) {
             Alert.alert('Error', 'Failed to update project state.');
         }
     };
+    
 
     useEffect(() => {
         fetchProjects();

@@ -23,7 +23,7 @@ const Investors = () => {
                 if (response && response.data && Array.isArray(response.data.investors)) {
                     setInvestors(response.data.investors); // Asumiendo que los inversores están dentro de 'data.investors'
                 } else {
-                    setInvestors([]); // Si no hay inversores, asignamos un arreglo vacío
+                    setInvestors([]); // Si no hay inversores, asignamos un array vacío
                 }
                 setLoading(false);
             } catch (error) {

@@ -47,9 +47,14 @@ export const getUserData = async () => {
 export const getProjectUpdates = (id) => API.get('/showUpdates/'+id);
 
 // Envía la solicitud POST para insertar un nuevo proyecto
-export const postInsertProject = (projectData) => {
-    return API.post('/project', projectData); // Se pasan los datos del proyecto en el cuerpo de la solicitud
+export const postInsertProject = (projectData, token) => {
+    return API.post('/project', projectData, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    });
 };
+
 
 export const addUpdates = (projectId, projectData) => {
     return API.post(`/addUpdate/${projectId}`, projectData); // Enviar el projectId en la URL
@@ -77,7 +82,8 @@ export const getProjectInvestors = (projectId) => {
 
 // Actualiza el estado de un proyecto
 export const activateOrReject = (projectId, state) => {
-    return API.put(`/activateOrRejectProject/${projectId}`, { state });
+    console.log('Enviando solicitud a la API:', { projectId, state });
+    return API.put(`/activateOrRejectProject/${projectId}`,  { state });
 };
 
 export const deleteUpdate = (id) => {
