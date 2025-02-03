@@ -1,0 +1,32 @@
+
+.cardProjectList:hover{
+    transform: scale(1.02);
+    transition: transform 0.3s ease-in-out;
+}
+
+
+@keyframes fadeIn {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+
+  .cardUserDetail {
+    animation: fadeIn 1s ease-out;
+  }
+  
+
+  @keyframes bounceWithPause {
+    0%, 5% { transform: scale(1); }  /* Estado normal */
+    10% { transform: scale(1.15); }  /* Crece un poco */
+    15% { transform: scale(1); }     /* Vuelve a su tamaño original */
+    100% { transform: scale(1); }    /* Se mantiene en estado normal hasta la siguiente animación */
+}
+
+.animated-button {
+    animation: bounceWithPause 10s ease-in-out infinite; /* 0.3s de animación + 9.7s de pausa */
+}
+

@@ -93,7 +93,7 @@
                         <!-- Botón "Found" visible solo para el usuario con rol 'investor' -->
                         @if (Auth::check() && Auth::user()->role == 'investor' && $project->state == 'active')
                             <button 
-                                        class="btn btn-warning btn-sm mt-3" 
+                                        class="btn btn-warning btn-sm mt-3 animated-button" 
                                         data-bs-toggle="modal" 
                                         data-bs-target="#editFoundsModal-{{ $project->id }}">
                                         Add Founds

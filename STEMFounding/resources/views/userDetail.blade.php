@@ -5,7 +5,7 @@
 @section('content')
 
 <div class="container mt-5">
-    <div class="card shadow-lg mb-4 fade-in">
+    <div class="card shadow-lg mb-4 cardUserDetail">
         <div class="row g-0">
             <!-- Fotografía del usuario a la izquierda -->
             <div class="col-md-4">
