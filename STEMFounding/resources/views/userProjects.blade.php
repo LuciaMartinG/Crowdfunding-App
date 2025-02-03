@@ -64,20 +64,29 @@
                                             {{ ucfirst($project->state) }}
                                         </span>
                                     </p>
+                                    @if(Auth::check() && Auth::user()->role == 'entrepreneur')
+                                        <a href="{{ route('projects.investors', ['id' => $project->id]) }}" class="btn btn-info btn-sm">View investors</a>
+                                    @endif
                                     @if (Auth::user()->role == 'entrepreneur' && $project->limit_date >= now())
                                     <form action="/projects/user/activate-or-deactivate" method="POST">
                                         @csrf
                                         <input type="hidden" name="id" value="{{ $project->id }}">
                                         @if ($project->state == 'active')
-                                            <button type="submit" name="state" value="inactive" class="btn btn-danger btn-sm mb-3">Disable Project</button>
+                                            <button type="submit" name="state" value="inactive" class="btn btn-danger btn-sm mt-3 mb-3">Disable Project</button>
                                         @elseif ($project->state == 'inactive')
                                             <button type="submit" name="state" value="active" class="btn btn-success btn-sm mb-3">Enable Project</button>
                                         @endif
                                     </form>
-                                    @if(Auth::check() && Auth::user()->role == 'entrepreneur')
-                                        <a href="{{ route('projects.investors', ['id' => $project->id]) }}" class="btn btn-info btn-sm">View investors</a>
                                     @endif
-                                    
+                                    @if ($project->current_investment >= $project->min_investment && $project->limit_date >= now())
+                                    <form action="{{ route('projects.withdrawFunds', ['projectId' => $project->id]) }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="btn btn-danger btn-sm mb-3">
+                                            Withdraw Funds
+                                        </button>
+                                    </form>
+                                    @endif
+                                
                                     <!-- Botón para abrir el modal: solo visible si el proyecto está activo -->
                                     @if ($project->state == 'active')
                                         <button 
@@ -87,7 +96,7 @@
                                             Edit Project
                                         </button>
                                     @endif
-                                @endif
+                            
                                 <a href="{{ route('projects.show', $project->id) }}" class="btn btn-secondary btn-sm mt-3 mb-3 me-2">View Details
     </a>
                                 </div>

@@ -555,8 +555,10 @@ public function editUpdate(Request $request, $updateId)
 
     public function withdrawFunds($projectId)
     {
-        $status = 'error';
-        $message = 'The project does not meet the conditions for fund withdrawal.';
+        $response = (object) [
+            'type' => 'error',
+            'message' => 'The project does not meet the conditions for fund withdrawal.'
+        ];
     
         $project = Project::findOrFail($projectId);
     
@@ -564,24 +566,22 @@ public function editUpdate(Request $request, $updateId)
             $message = 'No tienes permiso para retirar los fondos de este proyecto.';
         } elseif ($project->limit_date <= now() && $project->current_investment >= $project->min_investment) {
             DB::transaction(function () use ($project, &$message, &$status) {
-                $investments = Investment::where('project_id', $project->id)->get();
                 $entrepreneur = User::find($project->user_id);
     
-                foreach ($investments as $investment) {
-                    $entrepreneur->balance += $investment->investment_amount;
-                    $entrepreneur->save();
-                    $investment->delete();
-                }
+                // Añadir el total de current_investment al saldo del emprendedor
+                $entrepreneur->balance += $project->current_investment;
+                $entrepreneur->save();
     
+                // Desactivar el proyecto
                 $project->state = 'inactive';
                 $project->save();
     
-                $message = "Funds successfully withdrawn by the entrepreneur and project deactivated.";
-                $status = 'success';
+                $response->type = 'success';
+                $response->message = 'Funds successfully withdrawn and project deactivated.';
             });
         }
     
-        return response()->json(['status' => $status, 'message' => $message]);
+        return $response;
     }
     
 

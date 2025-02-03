@@ -244,11 +244,11 @@ Route::get('/', function () {
     
 
     // Ruta para retirar fondos del proyecto, solo accesible si el usuario está autenticado
-      Route::middleware('auth','role:entrepreneur')->post('/projects/{projectId}/withdraw', [ProjectController::class, 'withdrawFunds'])->name('projects.withdraw');
-
-      Route::post('/projects/{projectId}/withdraw-funds', function ($projectId) {
+    Route::post('/projects/{projectId}/withdraw', function (Request $request, $projectId) {
         $response = app(ProjectController::class)->withdrawFunds($projectId);
+        return redirect()->route('user.projects')
+            ->with($response->type, $response->message);
+    })->middleware('auth', 'role:entrepreneur')
+      ->name('projects.withdrawFunds');
     
-        return redirect()->route('projects.myProjects')->with($response['status'], $response['message']);
-    })->middleware('auth', 'role:entrepreneur')->name('projects.withdrawFunds');
     

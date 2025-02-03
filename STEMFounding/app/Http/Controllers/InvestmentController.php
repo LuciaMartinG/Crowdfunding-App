@@ -127,30 +127,6 @@ class InvestmentController extends Controller
     }
     
 
-    // public function showInvestors($projectId)
-    // {
-    //     // Obtener el proyecto por su ID
-    //     $project = Project::findOrFail($projectId);
-    
-    //     // Obtener todos los inversores que han invertido en este proyecto
-    //     $investors = $project->investments()
-    //                         ->with('user')  // Obtener la información del usuario (inversor)
-    //                         ->get();  // Obtener todas las inversiones
-    
-    //     // Mapear los inversores y sus cantidades invertidas en objetos PHP normales
-    //     $investorsWithAmount = $investors->map(function ($investment) {
-    //         return (object)[
-    //             'user' => $investment->user->name,  // Nombre del inversor
-    //             'investment_amount' => $investment->investment_amount,  // Cantidad invertida
-    //         ];
-    //     });
-    
-    //     // Devolver un objeto PHP normal con los datos (sin vista ni JSON)
-    //     return response()->json([
-    //         'project' => $project,  // Proyecto con sus datos
-    //         'investors' => $investorsWithAmount,  // Inversores y sus inversiones
-    //     ]);
-    // }
     
     public function showInvestors($projectId)
     {
