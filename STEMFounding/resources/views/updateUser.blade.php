@@ -12,26 +12,26 @@
 
         <div class="mb-3">
             <label for="name" class="form-label">Name</label>
-            <input type="text" name="name" class="form-control" value="{{ old('name', $user->name) }}">
+            <input type="text" name="name" class="form-control bg-white" value="{{ old('name', $user->name) }}">
         </div>
 
         <div class="mb-3">
             <label for="email" class="form-label">Email</label>
-            <input type="email" name="email" class="form-control" value="{{ old('email', $user->email) }}">
+            <input type="email" name="email" class="form-control bg-white" value="{{ old('email', $user->email) }}">
         </div>
 
         <div class="mb-3">
             <label for="photo" class="form-label">Profile Photo</label>
-            <input type="text" name="photo" class="form-control" value="{{ old('photo', $user->photo) }}">
+            <input type="text" name="photo" class="form-control bg-white" value="{{ old('photo', $user->photo) }}">
         </div>
 
         <div class="mb-3">
             <label for="password" class="form-label">New Password (optional)</label>
-            <input type="password" name="password" class="form-control">
+            <input type="password" name="password" class="form-control bg-white">
         </div>
 
       
-        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <button type="submit" class="btn btn-secondary text-white">Save Changes</button>
         
     </form>
 </div>
