@@ -6,7 +6,7 @@
 <div class="container mt-5">
     <h1 class="mb-4">Nuevo Proyecto</h1>
 
-    <div class="card">
+    <div class="card shadow">
         <div class="card-body">
             <form action="/project/create" method="POST">
                 @csrf
@@ -14,48 +14,48 @@
                 <!-- Título -->
                 <div class="mb-3">
                     <label for="title" class="form-label">Título</label>
-                    <input type="text" class="form-control" id="title" name="title" required>
+                    <input type="text" class="form-control bg-white" id="title" name="title" required>
                 </div>
 
-                                <!-- Descripcion -->
-                    <div class="mb-3">
-                    <label for="description" class="form-label">Descripcion</label>
-                    <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
+                <!-- Descripción -->
+                <div class="mb-3">
+                    <label for="description" class="form-label">Descripción</label>
+                    <textarea class="form-control bg-white" id="description" name="description" rows="4" required></textarea>
                 </div>
 
-                            <!-- URL imagen -->
+                <!-- URL imagen -->
                 <div class="mb-3">
                     <label for="image_url" class="form-label">Imagen URL</label>
-                    <input type="url" class="form-control" id="image_url" name="image_url" required>
+                    <input type="url" class="form-control bg-white" id="image_url" name="image_url" required>
                 </div>
+
                 <!-- URL video -->
-                    <div class="mb-3">
-                    <label for="video_url" class="form-label">video URL</label>
-                    <input type="url" class="form-control" id="video_url" name="video_url" required>
-                </div>
-
-                <!-- inversión minima -->
                 <div class="mb-3">
-                    <label for="min_investment" class="form-label">Minimum investment</label>
-                    <input type="number" class="form-control" id="min_investment" name="min_investment" required min="1">
+                    <label for="video_url" class="form-label">Video URL</label>
+                    <input type="url" class="form-control bg-white" id="video_url" name="video_url" required>
                 </div>
 
-                <!-- inversión maxima -->
+                <!-- Inversión mínima -->
                 <div class="mb-3">
-                    <label for="max_investment" class="form-label">Maximum investment</label>
-                    <input type="number" class="form-control" id="max_investment" name="max_investment">
+                    <label for="min_investment" class="form-label">Inversión Mínima</label>
+                    <input type="number" class="form-control bg-white" id="min_investment" name="min_investment" required min="1">
                 </div>
 
-                    <!-- Limit date -->
-                    <div class="mb-3">
-                    <label for="limit_date" class="form-label">Deadline</label>
-                    <input type="date" class="form-control" id="limit_date" name="limit_date" required min="{{ date(format: 'Y-m-d') }}">
+                <!-- Inversión máxima -->
+                <div class="mb-3">
+                    <label for="max_investment" class="form-label">Inversión Máxima</label>
+                    <input type="number" class="form-control bg-white" id="max_investment" name="max_investment">
                 </div>
 
+                <!-- Fecha límite -->
+                <div class="mb-3">
+                    <label for="limit_date" class="form-label">Fecha Límite</label>
+                    <input type="date" class="form-control bg-white" id="limit_date" name="limit_date" required min="{{ date('Y-m-d') }}">
+                </div>
 
                 <!-- Botón de envío -->
-                <button type="submit" class="btn btn-primary">Crear Proyecto</button>
-                <a href="/" class="btn btn-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-secondary text-white">Crear Proyecto</button>
+                <a href="/" class="btn btn-danger">Cancelar</a>
             </form>
         </div>
     </div>

@@ -41,32 +41,35 @@
                                 <!-- Calcula el porcentaje de inversión recaudada -->
                                 @php
                                     $percentage = ($project->current_investment / $project->max_investment) * 100;
-                                    if($percentage > 100) $percentage = 100;  // Asegúrate de que no se pase de 100%
+                                    if($percentage > 100) $percentage = 100;  
                                 @endphp
 
                                 <!-- Barra de Progreso que se ajusta según el porcentaje calculado -->
-                                <div class="progress-bar bg-secondary" role="progressbar" style="width: {{ $percentage }}%;" aria-valuenow="{{ $percentage }}" aria-valuemin="0" aria-valuemax="100">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated bg-secondary" role="progressbar" style="width: {{ $percentage }}%;" aria-valuenow="{{ $percentage }}" aria-valuemin="0" aria-valuemax="100">
                                     {{ round($percentage, 2) }}% 
                                 </div>
                             </div>
                         
                         <!-- Mostrar las actualizaciones del proyecto -->
+                        <!-- Mostrar las actualizaciones del proyecto -->
                         <h4 class="mb-3">Project Updates</h4>
                         @forelse ($project->updates as $update)
-                            <div class="update mb-3 p-3 border rounded">
+                            <div class="update mb-3 p-3 border border-primary rounded shadow-sm bg-light">
                                 <h5 class="update-title">{{ $update->title }}</h5>
                                 <p class="update-description">{{ $update->description }}</p>
                                 <p><strong>Updated by:</strong> {{ $update->user->name }} | <strong>On:</strong> {{ $update->updated_at->format('d-m-Y H:i') }}</p>
+                                
                                 @if (Auth::check() && (Auth::id() === $update->user_id || Auth::id() === $project->user_id))
-                                <a href="{{ route('projects.comments.delete', $update->id) }}" class="btn btn-danger btn-sm mb-3 w-auto" onclick="return confirm('¿Are you sure?');">Delete Update</a>
-                                <a href="#" data-bs-toggle="modal" data-bs-target="#editUpdateModal" class="btn btn-warning btn-sm mb-3 w-auto">Edit Update</a>
+                                    <a href="{{ route('projects.comments.delete', $update->id) }}" class="btn btn-danger btn-sm mb-3 w-auto" onclick="return confirm('¿Are you sure?');">Delete Update</a>
+                                    <a href="#" data-bs-toggle="modal" data-bs-target="#editUpdateModal" class="btn btn-warning btn-sm mb-3 w-auto">Edit Update</a>
                                 @endif
+                                
                                 @include('editUpdatesModal')
                             </div>
-
                         @empty
                             <p>No updates available for this project.</p>
                         @endforelse
+
 
                         @if(Auth::check() && Auth::user()->role == 'admin')
                             <a href="/project/delete/{{ $project->id }}" class="btn btn-danger btn-sm mb-3 w-auto" onclick="return confirm('¿Are you sure?');">Delete Project</a>
@@ -111,7 +114,7 @@
                                         Edit Project
                                     </button>
                 
-                        <button type="button" class="btn btn-primary btn-sm mt-3" data-bs-toggle="modal" data-bs-target="#addCommentModal">
+                        <button type="button" class="btn btn-secondary btn-sm mt-3" data-bs-toggle="modal" data-bs-target="#addCommentModal">
                             Add Update
                         </button>
                          

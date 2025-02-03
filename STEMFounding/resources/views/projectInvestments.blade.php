@@ -29,7 +29,7 @@
                 @foreach($investments as $investment)
                     <tr>
                         <td>{{ $investment->created_at->format('d-m-Y H:i') }}</td>
-                        <td>${{ number_format($investment->investment_amount, 2) }}</td>
+                        <td>{{ number_format($investment->investment_amount, 2) }}€</td>
                         <td>
                             <!-- Verificar si el tiempo transcurrido desde la inversión es menor a 24 horas -->
                             @php

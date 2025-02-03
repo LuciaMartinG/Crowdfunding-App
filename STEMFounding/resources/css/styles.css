@@ -29,4 +29,3 @@
 .animated-button {
     animation: bounceWithPause 10s ease-in-out infinite; /* 0.3s de animación + 9.7s de pausa */
 }
-
