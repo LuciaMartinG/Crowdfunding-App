@@ -116,5 +116,9 @@ public function listUsers(Request $request)
     ]);
 }
 
+public function getAuthenticatedUser(Request $request)
+{
+    return response()->json($request->user()); // Devuelve el usuario autenticado
+}
 
 }

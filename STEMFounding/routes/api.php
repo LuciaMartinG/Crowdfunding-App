@@ -39,13 +39,15 @@ Route::put('/updateProject', [ProjectController::class, 'updateProject']);
 
 
 // USER
-Route::get('/user', function () {
-    return User::all();
-});
+// Route::get('/user', function () {
+//     return User::all();
+// });
 
-Route::get('/user/{id}', function ($id) {
-    return User::find($id);
-});
+// Route::get('/user/{id}', function ($id) {
+//     return User::find($id);
+// });
+
+Route::middleware('auth:sanctum')->get('/user', [UserController::class, 'getAuthenticatedUser']);
 
 Route::delete('/user/{id}', function ($id) {
     return User::destroy($id);

@@ -1,30 +1,29 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, Button, Modal, TextInput, Alert } from "react-native";
-import { getUserById, updateUserBalance } from "../services/projectService"; // Importación de la función updateUserBalance
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getUserData, updateUserBalance } from "../services/projectService"; 
 
 const MyProfile = ({ navigation }) => {
-  const userId = 22; // ID del entrepreneur
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // Estado para manejar la carga
-
-  const [modalVisible, setModalVisible] = useState(false); // Estado para manejar la visibilidad del modal
-  const [amount, setAmount] = useState(""); // Estado para manejar la cantidad a retirar
+  const [loading, setLoading] = useState(true);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [amount, setAmount] = useState("");
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await getUserById(userId);
-        console.log("API Response:", response); // Verifica la estructura de los datos
-        setUser(response.data); // Ahora "response" contiene los datos del usuario
+        const response = await getUserData();
+        console.log(response); 
+        setUser(response);
       } catch (error) {
         console.error("Error fetching user data:", error);
       } finally {
-        setLoading(false); // Deja de cargar
+        setLoading(false);
       }
     };
 
     fetchUserData();
-  }, []);
+}, []);
 
   if (loading) {
     return <Text>Loading...</Text>;
@@ -35,35 +34,29 @@ const MyProfile = ({ navigation }) => {
   }
 
   const handleWithdraw = async () => {
-    const numericAmount = parseFloat(amount); // Convertir la cantidad ingresada a número
-  
-    // Validar que el monto sea positivo, no mayor al saldo disponible, y no NaN
+    const numericAmount = parseFloat(amount);
+    
     if (isNaN(numericAmount) || numericAmount <= 0 || numericAmount > user.balance) {
       Alert.alert("Error", "Invalid amount.");
       return;
     }
-  
-    // Objeto que se enviará a la API
+    
     const balanceData = {
-      id: user.id.toString(), // Convertir el ID a string
-      amount: numericAmount.toString(), // Convertir el monto a string
-      transaction_type: "withdrawal", // Tipo de transacción fijo
+      id: user.id.toString(),
+      amount: numericAmount.toString(),
+      transaction_type: "withdrawal",
     };
-  
+    
     try {
-      const response = await updateUserBalance(balanceData); // Llamada a la API
+      await updateUserBalance(balanceData);
       Alert.alert("Success", `You have withdrawn €${numericAmount}`);
       setModalVisible(false);
       setAmount("");
-  
-      // Actualizar el balance local
-      const updatedBalance = user.balance - numericAmount;
-      setUser({ ...user, balance: updatedBalance });
+      setUser({ ...user, balance: user.balance - numericAmount });
     } catch (error) {
       Alert.alert("Error", "There was an issue processing your withdrawal.");
     }
   };
-  
 
   return (
     <View style={styles.container}>
@@ -81,41 +74,16 @@ const MyProfile = ({ navigation }) => {
         <Text style={styles.label}>Current Balance:</Text>
         <Text style={styles.value}>€{user.balance}</Text>
 
-        {/* Botón para abrir el modal */}
-        <Button
-          title="Modify Balance"
-          onPress={() => setModalVisible(true)} // Mostrar el modal al presionar el botón
-        />
+        <Button title="Modify Balance" onPress={() => setModalVisible(true)} />
       </View>
 
-      {/* Botón para navegar a EditUser y pasar los datos del usuario */}
-      <Button
-    title="Edit Profile"
-    onPress={() => navigation.dispatch({
-        ...navigation.navigate('EditUser', { user: user }),
-    })}
-/>
+      <Button title="Edit Profile" onPress={() => navigation.navigate('EditUser', { user })} />
 
-      {/* Modal */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)} // Cerrar el modal al presionar el botón de retroceso
-      >
+      <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={() => setModalVisible(false)}>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Withdraw Balance</Text>
-
-            {/* Campo para ingresar la cantidad a retirar */}
-            <TextInput
-              style={styles.input}
-              placeholder="Enter amount"
-              keyboardType="numeric"
-              value={amount}
-              onChangeText={setAmount}
-            />
-
+            <TextInput style={styles.input} placeholder="Enter amount" keyboardType="numeric" value={amount} onChangeText={setAmount} />
             <View style={styles.buttonContainer}>
               <Button title="Withdraw" onPress={handleWithdraw} />
               <Button title="Close" onPress={() => setModalVisible(false)} />

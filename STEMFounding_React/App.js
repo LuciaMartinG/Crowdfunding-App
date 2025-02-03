@@ -34,7 +34,7 @@ export default function App() {
 
     // Verifica el estado de login al montar la aplicación
     useEffect(() => {
-        // checkLoginStatus();
+        checkLoginStatus();
     }, []);
 
     // Función para cerrar sesión (Logout)

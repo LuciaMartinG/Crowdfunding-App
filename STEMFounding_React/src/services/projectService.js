@@ -23,7 +23,27 @@ export const getUserProjects = async () => {
     }
 };
 
-export const getUserById = (userId) => API.get('/user/'+userId);
+// export const getUserById = (userId) => API.get('/user/'+userId);
+
+export const getUserData = async () => {
+    try {
+        const userString = await AsyncStorage.getItem('user');
+        const user = JSON.parse(userString);
+        
+        const response = await API.get('/user', {
+            headers: {
+                Authorization: `Bearer ${user.access_token}`, // Autenticación con el token
+            },
+        });
+
+        return response.data; // Devuelve la respuesta de la API
+    } catch (error) {
+        console.error('Error al obtener los datos del usuario:', error);
+        throw error;
+    }
+};
+
+
 export const getProjectUpdates = (id) => API.get('/showUpdates/'+id);
 
 // Envía la solicitud POST para insertar un nuevo proyecto
