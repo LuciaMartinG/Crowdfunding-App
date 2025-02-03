@@ -12,8 +12,8 @@ const MyProjects = () => {
     // Función para obtener proyectos del usuario
     const fetchProjects = async () => {
         try {
-            const response = await getUserProjects(22);
-            setProjects(response.data);
+            const response = await getUserProjects();
+            setProjects(response);
             setLoading(false);
         } catch (error) {
             setError('Error al cargar los proyectos');

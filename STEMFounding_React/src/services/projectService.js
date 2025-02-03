@@ -1,8 +1,28 @@
 import { API } from './api.js';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const getProjectList = () => API.get('/project');
 export const getProjectById = (id) => API.get('/project/'+id);
-export const getUserProjects = (userId) => API.get('/userProjects/'+userId);
+// export const getUserProjects = () => API.get('/userProjects/'+userId);
+
+export const getUserProjects = async () => {
+    
+    try {
+        const userString = await AsyncStorage.getItem('user');
+        const user = await JSON.parse(userString);
+        // console.log(user);
+        const response = await API.get(`/userProjects`, {
+            headers: {
+                Authorization: `Bearer ${user.access_token}`, // Incluye el token en los encabezados
+            },
+        });
+        return response.data; // Retorna los datos de la respuesta
+    } catch (error) {
+        console.error('Error al obtener los proyectos:', error);
+        throw error;
+    }
+};
+
 export const getUserById = (userId) => API.get('/user/'+userId);
 export const getProjectUpdates = (id) => API.get('/showUpdates/'+id);
 
@@ -53,7 +73,14 @@ export const editUpdate = (updateId, updateData) => {
 // Login: Enviar las credenciales del usuario
 export const login = (data) => {
     return API.post('/login', data)  // Enviar los datos del usuario a la API Laravel
-        .then(response => response.data)  // Retorna la respuesta que incluye el token
+        .then(response => {
+            // Guardar el token y los datos del usuario en AsyncStorage
+            const user = response.data;  // Asumiendo que la respuesta contiene los datos del usuario
+            AsyncStorage.setItem('user', JSON.stringify(user));  // Guardar el usuario completo
+
+            // Retornar la respuesta que incluye el token
+            return response.data;
+        })
         .catch(error => {
             console.error('Error en el login:', error.response);
             throw error;  // Lanza el error para manejarlo en el componente

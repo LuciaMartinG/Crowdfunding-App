@@ -32,7 +32,7 @@ Route::delete('/project/{id}', function ($id) {
     return Project::destroy($id);
 });
 
-Route::post('/project', [ProjectController::class, 'createProjectPostman']);
+Route::middleware('auth:sanctum')->post('/project', [ProjectController::class, 'createProjectPostman']);
 
 Route::put('/updateProject', [ProjectController::class, 'updateProject']);
 
@@ -57,7 +57,7 @@ Route::put('/user', [UserController::class, 'updateUser']);
 
 Route::put('/updateUserBalance', [UserController::class, 'updateBalance']);
 
-Route::get('/userProjects/{id}', [ProjectController::class, 'showUserProjectsPostman']);
+Route::middleware('auth:sanctum')->get('/userProjects', [ProjectController::class, 'showUserProjectsPostman']);
 
 Route::put('/updateProjectPostman', [ProjectController::class, 'updateProjectPostman']);
 

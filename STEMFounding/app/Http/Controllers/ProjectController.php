@@ -58,7 +58,7 @@ class ProjectController extends Controller
             ]);
         // Crear el proyecto con los datos validados
         $project = Project::create([
-            'user_id' => 1,
+            'user_id' => Auth::user()->id,
             'title' => $validated['title'],
             'description' => $validated['description'],
             'image_url' => $validated['image_url'],
@@ -334,10 +334,10 @@ public function showActiveAndInactiveProjects()
         return view('userProjects', ['projects' => $projects]);
     }
 
-    public function showUserProjectsPostman($id)
+    public function showUserProjectsPostman()
     {
         // Obtener el usuario logueado
-        $user = User::find($id);
+        $user = Auth::user();
 
         // Obtener los proyectos asociados con ese usuario
         $projects = $user->projects;  // Esta es la relación 'hasMany' definida en el modelo User
