@@ -21,6 +21,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->app['router']->aliasMiddleware('role', \App\Http\Middleware\RoleMiddleware::class);
-        (new InvestmentController)->processRefunds();
+        // (new InvestmentController)->processRefunds();
     }
 }
