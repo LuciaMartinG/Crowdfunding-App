@@ -93,6 +93,7 @@ export const editUpdate = async (updateId, updateData) => {
                 Authorization: `Bearer ${user.access_token}`, // Incluir el token en el encabezado
             },
         });
+        console.log('API response:', response);
 
         // Verificar la respuesta
         if (response.status === 200) {
@@ -142,9 +143,9 @@ export const getProjectInvestors = (projectId) => {
 
 
 // Actualiza el estado de un proyecto
-export const activateOrReject = (projectId, state) => {
+export const activateOrDeactivate = (projectId, state) => {
     console.log('Enviando solicitud a la API:', { projectId, state });
-    return API.put(`/activateOrRejectProject/${projectId}`,  { state });
+    return API.put(`/activateOrDeactivateProject/${projectId}`,  { state });
 };
 
 export const deleteUpdate = (id) => {

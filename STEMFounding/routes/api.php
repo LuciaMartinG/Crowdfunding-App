@@ -62,7 +62,7 @@ Route::middleware('auth:sanctum')->put('/updateProject', [ProjectController::cla
 
 Route::get('/projects/{projectId}/investors', [InvestmentController::class, 'showInvestors']);
 
-Route::put('/activateOrRejectProject/{id}', [ProjectController::class, 'activateOrRejectProjectPostman']);
+Route::put('/activateOrDeactivateProject/{id}', [ProjectController::class, 'activateOrDeactivateProject']);
 
 Route::get('/showUpdates/{id}', [ProjectController::class, 'showUpdates']);
 

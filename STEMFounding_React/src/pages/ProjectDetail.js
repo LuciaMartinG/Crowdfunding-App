@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, Modal, TextInput, Button, Alert } from "react-native";
 import { useRoute, useNavigation } from "@react-navigation/native";
-import { getProjectById, getProjectUpdates, addUpdates, deleteUpdate, editUpdate } from "../services/projectService"; // Importar la función updateUpdate
+import { getProjectById, getProjectUpdates, addUpdates, deleteUpdate, editUpdate, getUserData } from "../services/projectService"; // Importar la función updateUpdate
 
 const ProjectDetail = () => {
     const route = useRoute();
@@ -10,6 +10,7 @@ const ProjectDetail = () => {
 
     const [project, setProject] = useState(null);
     const [updates, setUpdates] = useState([]);
+    const [user, setUser] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
     const [newUpdate, setNewUpdate] = useState({
         title: '',
@@ -22,6 +23,10 @@ const ProjectDetail = () => {
     useEffect(() => {
         async function fetchData() {
             try {
+
+                const userData = await getUserData();
+                setUser(userData);
+
                 const projectResponse = await getProjectById(id);
                 setProject(projectResponse.data);
 
@@ -78,7 +83,7 @@ const ProjectDetail = () => {
                 throw new Error('Failed to add or update update.');
             }
         } catch (error) {
-            console.error("Error during API call:", error);
+            // console.error("Error during API call:", error);
             Alert.alert('Error', 'There was an issue adding or updating the update: ' + error.message);
         }
     };
@@ -131,7 +136,7 @@ const ProjectDetail = () => {
                             {calculateProgress().toFixed(2)}% funded
                         </Text>
 
-                        {project.user_id === 22 && (
+                        {user && project.user_id === user.id && (
                             <View style={styles.buttonContainer}>
                                 <TouchableOpacity
                                     style={styles.editButton}
@@ -161,7 +166,7 @@ const ProjectDetail = () => {
                                         Updated on: {new Date(update.updated_at).toLocaleDateString()}
                                     </Text>
 
-                                    {project.user_id === 22 && (
+                                    {user && project.user_id === user.id && (
                                         <TouchableOpacity
                                             style={styles.editButton}
                                             onPress={() => handleEditUpdate(update.id)}
@@ -170,7 +175,7 @@ const ProjectDetail = () => {
                                         </TouchableOpacity>
                                     )}
 
-                                    {project.user_id === 22 && (
+                                    {user && project.user_id === user.id && (
                                         <TouchableOpacity
                                             style={styles.deleteButton}
                                             onPress={() => handleDeleteUpdate(update.id)}

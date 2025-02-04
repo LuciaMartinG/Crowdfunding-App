@@ -164,7 +164,7 @@ class ProjectController extends Controller
     return redirect()->back()->with($type, $message);
 }
 
-public function activateOrRejectProjectPostman(Request $request, $id)
+public function activateOrDeactivateProject(Request $request, $id)
 {
     // Inicializar las variables
     $message = '';
@@ -369,41 +369,6 @@ public function editUpdate(Request $request, $updateId)
     ];
 }
 
-
-    public function editUpdatePostman(Request $request, $updateId)
-    {
-        $message = '';
-        $type = 'error'; // Por defecto, error
-        $update = ProjectUpdate::find($updateId);
-
-        if (!$update) {
-            $message = 'Update not found.';
-        } else {
-            // Validar los datos de la solicitud
-            $request->validate([
-                'title' => 'nullable|string|max:255',
-                'description' => 'nullable|string|max:1000',
-                'image_url' => 'nullable|url',
-            ]);
-
-            // Actualizar la actualización
-            $update->update([
-                'title' => $request->input('title', $update->title),
-                'description' => $request->input('description', $update->description),
-                'image_url' => $request->input('image_url', $update->image_url),
-            ]);
-
-            $message = 'Update updated successfully.';
-            $type = 'success'; // Cambiar tipo a éxito
-        }
-
-        // Devolver el mensaje y el tipo en un objeto, junto con los detalles de la actualización si fue exitosa
-        return (object)[
-            'type' => $type,
-            'message' => $message,
-            'update' => $type === 'success' ? $update : null,
-        ];
-    }
 
 
     public function showProjects(Request $request)

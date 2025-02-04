@@ -5,6 +5,7 @@
 @section('content')
 
 <div class="container">
+    <h1 id="welcomeTitle" class ="text-center"> Welcome to STEMFounding </h1>
 @if(session('success'))
         <div class="alert alert-success">
             {{ session('success') }}

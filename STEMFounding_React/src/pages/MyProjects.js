@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { getUserProjects, activateOrReject, withdrawFunds } from '../services/projectService';
+import { getUserProjects, activateOrDeactivate, withdrawFunds } from '../services/projectService';
 
 const MyProjects = () => {
     const [projects, setProjects] = useState([]);
@@ -40,7 +40,7 @@ const MyProjects = () => {
     const handleToggleProjectState = async (projectId, currentState) => {
         const newState = currentState === 'active' ? 'inactive' : 'active';
         try {
-            const response = await activateOrReject(projectId, newState); 
+            const response = await activateOrDeactivate(projectId, newState); 
             Alert.alert('Success', `Project has been ${newState === 'active' ? 'activated' : 'deactivated'} successfully.`);
             fetchProjects();
         } catch (error) {
