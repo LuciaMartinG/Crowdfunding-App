@@ -78,7 +78,7 @@
                                         @endif
                                     </form>
                                     @endif
-                                    @if ($project->current_investment >= $project->min_investment && $project->limit_date >= now())
+                                    @if ($project->current_investment >= $project->min_investment && \Carbon\Carbon::parse($project->limit_date)->lessThan(now()))
                                     <form action="{{ route('projects.withdrawFunds', ['projectId' => $project->id]) }}" method="POST">
                                         @csrf
                                         <button type="submit" class="btn btn-danger btn-sm mb-3">
