@@ -239,7 +239,6 @@ public function showActiveAndInactiveProjects()
 }
 
 
-
     public function showPendingProjects()
     {
         // Obtener todos los proyectos cuyo estado sea 'active' o 'inactive'
@@ -248,9 +247,6 @@ public function showActiveAndInactiveProjects()
         // Retornar la vista con los proyectos
         return view('pendingProjectList', ['pendingProjectList' => $pendingProjectList]);
     }
-
-    // app/Http/Controllers/ProjectController.php
-
 
 
     public function showUserProjects()

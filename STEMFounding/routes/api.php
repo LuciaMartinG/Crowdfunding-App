@@ -12,9 +12,6 @@ use App\Models\Investment;
 use App\Models\ProjectUpdate;
 use App\Http\Controllers\Api\AuthController;
 
-// Route::get('/user', function (Request $request) {
-//     return $request->user();
-// })->middleware('auth:sanctum');
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -34,23 +31,12 @@ Route::delete('/project/{id}', function ($id) {
 
 Route::middleware('auth:sanctum')->post('/project', [ProjectController::class, 'createProject']);
 
-
-// USER
-// Route::get('/user', function () {
-//     return User::all();
-// });
-
-// Route::get('/user/{id}', function ($id) {
-//     return User::find($id);
-// });
-
 Route::middleware('auth:sanctum')->get('/user', [UserController::class, 'getAuthenticatedUser']);
 
 Route::delete('/user/{id}', function ($id) {
     return User::destroy($id);
 });
 
-// Route::post('/user', [RegisterController::class, 'createUser']);
 
 Route::put('/user', [UserController::class, 'updateUser']);
 
