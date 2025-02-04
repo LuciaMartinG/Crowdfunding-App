@@ -553,7 +553,6 @@ public function editUpdate(Request $request, $updateId)
         return view('projectDetail', ['project' => $project]);
     }
 
-
     public function withdrawFunds($projectId)
     {
         $response = (object) [
@@ -564,9 +563,9 @@ public function editUpdate(Request $request, $updateId)
         $project = Project::findOrFail($projectId);
     
         if ($project->user_id !== auth()->id()) {
-            $message = 'No tienes permiso para retirar los fondos de este proyecto.';
+            $response->message = 'No tienes permiso para retirar los fondos de este proyecto.';
         } elseif ($project->limit_date <= now() && $project->current_investment >= $project->min_investment) {
-            DB::transaction(function () use ($project, &$message, &$status) {
+            DB::transaction(function () use ($project, &$response) {
                 $entrepreneur = User::find($project->user_id);
     
                 // Añadir el total de current_investment al saldo del emprendedor
@@ -577,6 +576,7 @@ public function editUpdate(Request $request, $updateId)
                 $project->state = 'inactive';
                 $project->save();
     
+                // Actualizar la respuesta dentro de la transacción
                 $response->type = 'success';
                 $response->message = 'Funds successfully withdrawn and project deactivated.';
             });
@@ -584,6 +584,7 @@ public function editUpdate(Request $request, $updateId)
     
         return $response;
     }
+    
 
 
     public function withdrawFundsPostman(Request $request, $projectId)
