@@ -30,35 +30,6 @@ class ProjectController extends Controller
     
         // Crear el proyecto con los datos validados
         $project = Project::create([
-            'user_id' => auth()->id(),
-            'title' => $validated['title'],
-            'description' => $validated['description'],
-            'image_url' => $validated['image_url'],
-            'video_url' => $validated['video_url'],
-            'min_investment' => $validated['min_investment'],
-            'max_investment' => $validated['max_investment'],
-            'limit_date' => $validated['limit_date'],
-            'state' => 'pending',  // Para que por defecto se cree un proyecto en estado "pendiente"
-            'current_investment' => 0,
-        ]);
-    
-        return $project;
-    }
-
-    public function createProjectPostman(Request $request)
-    {
-            // Validación de los datos del proyecto
-            $validated = $request->validate([
-                'title' => 'required|string|max:255',  // El título es obligatorio, es una cadena y máximo 255 caracteres
-                'description' => 'required|string|max:1000',  // La descripción es obligatoria, es una cadena y máximo 1000 caracteres
-                'image_url' => 'required|string|max:1000',  // La URL de la imagen es opcional, pero si está presente debe ser una URL válida
-                'video_url' => 'required|string|max:1000',  // La URL del video es opcional, pero si está presente debe ser una URL válida
-                'min_investment' => 'required|numeric|min:1',  // Mínima inversión es obligatoria
-                'max_investment' => 'required|numeric|min:1|gte:min_investment',  // Máxima inversión es obligatoria, debe ser mayor o igual que la mínima inversión
-                'limit_date' => 'required|date|after_or_equal:today',  // La fecha límite es obligatoria, debe ser una fecha posterior o igual al día actual
-            ]);
-        // Crear el proyecto con los datos validados
-        $project = Project::create([
             'user_id' => Auth::user()->id,
             'title' => $validated['title'],
             'description' => $validated['description'],
@@ -73,51 +44,10 @@ class ProjectController extends Controller
     
         return $project;
     }
-    public function updateProject(Request $request)
-    {
-        // Inicializar las variables
-        $message = '';
-        $type = 'error'; // Por defecto, el tipo de mensaje será error
-        
-        // Obtener el ID del proyecto desde el request
-        $id = $request->input('id');
-        
-        // Buscar el proyecto en la base de datos
-        $project = Project::find($id);
-        
-        // Verificar si el proyecto existe
-        if (!$project) {
-            $message = 'Project not found';
-        }
-        // Verificar si el usuario autenticado es el dueño del proyecto y que esté activo
-        else if (auth()->user()->id !== $project->user_id || $project->state !== 'active') {
-            $message = 'You are not authorized to update this project';
-        }
-        // Si todo está bien, proceder con la actualización
-        else {
-            // Actualizar los datos del proyecto
-            $project->title = $request->input('title', $project->title);
-            $project->description = $request->input('description', $project->description);
-            $project->image_url = $request->input('image_url', $project->image_url);
-            $project->video_url = $request->input('video_url', $project->video_url);
-            $project->min_investment = $request->input('min_investment', $project->min_investment);
-            $project->max_investment = $request->input('max_investment', $project->max_investment);
-            $project->limit_date = $request->input('limit_date', $project->limit_date);
-            $project->state = $request->input('state', $project->state);
-    
-            // Guardar los cambios en el proyecto
-            $project->save();
-    
-            // Establecer el mensaje de éxito
-            $message = 'Project updated successfully!';
-            $type = 'success'; // Cambiar tipo de mensaje a éxito
-        }
-    
-        // Redirigir con el mensaje adecuado
-        return redirect()->back()->with($type, $message);
-    }
 
-    public function updateProjectPostman(Request $request)
+
+
+    public function updateProject(Request $request)
 {
     // Inicializar las variables
     $message = '';
@@ -134,7 +64,7 @@ class ProjectController extends Controller
         $message = 'Project not found';
     } 
     // Verificar si el proyecto pertenece al usuario con ID 22 y está activo
-    else if ($project->user_id !== 22 || $project->state !== 'active') {
+    else if ($project->user_id !== Auth::user()->id || $project->state !== 'active') {
         $message = 'You are not authorized to update this project';
     } 
     // Si todo está bien, proceder con la actualización
@@ -375,12 +305,12 @@ public function showActiveAndInactiveProjects()
         $message = 'Project not found.';
     } else if ($project->state !== 'active') {
         $message = 'Updates can only be added to active projects.';
-    } else if ($project->user_id !== auth()->user()->id) {
+    } else if ($project->user_id !== Auth::user()->id) {
         $message = 'Only the project owner can add updates.';
     } else {
         $update = ProjectUpdate::create([
             'project_id' => $project->id,
-            'user_id' => auth()->user()->id,
+            'user_id' => Auth::user()->id,
             'title' => $request->input('title'),
             'description' => $request->input('description'),
             'image_url' => $request->input('image_url'),
@@ -397,44 +327,6 @@ public function showActiveAndInactiveProjects()
     ];
 }
 
-public function addUpdatesPostman(Request $request, $projectId)
-{
-    $request->validate([
-        'title' => 'nullable|string|max:255',
-        'description' => 'nullable|string|max:1000',
-        'image_url' => 'nullable|url',
-    ]);
-
-    $message = '';
-    $type = 'error'; // Por defecto, error
-    $project = Project::find($projectId);
-    $update = null; // Inicializamos la variable de actualización
-
-    if (!$project) {
-        $message = 'Project not found.';
-    } else if ($project->state !== 'active') {
-        $message = 'Updates can only be added to active projects.';
-    } else if ($project->user_id !== 22) {
-        $message = 'Only the project owner can add updates.';
-    } else {
-        $update = ProjectUpdate::create([
-            'project_id' => $project->id,
-            'user_id' => 22,
-            'title' => $request->input('title'),
-            'description' => $request->input('description'),
-            'image_url' => $request->input('image_url'),
-        ]);
-
-        $message = 'Update added successfully';
-        $type = 'success';
-    }
-
-    return (object)[
-        'type' => $type,
-        'message' => $message,
-        'update' => $type === 'success' ? $update : null,
-    ];
-}
     
 public function editUpdate(Request $request, $updateId)
 {
@@ -447,7 +339,7 @@ public function editUpdate(Request $request, $updateId)
         $message = 'Update not found.';
     } 
     // Verificar si el usuario tiene permiso para actualizar este update
-    else if ($update->user_id !== auth()->user()->id || $update->project->user_id !== auth()->user()->id) {
+    else if ($update->user_id !== Auth::user()->id || $update->project->user_id !== Auth::user()->id) {
         $message = 'You do not have permission to update this update.';
     } 
     else {

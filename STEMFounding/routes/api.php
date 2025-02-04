@@ -32,10 +32,7 @@ Route::delete('/project/{id}', function ($id) {
     return Project::destroy($id);
 });
 
-Route::middleware('auth:sanctum')->post('/project', [ProjectController::class, 'createProjectPostman']);
-
-Route::put('/updateProject', [ProjectController::class, 'updateProject']);
-
+Route::middleware('auth:sanctum')->post('/project', [ProjectController::class, 'createProject']);
 
 
 // USER
@@ -61,7 +58,7 @@ Route::put('/updateUserBalance', [UserController::class, 'updateBalance']);
 
 Route::middleware('auth:sanctum')->get('/userProjects', [ProjectController::class, 'showUserProjectsPostman']);
 
-Route::put('/updateProjectPostman', [ProjectController::class, 'updateProjectPostman']);
+Route::middleware('auth:sanctum')->put('/updateProject', [ProjectController::class, 'updateProject']);
 
 Route::get('/projects/{projectId}/investors', [InvestmentController::class, 'showInvestors']);
 
@@ -69,13 +66,13 @@ Route::put('/activateOrRejectProject/{id}', [ProjectController::class, 'activate
 
 Route::get('/showUpdates/{id}', [ProjectController::class, 'showUpdates']);
 
-Route::post('/addUpdate/{projectId}', [ProjectController::class, 'addUpdatesPostman']);
+Route::middleware('auth:sanctum')->post('/addUpdate/{projectId}', [ProjectController::class, 'addUpdates']);
 
 Route::delete('/update/{id}', function ($id) {
     return ProjectUpdate::destroy($id);
 });
 
-Route::put('/update/{id}', [ProjectController::class, 'editUpdatePostman']); // RUTA PARA EDITAR UNA ACTUALIZACIÓN
+Route::middleware('auth:sanctum')->put('/update/{id}', [ProjectController::class, 'editUpdate']); // RUTA PARA EDITAR UNA ACTUALIZACIÓN
 
 Route::post('/process-refunds', [InvestmentController::class, 'processRefunds']); //Ruta para procesar reembolsos
 

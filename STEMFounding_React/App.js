@@ -79,6 +79,7 @@ export default function App() {
             }}
         >
             <Stack.Screen name="MyProjects" component={MyProjects} />
+            <Stack.Screen name="ProjectDetail" component={ProjectDetail} />
             <Stack.Screen name="EditProject" component={EditProject} />
             <Stack.Screen name="Investors" component={Investors} />
         </Stack.Navigator>

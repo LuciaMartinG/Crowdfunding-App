@@ -56,14 +56,75 @@ export const postInsertProject = (projectData, token) => {
 };
 
 
-export const addUpdates = (projectId, projectData) => {
-    return API.post(`/addUpdate/${projectId}`, projectData); // Enviar el projectId en la URL
+export const addUpdates = async (projectId, projectData) => {
+    try {
+        // Obtener el token desde AsyncStorage
+        const userString = await AsyncStorage.getItem('user');
+        const user = JSON.parse(userString);
+
+        // Hacer la solicitud POST a la API
+        const response = await API.post(`/addUpdate/${projectId}`, projectData, {
+            headers: {
+                Authorization: `Bearer ${user.access_token}`, // Incluir el token en el encabezado
+            },
+        });
+
+    } catch (error) {
+        console.error('Error en addUpdates:', error);
+        throw error; // Maneja el error adecuadamente
+    }
+};
+
+// Edita una actualización existente
+
+export const editUpdate = async (updateId, updateData) => {
+    try {
+        // Obtener el token desde AsyncStorage
+        const userString = await AsyncStorage.getItem('user');
+        const user = JSON.parse(userString);
+
+        if (!user || !user.access_token) {
+            throw new Error("User is not authenticated.");
+        }
+
+        // Hacer la solicitud PUT a la API para editar la actualización
+        const response = await API.put(`/update/${updateId}`, updateData, {
+            headers: {
+                Authorization: `Bearer ${user.access_token}`, // Incluir el token en el encabezado
+            },
+        });
+
+        // Verificar la respuesta
+        if (response.status === 200) {
+            console.log('Update successfully edited:', response.data);
+            return response.data;
+        } else {
+            throw new Error('Failed to edit update');
+        }
+    } catch (error) {
+        console.error('Error in editUpdate:', error);
+        throw error;
+    }
 };
 
 // Actualiza un proyecto existente
-export const updateProject = (projectData) => {
-    return API.put('/updateProjectPostman', projectData); // Enviar los datos del proyecto en el cuerpo de la solicitud
+export const updateProject = async (projectData) => {
+    try {
+        // Obtener el token desde AsyncStorage
+        const userString = await AsyncStorage.getItem('user');
+        const user = JSON.parse(userString);
+
+        return API.put('/updateProject', projectData, {
+            headers: {
+                Authorization: `Bearer ${user.access_token}`, // Asegúrate de incluir el token aquí
+            }
+        });
+    } catch (error) {
+        console.error("Error updating project:", error);
+        throw error; // Maneja el error adecuadamente
+    }
 };
+
 
 // Actualiza un usuario existente
 export const updateUser = (userData) => {
@@ -90,10 +151,7 @@ export const deleteUpdate = (id) => {
     return API.delete(`/update/${id}`);
 };
 
-// Edita una actualización existente
-export const editUpdate = (updateId, updateData) => {
-    return API.put(`/update/${updateId}`, updateData); // Se envían los datos de la actualización
-};
+
 
 export const withdrawFunds = async (projectId) => {
     try {

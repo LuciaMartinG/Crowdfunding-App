@@ -80,6 +80,14 @@ const MyProjects = () => {
                         <Text style={styles.projectText}>Max Investment: €{project.max_investment}</Text>
                         <Text style={styles.projectText}>Status: {project.state}</Text>
 
+                                                {/* Botón para ver detalles del proyecto */}
+                        <TouchableOpacity
+                            style={styles.viewDetailsButton}
+                            onPress={() => navigation.navigate('ProjectDetail', { id: project.id })}
+                        >
+                            <Text style={styles.viewDetailsButtonText}>View Details</Text>
+                        </TouchableOpacity>
+
                         {/* Botón para editar proyecto */}
                         {project.state === 'active' && (
                             <TouchableOpacity
@@ -149,6 +157,17 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 5,
         elevation: 3,
+    },
+    viewDetailsButton: {
+        marginTop: 10,
+        backgroundColor: '#007BFF',
+        padding: 10,
+        borderRadius: 8,
+    },
+    viewDetailsButtonText: {
+        color: '#fff',
+        fontSize: 14,
+        textAlign: 'center',
     },
     image: {
         width: '100%',

@@ -80,7 +80,7 @@ Route::get('/', function () {
    
     Route::post('/project/update', function (Request $request) {
         $project = app(ProjectController::class)->updateProject($request);
-        return redirect('/project/detail/1');
+        return redirect()->route('user.projects');
     })->middleware('auth','role:entrepreneur');
 
     
@@ -176,7 +176,8 @@ Route::get('/', function () {
 
    
     Route::get('/user/projects', [ProjectController::class, 'showUserProjects'])->middleware('auth')->name('user.projects');
-    
+
+
    // Ruta para añadir actualizaciones
    Route::post('/projects/{projectId}/comments', function (Request $request, $projectId) {
     $response = app(ProjectController::class)->addUpdates($request, $projectId);
