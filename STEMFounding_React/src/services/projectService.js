@@ -95,6 +95,24 @@ export const editUpdate = (updateId, updateData) => {
     return API.put(`/update/${updateId}`, updateData); // Se envían los datos de la actualización
 };
 
+export const withdrawFunds = async (projectId) => {
+    try {
+        const userString = await AsyncStorage.getItem('user');
+        const user = JSON.parse(userString);
+
+        const response = await API.post(`/withdraw/${projectId}`, null, {
+            headers: {
+                Authorization: `Bearer ${user.access_token}`, // Incluye el token en los encabezados
+            },
+        });
+
+        return response.data; // Retorna la respuesta de la API
+    } catch (error) {
+        console.error('Error al retirar fondos:', error);
+        throw error;
+    }
+};
+
 
 // Login: Enviar las credenciales del usuario
 export const login = (data) => {

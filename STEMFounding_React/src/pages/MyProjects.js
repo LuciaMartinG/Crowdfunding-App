@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { getUserProjects, activateOrReject } from '../services/projectService';
+import { getUserProjects, activateOrReject, withdrawFunds } from '../services/projectService';
 
 const MyProjects = () => {
     const [projects, setProjects] = useState([]);
@@ -21,6 +21,21 @@ const MyProjects = () => {
         }
     };
 
+    // Función para manejar el retiro de fondos
+    const handleWithdrawFunds = async (projectId) => {
+        try {
+            const response = await withdrawFunds(projectId);
+            if (response.type === 'success') {
+                Alert.alert('Success', response.message);
+                fetchProjects(); // Recargar los proyectos después de retirar los fondos
+            } else {
+                Alert.alert('Error', response.message);
+            }
+        } catch (error) {
+            Alert.alert('Error', 'No se pudo retirar los fondos.');
+        }
+    };
+
     // Función para cambiar el estado del proyecto
     const handleToggleProjectState = async (projectId, currentState) => {
         const newState = currentState === 'active' ? 'inactive' : 'active';
@@ -32,7 +47,6 @@ const MyProjects = () => {
             Alert.alert('Error', 'Failed to update project state.');
         }
     };
-    
 
     useEffect(() => {
         fetchProjects();
@@ -93,6 +107,16 @@ const MyProjects = () => {
                                 {project.state === 'active' ? 'Deactivate' : 'Activate'}
                             </Text>
                         </TouchableOpacity>
+
+                        {/* Botón para retirar fondos */}
+                        {project.current_investment >= project.min_investment && new Date(project.limit_date) <= new Date() && project.state === 'active' && (
+                            <TouchableOpacity
+                                style={styles.withdrawButton}
+                                onPress={() => handleWithdrawFunds(project.id)}
+                            >
+                                <Text style={styles.withdrawButtonText}>Withdraw Funds</Text>
+                            </TouchableOpacity>
+                        )}
                     </View>
                 ))
             ) : (
@@ -166,6 +190,17 @@ const styles = StyleSheet.create({
         borderRadius: 8,
     },
     toggleButtonText: {
+        color: '#fff',
+        fontSize: 14,
+        textAlign: 'center',
+    },
+    withdrawButton: {
+        marginTop: 10,
+        backgroundColor: '#28a745',
+        padding: 10,
+        borderRadius: 8,
+    },
+    withdrawButtonText: {
         color: '#fff',
         fontSize: 14,
         textAlign: 'center',
