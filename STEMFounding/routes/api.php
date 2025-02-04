@@ -79,4 +79,4 @@ Route::put('/update/{id}', [ProjectController::class, 'editUpdatePostman']); // 
 
 Route::post('/process-refunds', [InvestmentController::class, 'processRefunds']); //Ruta para procesar reembolsos
 
-Route::middleware('auth:sanctum')->post('/withdraw/{projectId}', [ProjectController::class, 'withdrawFundsPostman']);
+Route::middleware('auth:sanctum')->post('/withdraw/{projectId}', [ProjectController::class, 'withdrawFunds']);

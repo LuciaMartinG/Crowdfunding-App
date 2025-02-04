@@ -562,7 +562,7 @@ public function editUpdate(Request $request, $updateId)
     
         $project = Project::findOrFail($projectId);
     
-        if ($project->user_id !== auth()->id()) {
+        if ($project->user_id !== Auth::user()->id) {
             $response->message = 'No tienes permiso para retirar los fondos de este proyecto.';
         } elseif ($project->limit_date <= now() && $project->current_investment >= $project->min_investment) {
             DB::transaction(function () use ($project, &$response) {
@@ -587,61 +587,6 @@ public function editUpdate(Request $request, $updateId)
     
 
 
-    public function withdrawFundsPostman(Request $request, $projectId)
-    {
-        $response = [
-            'type' => 'error',
-            'message' => 'Ocurrió un error inesperado.',
-        ];
-        $statusCode = 500;
-    
-        $user = auth()->user(); // Obtener el usuario autenticado mediante token
-    
-        if (!$user) {
-            $response['message'] = 'Usuario no autenticado.';
-            $statusCode = 401;
-        } else {
-            $project = Project::find($projectId);
-    
-            if (!$project) {
-                $response['message'] = 'Proyecto no encontrado.';
-                $statusCode = 404;
-            } elseif ($project->user_id !== $user->id) {
-                $response['message'] = 'No tienes permiso para retirar los fondos de este proyecto.';
-                $statusCode = 403;
-            } elseif ($project->limit_date > now() || $project->current_investment < $project->min_investment) {
-                $response['message'] = 'El proyecto no cumple las condiciones para retirar fondos.';
-                $statusCode = 400;
-            } else {
-                DB::beginTransaction();
-                try {
-                    // Transferir fondos al emprendedor
-                    $user->balance += $project->current_investment;
-                    $user->save();
-    
-                    // Desactivar el proyecto
-                    $project->state = 'inactive';
-                    $project->save();
-    
-                    DB::commit();
-    
-                    $response = [
-                        'type' => 'success',
-                        'message' => 'Fondos retirados con éxito y proyecto desactivado.',
-                    ];
-                    $statusCode = 200;
-                } catch (\Exception $e) {
-                    DB::rollBack();
-                    $response['message'] = 'Hubo un problema al procesar la transacción.';
-                    $response['error'] = $e->getMessage();
-                    $statusCode = 500;
-                }
-            }
-        }
-    
-        return response()->json($response, $statusCode);
-
 }
 
     
-}
