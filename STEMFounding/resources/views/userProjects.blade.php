@@ -65,20 +65,17 @@
                                         </span>
                                     </p>
                                     @if(Auth::check() && Auth::user()->role == 'entrepreneur')
-                                        <a href="{{ route('projects.investors', ['id' => $project->id]) }}" class="btn btn-info btn-sm">View investors</a>
-                                    @endif
-                                    @if (Auth::user()->role == 'entrepreneur' && $project->limit_date >= now())
+                                    <a href="{{ route('projects.investors', ['id' => $project->id]) }}" class="btn btn-info btn-sm">View investors</a>
+                                    
                                     <form action="/projects/user/activate-or-deactivate" method="POST">
                                         @csrf
                                         <input type="hidden" name="id" value="{{ $project->id }}">
                                         @if ($project->state == 'active')
                                             <button type="submit" name="state" value="inactive" class="btn btn-danger btn-sm mt-3 mb-3">Disable Project</button>
-                                        @elseif ($project->state == 'inactive')
-                                            <button type="submit" name="state" value="active" class="btn btn-success btn-sm mb-3">Enable Project</button>
                                         @endif
                                     </form>
                                     @endif
-                                    @if ($project->current_investment >= $project->min_investment && \Carbon\Carbon::parse($project->limit_date)->lessThan(now()))
+                                    @if ($project->current_investment >= $project->min_investment && \Carbon\Carbon::parse($project->limit_date)->lessThan(now()) && $project->state == 'active')
                                     <form action="{{ route('projects.withdrawFunds', ['projectId' => $project->id]) }}" method="POST">
                                         @csrf
                                         <button type="submit" class="btn btn-danger btn-sm mb-3">

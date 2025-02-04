@@ -13,7 +13,7 @@
     <header class="bg-secondary text-white py-3">
         <nav class="navbar navbar-expand-lg bg-secondary container">
             <!-- Brand -->
-            <a class="navbar-brand text-white" href="/">STEMFounding</a>
+            <a class="navbar-brand text-white ms-3" href="/">STEMFounding</a>
 
             <!-- Toggler -->
             <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">

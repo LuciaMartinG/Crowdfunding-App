@@ -145,14 +145,14 @@ class ProjectController extends Controller
             } else {
                 // Cambiar el estado del proyecto a 'active'
                 $project->state = 'active';
-                $message = 'Proyecto actualizado con éxito.';
+                $message = 'Project activated successfully.';
                 $type = 'success'; // Cambiar tipo de mensaje a éxito
             }
         }
         // Si se va a rechazar el proyecto
         else if ($state === 'rejected') {
             $project->state = 'rejected';
-            $message = 'Proyecto actualizado con éxito.';
+            $message = 'Project rejected successfully.';
             $type = 'success'; // Cambiar tipo de mensaje a éxito
         }
 
