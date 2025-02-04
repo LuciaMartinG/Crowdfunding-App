@@ -190,9 +190,12 @@ const ProjectDetail = () => {
                         )}
                     </View>
 
-                    <TouchableOpacity style={styles.addButton} onPress={() => setModalVisible(true)}>
-                        <Text style={styles.addButtonText}>Add Update</Text>
-                    </TouchableOpacity>
+                    {user && project.user_id === user.id && (
+                        <TouchableOpacity style={styles.addButton} onPress={() => setModalVisible(true)}>
+                            <Text style={styles.addButtonText}>Add Update</Text>
+                        </TouchableOpacity>
+                    )}
+
 
                     <Modal
                         animationType="slide"
