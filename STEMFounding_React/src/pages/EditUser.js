@@ -31,7 +31,7 @@ const EditUser = ({ route, navigation }) => {
       navigation.navigate('MyProfile', { updatedUser }); // Enviar datos actualizados a MyProfile
 
       // O si prefieres ir a la pantalla anterior:
-      // navigation.goBack();
+      navigation.goBack();
     } catch (error) {
       console.error('Error updating user:', error);
       Alert.alert('Error', 'No se pudieron guardar los cambios. Por favor, inténtelo de nuevo.');

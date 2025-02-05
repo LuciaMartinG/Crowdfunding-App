@@ -149,7 +149,7 @@ export default function App() {
 // Estilos de la aplicación
 const styles = StyleSheet.create({
     header: {
-        backgroundColor: '#578E7E', // Fondo verde para la barra de navegación
+        backgroundColor: '#578E7E', 
         height: 80,
         justifyContent: 'center',
         alignItems: 'center',
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
     headerTitle: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: '#ffffff', // Letras blancas en la barra de navegación
+        color: '#ffffff', 
     },
     footer: {
         backgroundColor: '#55877e',
@@ -174,6 +174,6 @@ const styles = StyleSheet.create({
     },
     container: {
         flex: 1,
-        backgroundColor: '#ffffff', // Fondo blanco para el contenido
+        backgroundColor: '#ffffff', 
     },
 });
