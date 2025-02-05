@@ -7,6 +7,8 @@ use App\Models\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\Request;
+use Laravel\Sanctum\HasApiTokens;
 
 class RegisterController extends Controller
 {
@@ -22,13 +24,13 @@ class RegisterController extends Controller
     */
 
     use RegistersUsers;
-
+    use HasApiTokens;
     /**
      * Where to redirect users after registration.
      *
      * @var string
      */
-    protected $redirectTo = '/home';
+    protected $redirectTo = '/';
 
     /**
      * Create a new controller instance.
@@ -67,7 +69,25 @@ class RegisterController extends Controller
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-            'balance' => 0.00,
+            'balance' => 0,
+            'role' => $data['role'],
+            'photo' => $data['photo'],
         ]);
     }
+
+
+
+    // protected function createUser(Request $request)
+    // {
+    //     $user = User::create([
+    //         'name' => $request->input('name'),
+    //         'email' => $request->input('email'),
+    //         'password' => Hash::make($request->input('password')),
+    //         'balance' => 0,
+    //         'role' => $request->input('role'),
+    //         'photo' => $request['photo'],
+    //     ]);
+
+    //     return $user;
+    // }
 }

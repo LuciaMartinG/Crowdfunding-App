@@ -30,7 +30,9 @@ class UserFactory extends Factory
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
             'balance' => fake()->randomFloat(2, 0, 100000),
-            'role' => fake()->randomElement(['entrepeneur', 'investor', 'administrator', 'banned']),
+            'role' => fake()->randomElement(['entrepreneur', 'investor']),
+            'photo'=> 'https://www.clarin.com/2024/04/25/HKCtyMwSF_2000x1500__1.jpg',
+            'banned' => $this->faker->boolean(10)
         ];
     }
 
