@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { getUserProjects, activateOrReject } from '../services/projectService';
+import { getUserProjects, activateOrDeactivate, withdrawFunds } from '../services/projectService';
 
 const MyProjects = () => {
     const [projects, setProjects] = useState([]);
@@ -12,8 +12,8 @@ const MyProjects = () => {
     // Función para obtener proyectos del usuario
     const fetchProjects = async () => {
         try {
-            const response = await getUserProjects(22);
-            setProjects(response.data);
+            const response = await getUserProjects();
+            setProjects(response);
             setLoading(false);
         } catch (error) {
             setError('Error al cargar los proyectos');
@@ -21,13 +21,28 @@ const MyProjects = () => {
         }
     };
 
+    // Función para manejar el retiro de fondos
+    const handleWithdrawFunds = async (projectId) => {
+        try {
+            const response = await withdrawFunds(projectId);
+            if (response.type === 'success') {
+                Alert.alert('Success', response.message);
+                fetchProjects(); // Recargar los proyectos después de retirar los fondos
+            } else {
+                Alert.alert('Error', response.message);
+            }
+        } catch (error) {
+            Alert.alert('Error', 'No se pudo retirar los fondos.');
+        }
+    };
+
     // Función para cambiar el estado del proyecto
     const handleToggleProjectState = async (projectId, currentState) => {
         const newState = currentState === 'active' ? 'inactive' : 'active';
         try {
-            await activateOrReject(projectId, {state:newState}); // Llamar al servicio con el nuevo estado
+            const response = await activateOrDeactivate(projectId, newState); 
             Alert.alert('Success', `Project has been ${newState === 'active' ? 'activated' : 'deactivated'} successfully.`);
-            fetchProjects(); // Recargar los proyectos para reflejar los cambios
+            fetchProjects();
         } catch (error) {
             Alert.alert('Error', 'Failed to update project state.');
         }
@@ -65,6 +80,14 @@ const MyProjects = () => {
                         <Text style={styles.projectText}>Max Investment: €{project.max_investment}</Text>
                         <Text style={styles.projectText}>Status: {project.state}</Text>
 
+                                                {/* Botón para ver detalles del proyecto */}
+                        <TouchableOpacity
+                            style={styles.viewDetailsButton}
+                            onPress={() => navigation.navigate('ProjectDetail', { id: project.id })}
+                        >
+                            <Text style={styles.viewDetailsButtonText}>View Details</Text>
+                        </TouchableOpacity>
+
                         {/* Botón para editar proyecto */}
                         {project.state === 'active' && (
                             <TouchableOpacity
@@ -92,6 +115,16 @@ const MyProjects = () => {
                                 {project.state === 'active' ? 'Deactivate' : 'Activate'}
                             </Text>
                         </TouchableOpacity>
+
+                        {/* Botón para retirar fondos */}
+                        {project.current_investment >= project.min_investment && new Date(project.limit_date) <= new Date() && project.state === 'active' && (
+                            <TouchableOpacity
+                                style={styles.withdrawButton}
+                                onPress={() => handleWithdrawFunds(project.id)}
+                            >
+                                <Text style={styles.withdrawButtonText}>Withdraw Funds</Text>
+                            </TouchableOpacity>
+                        )}
                     </View>
                 ))
             ) : (
@@ -124,6 +157,17 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 5,
         elevation: 3,
+    },
+    viewDetailsButton: {
+        marginTop: 10,
+        backgroundColor: '#007BFF',
+        padding: 10,
+        borderRadius: 8,
+    },
+    viewDetailsButtonText: {
+        color: '#fff',
+        fontSize: 14,
+        textAlign: 'center',
     },
     image: {
         width: '100%',
@@ -165,6 +209,17 @@ const styles = StyleSheet.create({
         borderRadius: 8,
     },
     toggleButtonText: {
+        color: '#fff',
+        fontSize: 14,
+        textAlign: 'center',
+    },
+    withdrawButton: {
+        marginTop: 10,
+        backgroundColor: '#28a745',
+        padding: 10,
+        borderRadius: 8,
+    },
+    withdrawButtonText: {
         color: '#fff',
         fontSize: 14,
         textAlign: 'center',

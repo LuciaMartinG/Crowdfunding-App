@@ -1,50 +1,125 @@
 import { API } from './api.js';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
+// Función reutilizable para obtener los encabezados con autenticación
+const getAuthHeaders = async () => {
+    try {
+        const userString = await AsyncStorage.getItem('user');
+        if (!userString) throw new Error('No user found in storage');
+
+        const user = JSON.parse(userString);
+        if (!user.access_token) throw new Error('No access token found');
+
+        return { Authorization: `Bearer ${user.access_token}` };
+    } catch (error) {
+        console.error('Error getting auth headers:', error);
+        throw error;
+    }
+};
+
+// Endpoints
 export const getProjectList = () => API.get('/project');
-export const getProjectById = (id) => API.get('/project/'+id);
-export const getUserProjects = (userId) => API.get('/userProjects/'+userId);
-export const getUserById = (userId) => API.get('/user/'+userId);
-export const getProjectUpdates = (id) => API.get('/showUpdates/'+id);
+export const getProjectById = (id) => API.get(`/project/${id}`);
+export const getProjectUpdates = (id) => API.get(`/showUpdates/${id}`);
+export const getProjectInvestors = (projectId) => API.get(`/projects/${projectId}/investors`);
+export const deleteUpdate = (id) => API.delete(`/update/${id}`);
 
-// Envía la solicitud POST para insertar un nuevo proyecto
-export const postInsertProject = (projectData) => {
-    return API.post('/project', projectData); // Se pasan los datos del proyecto en el cuerpo de la solicitud
+export const getUserProjects = async () => {
+    try {
+        const headers = await getAuthHeaders();
+        const response = await API.get('/userProjects', { headers });
+        return response.data;
+    } catch (error) {
+        console.error('Error getting user projects:', error);
+        throw error;
+    }
 };
 
-export const addUpdates = (projectId, projectData) => {
-    return API.post(`/addUpdate/${projectId}`, projectData); // Enviar el projectId en la URL
+export const getUserData = async () => {
+    try {
+        const headers = await getAuthHeaders();
+        const response = await API.get('/user', { headers });
+        return response.data;
+    } catch (error) {
+        console.error('Error getting user data:', error);
+        throw error;
+    }
 };
 
-// Actualiza un proyecto existente
-export const updateProject = (projectData) => {
-    return API.put('/updateProjectPostman', projectData); // Enviar los datos del proyecto en el cuerpo de la solicitud
+export const postInsertProject = (projectData, token) => 
+    API.post('/project', projectData, { headers: { Authorization: `Bearer ${token}` } });
+
+export const addUpdates = async (projectId, projectData) => {
+    try {
+        const headers = await getAuthHeaders();
+        return await API.post(`/addUpdate/${projectId}`, projectData, { headers });
+    } catch (error) {
+        console.error('Error in addUpdates:', error);
+        throw error;
+    }
 };
 
-// Actualiza un usuario existente
-export const updateUser = (userData) => {
-    return API.put('/user', userData); // Enviar los datos del usuario en el cuerpo de la solicitud
+export const editUpdate = async (updateId, updateData) => {
+    try {
+        const headers = await getAuthHeaders();
+        const response = await API.put(`/update/${updateId}`, updateData, { headers });
+        return response.data;
+    } catch (error) {
+        console.error('Error in editUpdate:', error);
+        throw error;
+    }
 };
 
-// Actualiza el saldo del usuario
-export const updateUserBalance = (balanceData) => {
-    return API.put('/updateUserBalance', balanceData); 
+export const updateProject = async (projectData) => {
+    try {
+        const headers = await getAuthHeaders();
+        return await API.put('/updateProject', projectData, { headers });
+    } catch (error) {
+        console.error('Error updating project:', error);
+        throw error;
+    }
 };
 
-export const getProjectInvestors = (projectId) => {
-    return API.get(`/projects/${projectId}/investors`); // Llamada GET al endpoint de inversores
+export const updateUser = (userData) => API.put('/user', userData);
+export const updateUserBalance = (balanceData) => API.put('/updateUserBalance', balanceData);
+
+export const activateOrDeactivate = (projectId, state) => 
+    API.put(`/activateOrDeactivateProject/${projectId}`, { state });
+
+export const withdrawFunds = async (projectId) => {
+    try {
+        const headers = await getAuthHeaders();
+        const response = await API.post(`/withdraw/${projectId}`, null, { headers });
+        return response.data;
+    } catch (error) {
+        console.error('Error withdrawing funds:', error);
+        throw error;
+    }
 };
 
+export const login = (data) => 
+    API.post('/login', data)
+        .then(response => {
+            AsyncStorage.setItem('user', JSON.stringify(response.data));
+            return response.data;
+        })
+        .catch(error => {
+            console.error('Error in login:', error.response);
+            throw error;
+        });
 
-// Actualiza el estado de un proyecto
-export const activateOrReject = (projectId, state) => {
-    return API.put(`/activateOrRejectProject/${projectId}`, { state });
-};
+export const register = (data) => 
+    API.post('/register', data)
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error in register:', error.response);
+            throw error;
+        });
 
-export const deleteUpdate = (id) => {
-    return API.delete(`/update/${id}`);
-};
-
-// Edita una actualización existente
-export const editUpdate = (updateId, updateData) => {
-    return API.put(`/update/${updateId}`, updateData); // Se envían los datos de la actualización
-};
+export const logout = (token) => 
+    API.post('/logout', {}, { headers: { Authorization: `Bearer ${token}` } })
+        .then(response => response.data)
+        .catch(error => {
+            console.error('Error in logout:', error.response);
+            throw error;
+        });

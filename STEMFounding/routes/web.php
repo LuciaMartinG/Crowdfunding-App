@@ -80,7 +80,7 @@ Route::get('/', function () {
    
     Route::post('/project/update', function (Request $request) {
         $project = app(ProjectController::class)->updateProject($request);
-        return redirect('/project/detail/1');
+        return redirect()->route('user.projects');
     })->middleware('auth','role:entrepreneur');
 
     
@@ -105,9 +105,9 @@ Route::get('/', function () {
         return redirect('/user/projects');
     });
 
-    // Ruta para actualizar el estado del proyecto, solo accesible para administradores
+    // Ruta para activar o RECHAZAR un proyecto, solo accesible para administradores
     Route::post('/projects/{id}/updateState', [ProjectController::class, 'activateOrRejectProject'])
-    ->middleware(['auth', 'role:admin']);  // Asegura que el usuario esté autenticado y sea admin
+    ->middleware(['auth', 'role:admin']);  // Asegura que el usuario esté autenticado y sea admin  ->>>>>>> comprobar en REACT
 
  
     /*
@@ -176,7 +176,8 @@ Route::get('/', function () {
 
    
     Route::get('/user/projects', [ProjectController::class, 'showUserProjects'])->middleware('auth')->name('user.projects');
-    
+
+
    // Ruta para añadir actualizaciones
    Route::post('/projects/{projectId}/comments', function (Request $request, $projectId) {
     $response = app(ProjectController::class)->addUpdates($request, $projectId);
@@ -241,4 +242,14 @@ Route::get('/', function () {
         ]);
     })->middleware(['auth', 'role:entrepreneur'])
       ->name('projects.investors');
+    
+
+    // Ruta para retirar fondos del proyecto, solo accesible si el usuario está autenticado
+    Route::post('/projects/{projectId}/withdraw', function (Request $request, $projectId) {
+        $response = app(ProjectController::class)->withdrawFunds($projectId);
+        return redirect()->route('user.projects')
+            ->with($response->type, $response->message);
+    })->middleware('auth', 'role:entrepreneur')
+      ->name('projects.withdrawFunds');
+    
     

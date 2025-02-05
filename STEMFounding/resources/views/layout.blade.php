@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title')</title>
     <!-- Scripts -->
-    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+    @vite(['resources/sass/app.scss', 'resources/js/app.js', 'resources/css/styles.css' ])
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
 </head>
 <body class="d-flex flex-column min-vh-100">
@@ -13,7 +13,7 @@
     <header class="bg-secondary text-white py-3">
         <nav class="navbar navbar-expand-lg bg-secondary container">
             <!-- Brand -->
-            <a class="navbar-brand text-white" href="/">STEMFounding</a>
+            <a class="navbar-brand text-white ms-3" href="/">STEMFounding</a>
 
             <!-- Toggler -->
             <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -75,7 +75,7 @@
     </header>
 
     <!-- Main Content -->
-    <main>
+    <main class="mt-5"> <!-- Aquí agregamos un margen superior -->
         @yield('content')
     </main>
 

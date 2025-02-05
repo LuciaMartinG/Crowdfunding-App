@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Project;
 use App\Models\Investment;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 
 class InvestmentController extends Controller
@@ -125,30 +127,6 @@ class InvestmentController extends Controller
     }
     
 
-    // public function showInvestors($projectId)
-    // {
-    //     // Obtener el proyecto por su ID
-    //     $project = Project::findOrFail($projectId);
-    
-    //     // Obtener todos los inversores que han invertido en este proyecto
-    //     $investors = $project->investments()
-    //                         ->with('user')  // Obtener la información del usuario (inversor)
-    //                         ->get();  // Obtener todas las inversiones
-    
-    //     // Mapear los inversores y sus cantidades invertidas en objetos PHP normales
-    //     $investorsWithAmount = $investors->map(function ($investment) {
-    //         return (object)[
-    //             'user' => $investment->user->name,  // Nombre del inversor
-    //             'investment_amount' => $investment->investment_amount,  // Cantidad invertida
-    //         ];
-    //     });
-    
-    //     // Devolver un objeto PHP normal con los datos (sin vista ni JSON)
-    //     return response()->json([
-    //         'project' => $project,  // Proyecto con sus datos
-    //         'investors' => $investorsWithAmount,  // Inversores y sus inversiones
-    //     ]);
-    // }
     
     public function showInvestors($projectId)
     {
@@ -177,6 +155,33 @@ class InvestmentController extends Controller
             'investors' => $investorsWithAmount,  // Inversores y sus inversiones
         ];
     }
+
+    public function processRefunds()
+{
+   
+    $projects = Project::where('limit_date', '<', now())
+                       ->whereColumn('current_investment', '<', 'min_investment')
+                       ->get();
+
+    foreach ($projects as $project) {
+        DB::transaction(function () use ($project) {
+            $investments = Investment::where('project_id', $project->id)->get();
+
+            foreach ($investments as $investment) {
+                $user = User::find($investment->user_id);
+                $user->balance += $investment->investment_amount;
+                $user->save();
+
+                $investment->delete();
+            }
+            $project->state = 'inactive';
+            $project->current_investment = 0;
+            $project->save();
+        });
+    }
+
+    return response()->json(['message' => 'Reembolsos procesados correctamente.']);
+}
     
     
     

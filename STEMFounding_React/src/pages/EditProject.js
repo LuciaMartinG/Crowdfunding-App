@@ -8,7 +8,7 @@ const EditProject = ({ route }) => {
     const navigation = useNavigation(); // Hook para navegar después de editar el proyecto
     // const route = useRoute(); // Obtener parámetros pasados a la pantalla
 
-    const projectId = route.params.projectId; // Asegúrate de recibir `projectId`
+    const projectId = route.params.projectId; 
 
     // Estado para los campos del formulario
     const [title, setTitle] = useState('');
@@ -21,7 +21,7 @@ const EditProject = ({ route }) => {
     const fetchProjectData = async () => {
         try {
 
-            const response = await getProjectById(projectId); // Debes definir esta función en tu servicio
+            const response = await getProjectById(projectId); 
             const project = response.data;
 
             setTitle(project.title);

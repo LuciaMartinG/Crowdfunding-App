@@ -12,7 +12,7 @@
         <div class="row">
             @foreach($projects as $project)
                 <div class="col-12 col-md-6 col-lg-4 mb-4">
-                    <div class="card">
+                    <div class="card shadow">
                         <!-- Imagen del proyecto -->
                         <img src="https://imgs.search.brave.com/5BFgigCdSRNQjIo1mp9FL0jaX6J6Rt4HdCPn3cfsvjQ/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9mcmFt/ZXJ1c2VyY29udGVu/dC5jb20vaW1hZ2Vz/L3JpNWp4ellReFBD/SHVyWmdYZU9scmVj/RWdkVS5wbmc" 
                              class="card-img-top img-fluid" alt="{{ $project->title }}">

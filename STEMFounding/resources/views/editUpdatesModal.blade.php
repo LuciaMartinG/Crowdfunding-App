@@ -12,22 +12,22 @@
                     @csrf
                     @method('PUT') <!-- Cambiar a PUT para actualización -->
 
-                    <div class="form-group">
+                    <div class="form-group mb-3">
                         <label for="title">Title</label>
-                        <input type="text" name="title" class="form-control" value="{{ old('title', $update->title) }}">
+                        <input type="text" name="title" class="form-control bg-light border-secondary" value="{{ old('title', $update->title) }}">
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group mb-3">
                         <label for="description">Description</label>
-                        <textarea name="description" class="form-control">{{ old('description', $update->description) }}</textarea>
+                        <textarea name="description" class="form-control bg-light border-secondary">{{ old('description', $update->description) }}</textarea>
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group mb-3">
                         <label for="image_url">Image URL</label>
-                        <input type="url" name="image_url" class="form-control" value="{{ old('image_url', $update->image_url) }}">
+                        <input type="url" name="image_url" class="form-control bg-light border-secondary" value="{{ old('image_url', $update->image_url) }}">
                     </div>
 
-                    <button type="submit" class="btn btn-primary mt-3">Update</button>
+                    <button type="submit" class="btn btn-secondary mt-3">Update</button>
                 </form>
             </div>
         </div>

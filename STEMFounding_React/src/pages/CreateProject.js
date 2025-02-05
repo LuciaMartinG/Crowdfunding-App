@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
-import { postInsertProject } from '../services/projectService'; // Asegúrate de que postInsertProject esté bien importado
-import { useNavigation } from '@react-navigation/native'; // Para navegar después de la creación
+import { postInsertProject } from '../services/projectService';
+import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const CreateProject = () => {
-    // Establecer el estado para los campos del formulario
-    // const [userId, setUserId] = useState('');
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [imageUrl, setImageUrl] = useState('');
@@ -13,32 +12,35 @@ const CreateProject = () => {
     const [minInvestment, setMinInvestment] = useState('');
     const [maxInvestment, setMaxInvestment] = useState('');
     const [limitDate, setLimitDate] = useState('');
-    // const [currentInvestment, setCurrentInvestment] = useState('');
+    const [token, setToken] = useState(null);
 
-    const navigation = useNavigation(); // Hook para navegar después de crear el proyecto
+    const navigation = useNavigation();
 
-    // Función para manejar el envío del formulario
+    useEffect(() => {
+        const fetchToken = async () => {
+            try {
+                const userString = await AsyncStorage.getItem('user');
+                const user = JSON.parse(userString);
+                if (user && user.access_token) {
+                    setToken(user.access_token);
+                } else {
+                    Alert.alert('Error', 'User not authenticated.');
+                }
+            } catch (error) {
+                console.error('Error retrieving token:', error);
+            }
+        };
+        fetchToken();
+    }, []);
+
     const handleSubmit = async () => {
-        // Verificar si todos los campos están completos
-        if (
-            // !userId ||
-            !title || 
-            !description || 
-            !imageUrl || 
-            !videoUrl || 
-            !minInvestment || 
-            !maxInvestment || 
-            !limitDate
-            // !currentInvestment
-        ) {
+        if (!title || !description || !imageUrl || !videoUrl || !minInvestment || !maxInvestment || !limitDate) {
             Alert.alert('Error', 'Please fill out all fields.');
             return;
         }
 
         try {
-            // Preparar los datos del proyecto
             const projectData = {
-                // userId: userId,
                 title,
                 description,
                 image_url: imageUrl,
@@ -46,18 +48,16 @@ const CreateProject = () => {
                 min_investment: parseFloat(minInvestment),
                 max_investment: parseFloat(maxInvestment),
                 limit_date: limitDate
-                // current_investment: parseFloat(currentInvestment)
             };
-            console.log(projectData);
+            
+            console.log('Sending project data:', projectData);
 
+            const response = await postInsertProject(projectData, token);
+            console.log(response);
 
-            // Llamar a la función postInsertProject desde projectService
-            const response = await postInsertProject(projectData);
-console.log(response);
-            // Si la respuesta es exitosa, navegar a la pantalla de Projects
             if (response.status === 201 || response.status === 200) {
                 Alert.alert('Success', 'Project created successfully!');
-                navigation.navigate('Projects'); // Cambia 'Projects' por el nombre correcto de la pantalla de proyectos
+                navigation.navigate('Projects');
             } else {
                 Alert.alert('Error', 'Failed to create project.');
             }
@@ -66,6 +66,7 @@ console.log(response);
             Alert.alert('Error', 'Something went wrong. Please try again.');
         }
     };
+
 
     return (
         <View style={styles.container}>
