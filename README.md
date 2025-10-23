@@ -78,15 +78,6 @@ Open in your local environment: [http://localhost:8000](http://localhost:8000)
 
 > Update these credentials according to your seeders.
 
----
-
-### 📫 Contact
-
-Feel free to reach out or connect with me:
-
-- ✉️  [Send me an email](mailto:lmguijarro92@gmail.com) 
-
-- <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/linkedin.svg" alt="LinkedIn" width="20"/> [Visit my LinkedIn](https://www.linkedin.com/in/lucia-martin-guijarro)  
 
 ---
 
@@ -164,12 +155,10 @@ Abre en tu entorno local: [http://localhost:8000](http://localhost:8000)
 
 ---
 
-### 📫 Contacto
 
-- ✉️  [Envíame un email](mailto:lmguijarro92@gmail.com) 
+### 📫 Let's Connect!
 
-- <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/linkedin.svg" alt="LinkedIn" width="20"/> [Visita mi LinkedIn](https://www.linkedin.com/in/lucia-martin-guijarro)  
-
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/lucía-martín-guijarro-697ab792)  [![Email](https://img.shields.io/badge/Email-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:lmguijarro92@gmail.com)
 
 
 
