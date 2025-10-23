@@ -1,4 +1,4 @@
-# 🌟 STEMFounding – Full-Stack Web Application
+# 🚀 STEMFounding – Web Platform for Entrepreneurs & Investors
 
 ---
 
